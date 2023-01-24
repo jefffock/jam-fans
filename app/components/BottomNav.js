@@ -1,12 +1,8 @@
 import { Link } from '@remix-run/react';
-import type { MaybeSession, TypedSupabaseClient } from '~/routes/__supabase';
 
 export default function BottomNav({
 	supabase,
 	session,
-}: {
-	supabase: TypedSupabaseClient;
-	session: MaybeSession;
 }) {
 	return (
 		<section

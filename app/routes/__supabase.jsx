@@ -3,30 +3,20 @@ import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { useEffect, useState } from 'react';
 import { createServerClient } from 'utils/supabase.server';
-import TopNav from 'components/TopNav';
-import type { SupabaseClient, Session } from '@supabase/auth-helpers-remix';
-import type { LoaderArgs } from '@remix-run/node';
-import BottomNav from 'components/BottomNav';
-
-export type TypedSupabaseClient = SupabaseClient;
-export type MaybeSession = Session | null;
-
-export type SupabaseContext = {
-  supabase: TypedSupabaseClient;
-  session: MaybeSession;
-};
+import TopNav from 'app/components/TopNav';
+import BottomNav from 'app/components/BottomNav';
 
 // this uses Pathless Layout Routes [1] to wrap up all our Supabase logic
 
 // [1] https://remix.run/docs/en/v1/guides/routing#pathless-layout-routes
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }) => {
   // environment variables may be stored somewhere other than
   // `process.env` in runtimes other than node
   // we need to pipe these Supabase environment variables to the browser
   const env = {
-    SUPABASE_URL: process.env.SUPABASE_URL!,
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
   };
 
   // We can retrieve the session on the server and hand it to the client.
@@ -53,7 +43,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export default function Supabase() {
-  const { env, session } = useLoaderData<typeof loader>();
+  const { env, session } = useLoaderData();
   const fetcher = useFetcher();
 
   // it is important to create a single instance of Supabase

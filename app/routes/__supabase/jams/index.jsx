@@ -1,7 +1,8 @@
 import { Outlet, useLoaderData } from '@remix-run/react';
-import ArtistBar from '../ArtistBar'
+import ArtistBar from '../../../components/ArtistBar'
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { json } from '@remix-run/node';
+import JamCard from '../../../components/cards/JamCard';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -46,6 +47,14 @@ export default function JamsHome({
 		<div>
       <h1>at /jams</h1>
       <ArtistBar artists={artists}/>
+      <div>
+        {versions.map((version, index) => {
+          return (
+            <JamCard key={index} jam={version} />
+          );
+        }
+        )}
+      </div>
 		</div>
 	);
 }

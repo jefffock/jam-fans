@@ -2,8 +2,8 @@ import { Link, Outlet } from '@remix-run/react';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { useLoaderData } from '@remix-run/react';
 import { json } from '@remix-run/node';
-import ArtistBar from './ArtistBar';
-import JamCard from './JamCard';
+import ArtistBar from '../../components/ArtistBar';
+import JamCard from '../../components/cards/JamCard';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();

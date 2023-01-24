@@ -4,9 +4,9 @@ import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { Link, useLoaderData } from '@remix-run/react';
 import { useParams } from '@remix-run/react';
 import { useOutletContext } from '@remix-run/react';
-import { json } from '@remix-run/node' // change this import to whatever runtime you are using
+import { json } from '@remix-run/node' 
 import { createServerClient } from '@supabase/auth-helpers-remix'
-import JamCard from 'app/routes/__supabase/JamCard';
+import JamCard from 'app/components/cards/JamCard';
 
 export const loader = async ({ request, params }) => {
   const response = new Response()
