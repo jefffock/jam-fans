@@ -13,7 +13,6 @@ export default function JamsHome({
 		<div>
       <h1>Lists Layout</h1>
 			<Outlet context={{ supabase, session }}/>
-			<button>Add Jam</button>
 		</div>
 	);
 }

@@ -1,13 +1,12 @@
 import { json } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import { createBrowserClient } from '@supabase/auth-helpers-remix';
-// import Login from 'components/login';
-// import Nav from 'components/nav';
 import { useEffect, useState } from 'react';
 import { createServerClient } from 'utils/supabase.server';
-
+import TopNav from 'components/TopNav';
 import type { SupabaseClient, Session } from '@supabase/auth-helpers-remix';
 import type { LoaderArgs } from '@remix-run/node';
+import BottomNav from 'components/BottomNav';
 
 export type TypedSupabaseClient = SupabaseClient;
 export type MaybeSession = Session | null;
@@ -88,8 +87,9 @@ export default function Supabase() {
     <>
       {/* <Login supabase={supabase} session={session} />
       <Nav /> */}
-      <h1>Universal Layout</h1>
+      <TopNav supabase={supabase} session={session}/>
       <Outlet context={{ supabase, session }} />
+      <BottomNav supabase={supabase} session={session}/>
     </>
   );
 }

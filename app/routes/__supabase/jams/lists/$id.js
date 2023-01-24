@@ -6,21 +6,17 @@ import { useParams } from '@remix-run/react';
 import { useOutletContext } from '@remix-run/react';
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
+import JamCard from 'app/routes/__supabase/JamCard';
 
-import type { LoaderArgs } from '@remix-run/node' // change this import to whatever runtime you are using
-
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }) => {
   const response = new Response()
   const supabaseClient = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
     { request, response }
   )
-  console.log('PARAMS', params)
 
   const { data } = await supabaseClient.from('jams_lists').select('*').eq('id', params.id).single()
-  console.log('data in loader', data)
-  console.log('parsed params', JSON.parse(data.params))
   const listParams = JSON.parse(data.params);
 		const url = data.query;
 		const artist = listParams?.artist;
@@ -49,7 +45,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 			jams = jams.lte('date', before);
 		}
 		if (tags) {
-			tags.forEach((tag: any) => {
+			tags.forEach((tag) => {
 				jams = jams.eq(tag, true);
 			});
 		}
@@ -65,7 +61,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 		}
 		jams = jams.limit(limit);
     const { data: jamsData, error } = await jams;
-    console.log('jamsData', jamsData)
   return json(
     { jamsData },
     {
@@ -76,18 +71,21 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 export default function JamList() {
 
-  const { jamsData } = useLoaderData<typeof loader>()
-	const params = useParams();
-
+  const { jamsData } = useLoaderData()
 
 	if (!jamsData) {
-		return <div>no list yet</div>;
+		return <div>Loading jams</div>;
 	}
 	return (
 		<main className='mx-auto max-w-4xl'>
-			<p className='my-6 border-b-2 text-center text-3xl'>
-				Some Post: {JSON.stringify(jamsData, 0, 2)}
-			</p>
+			<div>
+        {jamsData.map((jam, index) => {
+          return (
+          <JamCard jam={jam} key={index} />
+          )
+        })
+        }
+			</div>
 		</main>
 	);
 }
