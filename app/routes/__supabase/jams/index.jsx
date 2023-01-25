@@ -2,7 +2,7 @@ import { Outlet, useLoaderData } from '@remix-run/react';
 import ArtistBar from '../../../components/ArtistBar'
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { json } from '@remix-run/node';
-import JamCard from '../../../components/cards/JamCard';
+import JamList from '../../../components/JamList';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -12,7 +12,7 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 	//get artists
-	const { data: artists } = await supabaseClient
+	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('nickname, emoji_code')
 		.order('name_for_order', { ascending: true })
@@ -23,13 +23,12 @@ export const loader = async ({ request, params }) => {
 		.order('avg_rating', { ascending: false })
 		.limit(100);
 	//get songs
-	const { data: songs } = await supabaseClient.from('songs').select('*');
-	artists.unshift({ nickname: 'Grateful Dead', emoji_code: '0x1F480' });
-	artists.unshift({ nickname: 'Phish', emoji_code: '0x1F41F' });
-	console.log('artists', artists);
+	const { data: songs } = await supabaseClient.from('songs').select('song, artist');
+  const { data: sounds } = await supabaseClient.from('sounds').select('*');
+  artists = [{ nickname: 'All Bands', emoji_code: '0x221E' }, { nickname: 'Phish', emoji_code: '0x1F41F' }, { nickname: 'Grateful Dead', emoji_code: '0x1F480' }].concat(artists)
 
 	return json(
-		{ artists, songs, versions },
+		{ artists, songs, versions, sounds },
 		{
 			headers: response.headers,
 		}
@@ -40,21 +39,14 @@ export default function JamsHome({
   supabase,
   session,
 }) {
-  const { artists, songs, versions } = useLoaderData();
+  const { artists, songs, versions, sounds } = useLoaderData();
   if (!artists) return <div>Loading...</div>;
 
 	return (
 		<div>
       <h1>at /jams</h1>
       <ArtistBar artists={artists}/>
-      <div>
-        {versions.map((version, index) => {
-          return (
-            <JamCard key={index} jam={version} />
-          );
-        }
-        )}
-      </div>
+      <JamList jams={versions} />
 		</div>
 	);
 }

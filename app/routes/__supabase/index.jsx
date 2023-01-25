@@ -3,7 +3,8 @@ import { createServerClient } from '@supabase/auth-helpers-remix';
 import { useLoaderData } from '@remix-run/react';
 import { json } from '@remix-run/node';
 import ArtistBar from '../../components/ArtistBar';
-import JamCard from '../../components/cards/JamCard';
+import JamList from '../../components/JamList';
+import JamFilters from '../../components/JamFilters';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -13,9 +14,9 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 	//get artists
-	const { data: artists } = await supabaseClient
+	let { data: artists } = await supabaseClient
 		.from('artists')
-		.select('nickname, emoji_code')
+		.select('nickname, emoji_code, url, artist')
 		.order('name_for_order', { ascending: true })
 	//get base versions
 	const { data: versions } = await supabaseClient
@@ -24,13 +25,12 @@ export const loader = async ({ request, params }) => {
 		.order('avg_rating', { ascending: false })
 		.limit(100);
 	//get songs
-	const { data: songs } = await supabaseClient.from('songs').select('*');
-	artists.unshift({ nickname: 'Grateful Dead', emoji_code: '0x1F480' });
-	artists.unshift({ nickname: 'Phish', emoji_code: '0x1F41F' });
-	console.log('artists', artists);
+	const { data: songs } = await supabaseClient.from('songs').select('song, artist').order('song', { ascending: true });
+  const { data: sounds } = await supabaseClient.from('sounds').select('*');
+	artists = [{ nickname: 'All Bands', emoji_code: '0x221E', url: null, artist: 'All Bands' }, { nickname: 'Phish', emoji_code: '0x1F41F', url: 'phish', artist: 'Phish' }, { nickname: 'Grateful Dead', emoji_code: '0x1F480', url: 'grateful-dead', artist: 'Grateful Dead' }].concat(artists)
 
 	return json(
-		{ artists, songs, versions },
+		{ artists, songs, versions, sounds },
 		{
 			headers: response.headers,
 		}
@@ -38,22 +38,15 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, versions } = useLoaderData();
+	const { artists, songs, versions, sounds } = useLoaderData();
   if (!artists) return <div>Loading...</div>;
+  console.log('songs', songs)
 
 	return (
 		<div>
-			<h1>General Home/Landing Page</h1>
-			<p>artists</p>
       <ArtistBar artists={artists} />
-      <div>
-        {versions.map((version, index) => {
-          return (
-            <JamCard key={index} jam={version} />
-          );
-        }
-        )}
-      </div>
+      <JamFilters sounds={sounds} artists={artists} songs={songs}/>
+      <JamList jams={versions} />
 		</div>
 	);
 }
