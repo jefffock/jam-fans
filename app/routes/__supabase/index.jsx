@@ -5,6 +5,10 @@ import { json } from '@remix-run/node';
 import ArtistBar from '../../components/ArtistBar';
 import JamList from '../../components/JamList';
 import JamFilters from '../../components/JamFilters';
+import JamFiltersSlideout from '../../components/JamFilters';
+import { useState } from 'react';
+import FiltersButton from '../../components/FiltersButton';
+import JamsHome from '../../components/JamsHome';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -39,14 +43,12 @@ export const loader = async ({ request, params }) => {
 
 export default function Index({ supabase, session }) {
 	const { artists, songs, versions, sounds } = useLoaderData();
+  const [open, setOpen] = useState(false);
   if (!artists) return <div>Loading...</div>;
-  console.log('songs', songs)
 
 	return (
 		<div>
-      <ArtistBar artists={artists} />
-      <JamFilters sounds={sounds} artists={artists} songs={songs}/>
-      <JamList jams={versions} />
+      <JamsHome supabase={supabase} session={session} artists={artists}  songs={songs} versions={versions} sounds={sounds} open={open} setOpen={setOpen} />
 		</div>
 	);
 }

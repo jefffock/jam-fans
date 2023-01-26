@@ -18,7 +18,7 @@ function classNames(...classes) {
 }
 
 export default function Example() {
-  const [selected, setSelected] = useState(limits[3])
+  const [selectedLimit, setSelectedLimit] = useState(limits[3])
 
   return (
     <Listbox value={selected} onChange={setSelected}>
