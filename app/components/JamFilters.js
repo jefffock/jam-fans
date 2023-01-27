@@ -130,7 +130,7 @@ export default function JamFiltersSlideout({
 																					>
 																						<div className='min-w-0 flex-1 text-sm'>
 																							<label
-																								htmlFor={`sound-${sound.text}`}
+																								htmlFor={`${sound.text}`}
 																								className='select-none font-medium text-gray-700 mx-2'
 																							>
 																								{sound.label}
@@ -138,8 +138,9 @@ export default function JamFiltersSlideout({
 																						</div>
 																						<div className='ml-3 flex h-5 items-center'>
 																							<input
-																								id={`sound-${sound.text}`}
-																								name={`sound-${sound.text}`}
+																								value={`${sound.text}`}
+                                                id={`${sound.text}`}
+																								name={`sounds-${sound.text}`}
 																								type='checkbox'
 																								className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
 																							/>
@@ -160,23 +161,24 @@ export default function JamFiltersSlideout({
 																	</legend>
 																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll'>
 																		{artists &&
-																			artists?.map((band, bandIdx) => (
+																			artists?.map((artist, artistIdx) => (
 																				<div
-																					key={bandIdx}
+																					key={artistIdx}
 																					className='relative flex items-start py-4'
 																				>
-																					<div className='min-w-0 flex-1 text-sm'>
+																					<div className='min-w-0 flex-1 text-sm '>
 																						<label
-																							htmlFor={`band-${band.artist}`}
-																							className='select-none font-medium text-gray-700 mx-2'
+																							htmlFor={`${artist.artist}`}
+																							className='select-none font-medium text-gray-700 mx-2 whitespace-normal'
 																						>
-																							{band.artist}
+																							{artist.artist}
 																						</label>
 																					</div>
 																					<div className='ml-3 flex h-5 items-center'>
 																						<input
-																							id={`band-${band.url}`}
-																							name={`band-${band.url}`}
+																							id={`${artist.url}`}
+                                              value={`${artist.url}`}
+																							name={`artists-${artist.url}`}
 																							type='checkbox'
 																							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
 																						/>
@@ -582,7 +584,7 @@ export default function JamFiltersSlideout({
 																		</label>
 																		<p
 																			id='show-ratings-description'
-																			className='text-gray-500 pb-10'
+																			className='text-gray-500 pb-16'
 																		>
 																			Show jam ratings on the cards.
 																		</p>
@@ -596,6 +598,7 @@ export default function JamFiltersSlideout({
 													<button
 														type='submit'
 														className='ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+                            onClick={() => setOpen(false)}
 													>
 														See Jams
 													</button>

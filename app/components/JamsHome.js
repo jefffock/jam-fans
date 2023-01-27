@@ -4,7 +4,7 @@ import ArtistBar from './ArtistBar';
 import FiltersButton from './FiltersButton';
 import JamList from './JamList';
 
-export default function JamsHome({ supabase, session, artists, songs, versions, sounds, open, setOpen }) {
+export default function JamsHome({ supabase, session, artists, songs, versions, sounds, open, setOpen, title, subtitle }) {
   if (!artists) return <div>Loading...</div>;
 
 	return (
@@ -14,7 +14,7 @@ export default function JamsHome({ supabase, session, artists, songs, versions, 
       </div>
       <ArtistBar artists={artists} />
       <JamFiltersSlideout sounds={sounds} artists={artists} songs={songs} open={open} setOpen={setOpen}/>
-      <JamList jams={versions} />
+      <JamList jams={versions} sounds={sounds} title={title} subtitle={subtitle}/>
 		</div>
 	);
 }

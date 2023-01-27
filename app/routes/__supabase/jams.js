@@ -7,9 +7,6 @@ export default function JamsHome({
 
 	return (
 		<div>
-      <h1>Jams</h1>
-      <h2>Artist Horizontal Scroll</h2>
-      <button>Filters</button>
 			<Outlet context={{ supabase, session }}/>
 		</div>
 	);
