@@ -9,7 +9,7 @@ export default function JamsHome({ supabase, session, artists, songs, versions, 
 
 	return (
 		<div>
-      <div className='flex justify-end p-4'>
+      <div className='flex justify-end'>
         <FiltersButton open={open} setOpen={setOpen} />
       </div>
       <ArtistBar artists={artists} />

@@ -112,12 +112,12 @@ export const loader = async ({ request, params }) => {
 		jams = jams.not('listen_link', 'is', null);
 	}
 	jams = jams.order(orderBy, { ascending: asc });
-	if (orderBy === 'avg_rating') {
-		jams = jams.order('num_ratings', { ascending: false });
-	}
-	if (orderBy === 'num_ratings') {
-		jams = jams.order('avg_rating', { ascending: false });
-	}
+		if (orderBy === 'avg_rating') {
+			jams = jams.order('num_ratings', { ascending: false });
+		}
+		if (orderBy === 'num_ratings') {
+			jams = jams.order('avg_rating', { ascending: false });
+		}
 	// if (orderBy === 'avg_rating') {
 	// 	jams = jams.order('num_ratings', { ascending: false });
 	// }
@@ -160,6 +160,7 @@ export const loader = async ({ request, params }) => {
 		soundsInQuery.forEach((sound) => {
 			title += sounds.find((s) => s.text === sound).label + ', ';
 		});
+    title = title.slice(0, -2);
 		//remove last two characters
 	}
 	if (song) {
