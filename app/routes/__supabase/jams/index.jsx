@@ -112,6 +112,12 @@ export const loader = async ({ request, params }) => {
 		jams = jams.not('listen_link', 'is', null);
 	}
 	jams = jams.order(orderBy, { ascending: asc });
+	if (orderBy === 'avg_rating') {
+		jams = jams.order('num_ratings', { ascending: false });
+	}
+	if (orderBy === 'num_ratings') {
+		jams = jams.order('avg_rating', { ascending: false });
+	}
 	// if (orderBy === 'avg_rating') {
 	// 	jams = jams.order('num_ratings', { ascending: false });
 	// }

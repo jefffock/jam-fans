@@ -6,13 +6,12 @@ export default function ArtistBar({ artists }) {
   const fetcher = useFetcher()
 
   function handleArtistClick(artist) {
-    console.log('artist', artist);
-
 
   }
+
   return (
     <div className="flex h-30 w-screen overflow-x-scroll space-x-10 items-starts justify-items-center px-2">
-      {artists.map((artist, index) => {
+      {artists?.map((artist, index) => {
         let url = `/jams?artists-${artist.url}=${artist.url}`
         return (
           <div key={index} className='text-center min-w-40 mb-2'>

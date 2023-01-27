@@ -1,7 +1,7 @@
 import SongPicker from './SongPicker';
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import SoundPicker from './SoundPicker';
-import { Form, useSubmit } from '@remix-run/react';
+import { Form, useSubmit, useFetcher } from '@remix-run/react';
 import YearFilter from './YearFilter';
 import LimitPicker from './LimitPicker';
 import CheckboxList from './CheckboxList';
@@ -37,6 +37,7 @@ export default function JamFiltersSlideout({
 	const [afterYearSelected, setAfterYearSelected] = useState(null);
 	const [limitSelected, setLimitSelected] = useState(limits[3]);
 	const submit = useSubmit();
+	const fetcher = useFetcher();
 
 	const dates = [];
 	let currentYear = new Date().getFullYear();
@@ -58,6 +59,32 @@ export default function JamFiltersSlideout({
 	const afterYearDisplayValue = afterYearSelected
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after';
+
+	function handleFilterChange(e) {
+		const inputs = document.querySelectorAll('input, form select');
+		inputs.forEach((input) =>
+			input.addEventListener('change', createQueryString)
+		);
+		function createQueryString(e) {
+			console.log('in create query string');
+			console.log('e target value', e?.target?.value);
+			let queryString = '/jamscount?';
+			inputs.forEach((input) => {
+				if (
+					(input.type === 'checkbox' && input.checked) ||
+					input.type !== 'checkbox'
+				) {
+					console.log('input', input);
+					queryString += `${input.name}=${input.value || input.id}&`;
+				}
+			});
+			queryString = queryString.slice(0, -1);
+			console.log('querystring', queryString);
+			fetcher.load(queryString);
+		}
+	}
+
+	const count = fetcher.data?.count;
 
 	return (
 		<Transition.Root
@@ -110,6 +137,7 @@ export default function JamFiltersSlideout({
 											<Form
 												action='/jams'
 												className='space-y-8 divide-y divide-gray-200'
+												id='jam-filter-form'
 											>
 												<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 													<div className='space-y-8 divide-y divide-gray-200'>
@@ -139,10 +167,11 @@ export default function JamFiltersSlideout({
 																						<div className='ml-3 flex h-5 items-center'>
 																							<input
 																								value={`${sound.text}`}
-                                                id={`${sound.text}`}
+																								id={`${sound.text}`}
 																								name={`sounds-${sound.text}`}
 																								type='checkbox'
 																								className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																								onChange={handleFilterChange}
 																							/>
 																						</div>
 																					</div>
@@ -177,10 +206,11 @@ export default function JamFiltersSlideout({
 																					<div className='ml-3 flex h-5 items-center'>
 																						<input
 																							id={`${artist.url}`}
-                                              value={`${artist.url}`}
+																							value={`${artist.url}`}
 																							name={`artists-${artist.url}`}
 																							type='checkbox'
 																							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																							onChange={handleFilterChange}
 																						/>
 																					</div>
 																				</div>
@@ -203,9 +233,10 @@ export default function JamFiltersSlideout({
 																<div className='relative mt-1 px-30'>
 																	<Combobox.Input
 																		className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
-																		onChange={(event) =>
-																			setQuery(event.target.value)
-																		}
+																		onChange={(event) => {
+																			setQuery(event.target.value);
+																			handleFilterChange();
+																		}}
 																		displayValue={(song) => song}
 																	/>
 																	<Combobox.Button className='absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none'>
@@ -274,7 +305,10 @@ export default function JamFiltersSlideout({
 														<div className='p-4'>
 															<Listbox
 																value={beforeYearSelected}
-																onChange={setBeforeYearSelected}
+																onChange={(e) => {
+																	setBeforeYearSelected(e);
+																	handleFilterChange();
+																}}
 																className='max-w-sm'
 																name='before-year'
 															>
@@ -364,7 +398,10 @@ export default function JamFiltersSlideout({
 														<div className='p-4'>
 															<Listbox
 																value={afterYearSelected}
-																onChange={setAfterYearSelected}
+																onChange={(e) => {
+																	setAfterYearSelected(e);
+																	handleFilterChange();
+																}}
 																className='max-w-sm'
 																name='after-year'
 															>
@@ -547,6 +584,7 @@ export default function JamFiltersSlideout({
 																			name='show-links'
 																			type='checkbox'
 																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			onChange={handleFilterChange}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -573,6 +611,7 @@ export default function JamFiltersSlideout({
 																			name='show-ratings'
 																			type='checkbox'
 																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			onChange={handleFilterChange}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -598,9 +637,9 @@ export default function JamFiltersSlideout({
 													<button
 														type='submit'
 														className='ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                            onClick={() => setOpen(false)}
+														onClick={() => setOpen(false)}
 													>
-														See Jams
+														{count ? `See ${count} jams` : `See jams`}
 													</button>
 													<button
 														type='button'
