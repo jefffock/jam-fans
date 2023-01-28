@@ -36,6 +36,7 @@ export default function JamFiltersSlideout({
 	const submit = useSubmit();
 	const fetcher = useFetcher();
   const [params] = useSearchParams();
+  const [count, setCount] = useState(totalCount);
 
 	const dates = [];
 	let currentYear = new Date().getFullYear();
@@ -58,19 +59,22 @@ export default function JamFiltersSlideout({
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after';
 
-	function createQueryString() {
+	function createQueryString(e, song) {
+		let queryString = '/jamscount?';
 		const form = document.querySelector('#jam-filter-form');
 		const inputs = form?.querySelectorAll('input, select');
-		let queryString = '/jamscount?';
 		inputs.forEach((input) => {
 			if (
 				(input.type === 'checkbox' && input.checked) ||
-				(input.type !== 'checkbox' && input.value !== '')
+				(input.type !== 'checkbox' && input.value !== '' && input.name)
 			) {
 				console.log('input', input);
 				queryString += `${input.name}=${input.value || input.id}&`;
 			}
 		});
+    console.log('song', song)
+    if (song) queryString += `song=${song.song},`;
+    console.log('song.song', song?.song)
 		queryString = queryString?.slice(0, -1);
 		console.log('queryString', queryString);
 		if (queryString) fetcher.load(queryString);
@@ -86,14 +90,12 @@ export default function JamFiltersSlideout({
 				input.value = '';
 			}
 		});
-		count = totalCount;
+		setCount(totalCount)
 	}
 
-	let count = fetcher?.data?.count
-		? fetcher?.data?.count
-		: fetcher?.data?.count === 0
-		? 0
-		: totalCount;
+	useEffect(() => {
+    if (fetcher.data) setCount(fetcher.data.count);
+  }, [fetcher.data])
 
   useEffect(() => {
     console.log('url', url)
@@ -261,8 +263,9 @@ console.log(searchParams.get('artists-phish'));
 																as='div'
 																value={songSelected}
 																onChange={(e) => {
+                                  console.log('e', e);
 																	setSongSelected(e);
-																	createQueryString();
+																	createQueryString(e, {song: e});
 																}}
 																name='song'
 															>
