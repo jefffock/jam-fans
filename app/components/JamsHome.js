@@ -14,7 +14,6 @@ export default function JamsHome({
 	open,
 	setOpen,
 	title,
-	subtitle,
 	count,
 	search,
 }) {
@@ -42,7 +41,6 @@ export default function JamsHome({
 				jams={versions}
 				sounds={sounds}
 				title={title}
-				subtitle={subtitle}
 			/>
 		</div>
 	);

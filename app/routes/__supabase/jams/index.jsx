@@ -188,41 +188,8 @@ export const loader = async ({ request, params }) => {
 	if (afterDate && !beforeDate) {
 		title += ' from ' + afterDate + ' and after ';
 	}
-	let subtitle = '';
-	let newLimit = limit !== 'null' ? limit : 'All';
-	if (orderBy) {
-		switch (orderBy) {
-			case 'id':
-				subtitle += newLimit + ' recently added';
-				break;
-			case 'artist':
-				subtitle += newLimit !== 'All' ? 'First ' + newLimit : 'All';
-				subtitle += 'by artist name';
-				order === 'asc' ? (subtitle += ' (A-Z)') : (subtitle += ' (Z-A)');
-				break;
-			case 'song_name':
-				subtitle += newLimit !== 'All' ? 'First ' + newLimit : 'All';
-				subtitle += 'by song name';
-				order === 'asc' ? (subtitle += ' (A-Z)') : (subtitle += ' (Z-A)');
-				break;
-			case 'date':
-				if (order === 'asc') {
-					subtitle += newLimit + ' oldest';
-				} else {
-					subtitle += newLimit + ' newest';
-				}
-				break;
-			case 'avg_rating':
-				subtitle += newLimit + ' highest-rated';
-				break;
-			case 'num_ratings':
-				subtitle += newLimit + ' most-rated';
-				break;
-		}
-	}
 	title.trim();
-	subtitle.trim();
-	const fullTitle = title + ': ' + subtitle + ' on Jam Fans';
+	const fullTitle = title + ' on Jam Fans';
 
   let count = await supabaseClient
   .from('versions')
@@ -232,7 +199,7 @@ export const loader = async ({ request, params }) => {
   console.log('search', typeof search)
 
 	return json(
-		{ artists, songs, versions, sounds, fullTitle, title, subtitle, count, search },
+		{ artists, songs, versions, sounds, fullTitle, title, count, search },
 		{
 			headers: response.headers,
 		}
@@ -240,7 +207,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title, subtitle, count, search } =
+	const { artists, songs, versions, sounds, fullTitle, title,  count, search } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -257,7 +224,6 @@ export default function Jams({ supabase, session }) {
 			setOpen={setOpen}
 			fullTitle={fullTitle}
 			title={title}
-			subtitle={subtitle}
       count={count}
       search={search}
 		/>
