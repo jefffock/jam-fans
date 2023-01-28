@@ -21,6 +21,7 @@ export default function JamCard({ jam, sounds }) {
 		}
 	}
 	soundsString = soundsString.slice(0, -2);
+  const ratingToShow = (jam.avg_rating/2).toFixed(3).replace(/\.?0+$/,'')
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 relative'>
 			<a href='#'>
@@ -38,7 +39,7 @@ export default function JamCard({ jam, sounds }) {
 			<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
       <div className="flex float-right">
 			<p className='mb-3 font-normal text-gray-700 ml-auto'>
-				{jam.avg_rating / 2}{' '}
+				{ratingToShow}{' '}
 			</p>
 				<svg
 					xmlns='http://www.w3.org/2000/svg'

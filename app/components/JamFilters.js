@@ -60,29 +60,30 @@ export default function JamFiltersSlideout({
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after';
 
-	function handleFilterChange(e) {
-		const inputs = document.querySelectorAll('input, form select');
-		inputs.forEach((input) =>
-			input.addEventListener('change', createQueryString)
-		);
-		function createQueryString(e) {
-			console.log('in create query string');
-			console.log('e target value', e?.target?.value);
-			let queryString = '/jamscount?';
-			inputs.forEach((input) => {
-				if (
-					(input.type === 'checkbox' && input.checked) ||
-					input.type !== 'checkbox'
-				) {
-					console.log('input', input);
-					queryString += `${input.name}=${input.value || input.id}&`;
-				}
-			});
-			queryString = queryString.slice(0, -1);
-			console.log('querystring', queryString);
-			fetcher.load(queryString);
+	useEffect(() => {
+		if (typeof document !== 'undefined' && typeof window !== 'undefined') {
+			const inputs = document.querySelectorAll('input, form select');
+			console.log('inputs', inputs);
+			inputs.forEach((input) =>
+				input.addEventListener('change', createQueryString)
+			);
+			function createQueryString() {
+				let queryString = '/jamscount?';
+				inputs.forEach((input) => {
+					if (
+						(input.type === 'checkbox' && input.checked) ||
+						input.type !== 'checkbox'
+					) {
+						console.log('input', input);
+						queryString += `${input.name}=${input.value || input.id}&`;
+					}
+				});
+				queryString = queryString.slice(0, -1);
+				console.log('queryString', queryString);
+				fetcher.load(queryString);
+			}
 		}
-	}
+	}, []);
 
 	const count = fetcher.data?.count;
 
@@ -171,7 +172,6 @@ export default function JamFiltersSlideout({
 																								name={`sounds-${sound.text}`}
 																								type='checkbox'
 																								className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
-																								onChange={handleFilterChange}
 																							/>
 																						</div>
 																					</div>
@@ -210,7 +210,6 @@ export default function JamFiltersSlideout({
 																							name={`artists-${artist.url}`}
 																							type='checkbox'
 																							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
-																							onChange={handleFilterChange}
 																						/>
 																					</div>
 																				</div>
@@ -235,7 +234,6 @@ export default function JamFiltersSlideout({
 																		className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
 																		onChange={(event) => {
 																			setQuery(event.target.value);
-																			handleFilterChange();
 																		}}
 																		displayValue={(song) => song}
 																	/>
@@ -307,7 +305,6 @@ export default function JamFiltersSlideout({
 																value={beforeYearSelected}
 																onChange={(e) => {
 																	setBeforeYearSelected(e);
-																	handleFilterChange();
 																}}
 																className='max-w-sm'
 																name='before-year'
@@ -400,7 +397,6 @@ export default function JamFiltersSlideout({
 																value={afterYearSelected}
 																onChange={(e) => {
 																	setAfterYearSelected(e);
-																	handleFilterChange();
 																}}
 																className='max-w-sm'
 																name='after-year'
@@ -584,7 +580,6 @@ export default function JamFiltersSlideout({
 																			name='show-links'
 																			type='checkbox'
 																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
-																			onChange={handleFilterChange}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -611,7 +606,6 @@ export default function JamFiltersSlideout({
 																			name='show-ratings'
 																			type='checkbox'
 																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
-																			onChange={handleFilterChange}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
