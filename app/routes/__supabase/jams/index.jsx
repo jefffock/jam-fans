@@ -22,7 +22,7 @@ export const loader = async ({ request, params }) => {
 		.order('name_for_order', { ascending: true });
 
 	const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.search);
+	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(searchParams);
 
 	delete queryParams['show-ratings'];
@@ -88,7 +88,7 @@ export const loader = async ({ request, params }) => {
 		//if first element is null, break
 		if (artistsInQuery[0] !== 'null') {
 			artistsInQuery.forEach((artist) => {
-				artistsInQueryNames.push(artists.find((a) => a.url === artist).artist);
+				artistsInQueryNames.push(artists.find((a) => a.url === artist)?.artist);
 			});
 			jams = jams.in('artist', artistsInQueryNames);
 		}
@@ -113,12 +113,12 @@ export const loader = async ({ request, params }) => {
 		jams = jams.not('listen_link', 'is', null);
 	}
 	jams = jams.order(orderBy, { ascending: asc });
-		if (orderBy === 'avg_rating') {
-			jams = jams.order('num_ratings', { ascending: false });
-		}
-		if (orderBy === 'num_ratings') {
-			jams = jams.order('avg_rating', { ascending: false });
-		}
+	if (orderBy === 'avg_rating') {
+		jams = jams.order('num_ratings', { ascending: false });
+	}
+	if (orderBy === 'num_ratings') {
+		jams = jams.order('avg_rating', { ascending: false });
+	}
 	// if (orderBy === 'avg_rating') {
 	// 	jams = jams.order('num_ratings', { ascending: false });
 	// }
@@ -139,7 +139,8 @@ export const loader = async ({ request, params }) => {
 		.select('song, artist');
 	const { data: sounds } = await supabaseClient
 		.from('sounds')
-		.select('label, text');
+		.select('label, text')
+		.order('label', { ascending: true });
 	artists = [
 		{
 			nickname: 'All Bands',
@@ -158,10 +159,14 @@ export const loader = async ({ request, params }) => {
 
 	let title = '';
 	if (soundsInQuery?.length > 0) {
-		soundsInQuery.forEach((sound) => {
-			title += sounds.find((s) => s.text === sound).label + ', ';
-		});
-    title = title.slice(0, -2);
+		console.log('soundsinquery', soundsInQuery);
+		for (var i = 0; i < soundsInQuery.length; i++) {
+			title += sounds.find((s) => s.text === soundsInQuery[i])?.label;
+			//addcommaexceptlast
+			if (i < soundsInQuery.length - 2) title += ', ';
+			if (i === soundsInQuery.length - 2) title += ' and ';
+			soundsInQuery.forEach((sound) => {});
+		}
 		//remove last two characters
 	}
 	if (song) {
@@ -170,9 +175,12 @@ export const loader = async ({ request, params }) => {
 	title += ' Jams';
 	if (artistsInQueryNames?.length > 0) {
 		title += ' by ';
+		title += ' ';
 		for (var j = 0; j < artistsInQueryNames.length; j++) {
+			if (artistsInQueryNames[j] === 'Grateful Dead') title += 'The ';
 			title += artistsInQueryNames[j];
-			if (j < artistsInQueryNames.length - 1) title += ', ';
+			if (j < artistsInQueryNames.length - 2) title += ', ';
+			if (j === artistsInQueryNames.length - 2) title += ' and ';
 		}
 	}
 	if (beforeDate && afterDate) {
@@ -191,12 +199,12 @@ export const loader = async ({ request, params }) => {
 	title.trim();
 	const fullTitle = title + ' on Jam Fans';
 
-  let count = await supabaseClient
-  .from('versions')
-  .select('*', { count: 'exact', head: true });
-  count = count.count
-  const search = url.search
-  console.log('search', typeof search)
+	let count = await supabaseClient
+		.from('versions')
+		.select('*', { count: 'exact', head: true });
+	count = count.count;
+	const search = url.search;
+	console.log('search', typeof search);
 
 	return json(
 		{ artists, songs, versions, sounds, fullTitle, title, count, search },
@@ -207,7 +215,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title,  count, search } =
+	const { artists, songs, versions, sounds, fullTitle, title, count, search } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -224,8 +232,8 @@ export default function Jams({ supabase, session }) {
 			setOpen={setOpen}
 			fullTitle={fullTitle}
 			title={title}
-      count={count}
-      search={search}
+			count={count}
+			search={search}
 		/>
 	);
 }

@@ -27,7 +27,7 @@ export default function JamsHome({
 					setOpen={setOpen}
 				/>
 			</div>
-			<ArtistBar artists={artists} />
+			<ArtistBar artists={artists} search={search}/>
 			<JamFiltersSlideout
 				sounds={sounds}
 				artists={artists}
