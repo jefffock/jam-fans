@@ -1,10 +1,5 @@
-import SongPicker from './SongPicker';
 import { Fragment, useState, useEffect, useRef } from 'react';
-import SoundPicker from './SoundPicker';
-import { Form, useSubmit, useFetcher } from '@remix-run/react';
-import YearFilter from './YearFilter';
-import LimitPicker from './LimitPicker';
-import CheckboxList from './CheckboxList';
+import { Form, useSubmit, useFetcher, Link, useSearchParams } from '@remix-run/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 import { Listbox, Transition, Dialog } from '@headlessui/react';
@@ -30,6 +25,8 @@ export default function JamFiltersSlideout({
 	sounds,
 	open,
 	setOpen,
+	totalCount,
+  url
 }) {
 	const [query, setQuery] = useState('');
 	const [songSelected, setSongSelected] = useState(null);
@@ -38,6 +35,7 @@ export default function JamFiltersSlideout({
 	const [limitSelected, setLimitSelected] = useState(limits[3]);
 	const submit = useSubmit();
 	const fetcher = useFetcher();
+  const [params] = useSearchParams();
 
 	const dates = [];
 	let currentYear = new Date().getFullYear();
@@ -60,32 +58,69 @@ export default function JamFiltersSlideout({
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after';
 
-	useEffect(() => {
-		if (typeof document !== 'undefined' && typeof window !== 'undefined') {
-			const inputs = document.querySelectorAll('input, form select');
-			console.log('inputs', inputs);
-			inputs.forEach((input) =>
-				input.addEventListener('change', createQueryString)
-			);
-			function createQueryString() {
-				let queryString = '/jamscount?';
-				inputs.forEach((input) => {
-					if (
-						(input.type === 'checkbox' && input.checked) ||
-						input.type !== 'checkbox'
-					) {
-						console.log('input', input);
-						queryString += `${input.name}=${input.value || input.id}&`;
-					}
-				});
-				queryString = queryString.slice(0, -1);
-				console.log('queryString', queryString);
-				fetcher.load(queryString);
+	function createQueryString() {
+		const form = document.querySelector('#jam-filter-form');
+		const inputs = form?.querySelectorAll('input, select');
+		let queryString = '/jamscount?';
+		inputs.forEach((input) => {
+			if (
+				(input.type === 'checkbox' && input.checked) ||
+				(input.type !== 'checkbox' && input.value !== '')
+			) {
+				console.log('input', input);
+				queryString += `${input.name}=${input.value || input.id}&`;
 			}
-		}
-	}, []);
+		});
+		queryString = queryString?.slice(0, -1);
+		console.log('queryString', queryString);
+		if (queryString) fetcher.load(queryString);
+	}
 
-	const count = fetcher.data?.count;
+	function clearFilters() {
+		const form = document.querySelector('#jam-filter-form');
+		const inputs = form?.querySelectorAll('input, select');
+
+		inputs.forEach((input) => {
+			if (input.type === 'checkbox') input.checked = false;
+			else {
+				input.value = '';
+			}
+		});
+		count = totalCount;
+	}
+
+	let count = fetcher?.data?.count
+		? fetcher?.data?.count
+		: fetcher?.data?.count === 0
+		? 0
+		: totalCount;
+
+  useEffect(() => {
+    console.log('url', url)
+    if (url) {
+      console.log('url', url)
+      console.log('params', params)
+      const searchParams = new URLSearchParams(new URL(url).search);
+      console.log('searchParams', searchParams)
+      console.log(searchParams.get('sounds-bliss'));
+console.log(searchParams.get('artists-phish'));
+      for (const [name, value] of searchParams) {
+        console.log('param', [name, value])
+        // Get the form element with the matching name attribute
+        const formElement = document.querySelector(`[name="${name}"]`);
+
+        // If the form element is found
+        if (formElement) {
+          if (formElement.type === 'checkbox') {
+            formElement.checked = true;
+          } else {
+            // Set the value of the form element
+            formElement.value = value;
+          }
+        }
+    }
+    }
+  }, [url])
 
 	return (
 		<Transition.Root
@@ -162,7 +197,7 @@ export default function JamFiltersSlideout({
 																								htmlFor={`${sound.text}`}
 																								className='select-none font-medium text-gray-700 mx-2'
 																							>
-																								{sound.label}
+																								{sound?.label}
 																							</label>
 																						</div>
 																						<div className='ml-3 flex h-5 items-center'>
@@ -171,7 +206,8 @@ export default function JamFiltersSlideout({
 																								id={`${sound.text}`}
 																								name={`sounds-${sound.text}`}
 																								type='checkbox'
-																								className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																								className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																								onChange={createQueryString}
 																							/>
 																						</div>
 																					</div>
@@ -209,7 +245,8 @@ export default function JamFiltersSlideout({
 																							value={`${artist.url}`}
 																							name={`artists-${artist.url}`}
 																							type='checkbox'
-																							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																							className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																							onChange={createQueryString}
 																						/>
 																					</div>
 																				</div>
@@ -223,7 +260,10 @@ export default function JamFiltersSlideout({
 															<Combobox
 																as='div'
 																value={songSelected}
-																onChange={setSongSelected}
+																onChange={(e) => {
+																	setSongSelected(e);
+																	createQueryString();
+																}}
 																name='song'
 															>
 																<Combobox.Label className='block text-lg font-medium text-gray-900'>
@@ -234,6 +274,7 @@ export default function JamFiltersSlideout({
 																		className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
 																		onChange={(event) => {
 																			setQuery(event.target.value);
+																			createQueryString();
 																		}}
 																		displayValue={(song) => song}
 																	/>
@@ -305,6 +346,7 @@ export default function JamFiltersSlideout({
 																value={beforeYearSelected}
 																onChange={(e) => {
 																	setBeforeYearSelected(e);
+																	createQueryString();
 																}}
 																className='max-w-sm'
 																name='before-year'
@@ -397,6 +439,7 @@ export default function JamFiltersSlideout({
 																value={afterYearSelected}
 																onChange={(e) => {
 																	setAfterYearSelected(e);
+																	createQueryString();
 																}}
 																className='max-w-sm'
 																name='after-year'
@@ -483,91 +526,6 @@ export default function JamFiltersSlideout({
 																)}
 															</Listbox>
 														</div>
-														{/* Limit Picker */}
-														<div className='px-4 py-2'>
-															<Listbox
-																value={limitSelected}
-																onChange={setLimitSelected}
-																name='limit'
-															>
-																{({ open }) => (
-																	<div className='max-w-20'>
-																		<Listbox.Label className='block text-lg font-medium text-gray-900 pt-4'>
-																			How many
-																		</Listbox.Label>
-																		<div className='relative mt-1'>
-																			<Listbox.Button className='relative cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
-																				<span className='block truncate'>
-																					{limitSelected}
-																				</span>
-																				<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
-																					<ChevronUpDownIcon
-																						className='h-5 w-5 text-gray-400'
-																						aria-hidden='true'
-																					/>
-																				</span>
-																			</Listbox.Button>
-
-																			<Transition
-																				show={open}
-																				as={Fragment}
-																				leave='transition ease-in duration-100'
-																				leaveFrom='opacity-100'
-																				leaveTo='opacity-0'
-																			>
-																				<Listbox.Options className='absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
-																					{limits.map((limit, limitIdx) => (
-																						<Listbox.Option
-																							key={limitIdx}
-																							className={({ active }) =>
-																								classNames(
-																									active
-																										? 'text-white bg-indigo-600'
-																										: 'text-gray-900',
-																									'relative cursor-default select-none py-2 pl-3 pr-9'
-																								)
-																							}
-																							value={limit}
-																						>
-																							{({ limitSelected, active }) => (
-																								<>
-																									<span
-																										className={classNames(
-																											limitSelected
-																												? 'font-semibold'
-																												: 'font-normal',
-																											'block truncate'
-																										)}
-																									>
-																										{limit}
-																									</span>
-
-																									{limitSelected ? (
-																										<span
-																											className={classNames(
-																												active
-																													? 'text-white'
-																													: 'text-indigo-600',
-																												'absolute inset-y-0 right-0 flex items-center pr-4'
-																											)}
-																										>
-																											<CheckIcon
-																												className='h-5 w-5'
-																												aria-hidden='true'
-																											/>
-																										</span>
-																									) : null}
-																								</>
-																							)}
-																						</Listbox.Option>
-																					))}
-																				</Listbox.Options>
-																			</Transition>
-																		</div>
-																	</div>
-																)}
-															</Listbox>
-														</div>
 														{/* Checkbox options (show ratings, only show links) */}
 														<div className='px-4 py-2'>
 															<fieldset className='space-y-5'>
@@ -579,7 +537,8 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-links-description'
 																			name='show-links'
 																			type='checkbox'
-																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			onChange={createQueryString}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -605,7 +564,8 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-ratings-description'
 																			name='show-ratings'
 																			type='checkbox'
-																			className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			onChange={createQueryString}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -627,17 +587,30 @@ export default function JamFiltersSlideout({
 														</div>
 													</div>
 												</div>
-												<div className='absolute flex flex-row-reverse bottom-0 right-0 pr-4 py-4 bg-white w-full max-w-md pl-10 ml-10'>
+												<div className='absolute flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
+													{count === 0 && <Link to='/add' className='underline mr-2 bottom-0 self-center'>Add a Jam?</Link>}
+									
 													<button
 														type='submit'
-														className='ml-4 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+														className={count !== 0 ? 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2' : 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-not-allowed'}
 														onClick={() => setOpen(false)}
+														disabled={count === 0}
 													>
-														{count ? `See ${count} jams` : `See jams`}
+														{count !== 0
+															? `See ${count} jams`
+															: `0 😢`}
+													</button>
+
+													<button
+														type='button'
+														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+														onClick={clearFilters}
+													>
+														Clear Filters
 													</button>
 													<button
 														type='button'
-														className='rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
 														onClick={() => setOpen(false)}
 													>
 														Cancel

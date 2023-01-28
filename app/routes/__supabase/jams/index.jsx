@@ -223,8 +223,13 @@ export const loader = async ({ request, params }) => {
 	subtitle.trim();
 	const fullTitle = title + ': ' + subtitle + ' on Jam Fans';
 
+  let count = await supabaseClient
+  .from('versions')
+  .select('*', { count: 'exact', head: true });
+  count = count.count
+
 	return json(
-		{ artists, songs, versions, sounds, fullTitle, title, subtitle },
+		{ artists, songs, versions, sounds, fullTitle, title, subtitle, count, url },
 		{
 			headers: response.headers,
 		}
@@ -232,7 +237,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title, subtitle } =
+	const { artists, songs, versions, sounds, fullTitle, title, subtitle, count, url } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -250,6 +255,8 @@ export default function Jams({ supabase, session }) {
 			fullTitle={fullTitle}
 			title={title}
 			subtitle={subtitle}
+      count={count}
+      url={url}
 		/>
 	);
 }

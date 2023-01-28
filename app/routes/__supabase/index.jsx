@@ -34,11 +34,13 @@ export const loader = async ({ request, params }) => {
   const { data: sounds } = await supabaseClient.from('sounds').select('label, text');
 	artists = [{ nickname: 'All Bands', emoji_code: '0x221E', url: null, artist: 'All Bands' }, { nickname: 'Phish', emoji_code: '0x1F41F', url: 'phish', artist: 'Phish' }, { nickname: 'Grateful Dead', emoji_code: '0x1F480', url: 'grateful-dead', artist: 'Grateful Dead' }].concat(artists)
   //make title
-  
-
-
+  let count = await supabaseClient
+  .from('versions')
+  .select('*', { count: 'exact', head: true });
+  count = count.count
+  const url = new URL(request.url)
 	return json(
-		{ artists, songs, versions, sounds },
+		{ artists, songs, versions, sounds, count },
 		{
 			headers: response.headers,
 		}
@@ -46,11 +48,11 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, versions, sounds, title } = useLoaderData();
+	const { artists, songs, versions, sounds, title, count } = useLoaderData();
   const [open, setOpen] = useState(false);
   if (!artists) return <div>Loading...</div>;
 
 	return (
-      <JamsHome supabase={supabase} session={session} artists={artists}  songs={songs} versions={versions} sounds={sounds} open={open} setOpen={setOpen}/>
+      <JamsHome supabase={supabase} session={session} artists={artists}  songs={songs} versions={versions} sounds={sounds} open={open} setOpen={setOpen} count={count}/>
 	);
 }
