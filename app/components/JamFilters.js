@@ -111,7 +111,6 @@ export default function JamFiltersSlideout({
         }
     }
       queryString = queryString?.slice(0, -1);
-      console.log('queryString', queryString);
       if (queryString) fetcher.load(queryString);
     }
 	}
@@ -135,35 +134,6 @@ export default function JamFiltersSlideout({
 	useEffect(() => {
 		if (fetcher.data) setCount(fetcher.data.count);
 	}, [fetcher.data]);
-
-	useEffect(() => {
-		if (search && typeof document !== 'undefined' && open) {
-        console.log('search', search)
-        // console.log('searchParams', searchParams)
-        // searchParams = new URLSearchParams(searchParams);
-        // console.log('document', document)
-        // console.log('params', params);
-        // console.log('searchParams', searchParams);
-        // console.log('sp.get(sb)', searchParams.get('sounds-bliss'));
-        // console.log(searchParams.get('artists-phish'));
-        // for (const [name, value] of searchParams) {
-        //   console.log('param', [name, value]);
-        //   // Get the form element with the matching name attribute
-        //   const formElement = document.querySelector(`[name="${name}"]`);
-        //   console.log('formElement', formElement)
-  
-        //   // If the form element is found
-        //   if (formElement) {
-        //     if (formElement.type === 'checkbox') {
-        //       formElement.checked = true;
-        //     } else {
-        //       // Set the value of the form element
-        //       formElement.value = value;
-        //     }
-        //   }
-        // }
-		}
-	});
 
 	return (
 		<Transition.Root
@@ -306,7 +276,6 @@ export default function JamFiltersSlideout({
 																as='div'
 																value={songSelected}
 																onChange={(e) => {
-																	console.log('e', e);
 																	setSongSelected(e);
 																	createQueryString(e, { song: e });
 																}}

@@ -159,7 +159,6 @@ export const loader = async ({ request, params }) => {
 
 	let title = '';
 	if (soundsInQuery?.length > 0) {
-		console.log('soundsinquery', soundsInQuery);
 		for (var i = 0; i < soundsInQuery.length; i++) {
 			title += sounds.find((s) => s.text === soundsInQuery[i])?.label;
 			//addcommaexceptlast
@@ -204,7 +203,6 @@ export const loader = async ({ request, params }) => {
 		.select('*', { count: 'exact', head: true });
 	count = count.count;
 	const search = url.search;
-	console.log('search', typeof search);
 
 	return json(
 		{ artists, songs, versions, sounds, fullTitle, title, count, search },

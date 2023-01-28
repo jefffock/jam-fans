@@ -23,7 +23,7 @@ export default function JamCard({ jam, sounds, user, profile }) {
 		}
 	}
 	soundsString = soundsString.slice(0, -2);
-	const ratingToShow = (jam.avg_rating / 2).toFixed(3).replace(/\.?0+$/, '');
+	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>

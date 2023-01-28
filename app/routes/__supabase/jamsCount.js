@@ -2,7 +2,6 @@ import { createServerClient } from '@supabase/auth-helpers-remix';
 import { json } from '@remix-run/node';
 
 export const loader = async ({ request, params }) => {
-	console.log('in jamscount');
 	const response = new Response();
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
@@ -22,7 +21,6 @@ export const loader = async ({ request, params }) => {
 	delete queryParams['limit[label]'];
 
 	const stringParams = JSON.stringify(queryParams);
-	console.log('stringParams', stringParams);
 
 	//iterate through queryParamsArray and build a supabase query
 	let song;
@@ -36,7 +34,6 @@ export const loader = async ({ request, params }) => {
 	let queryObjToStore = {};
 	let soundsInQuery = [];
 	let artistsInQuery = [];
-  console.log('queryParams', queryParams)
 
 	for (const [key, value] of Object.entries(queryParams)) {
 		if (key.includes('sound')) {
@@ -102,7 +99,6 @@ export const loader = async ({ request, params }) => {
 		jams = jams.not('listen_link', 'is', null);
 	}
 	const { count } = await jams;
-	console.log('count', count);
 	return json(
 		{ count },
 		{
