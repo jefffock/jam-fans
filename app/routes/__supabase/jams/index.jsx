@@ -22,7 +22,8 @@ export const loader = async ({ request, params }) => {
 		.order('name_for_order', { ascending: true });
 
 	const url = new URL(request.url);
-	const queryParams = Object.fromEntries(url.searchParams.entries());
+  const searchParams = new URLSearchParams(url.search);
+	const queryParams = Object.fromEntries(searchParams);
 
 	delete queryParams['show-ratings'];
 	delete queryParams['limit[label]'];
@@ -67,7 +68,7 @@ export const loader = async ({ request, params }) => {
 		if (key.includes('limit')) {
 			limit = value;
 		}
-		if (key.includes('show-listenable')) {
+		if (key.includes('show-links')) {
 			showListenable = true;
 		}
 	}
@@ -227,9 +228,11 @@ export const loader = async ({ request, params }) => {
   .from('versions')
   .select('*', { count: 'exact', head: true });
   count = count.count
+  const search = url.search
+  console.log('search', typeof search)
 
 	return json(
-		{ artists, songs, versions, sounds, fullTitle, title, subtitle, count, url },
+		{ artists, songs, versions, sounds, fullTitle, title, subtitle, count, search },
 		{
 			headers: response.headers,
 		}
@@ -237,7 +240,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title, subtitle, count, url } =
+	const { artists, songs, versions, sounds, fullTitle, title, subtitle, count, search } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -256,7 +259,7 @@ export default function Jams({ supabase, session }) {
 			title={title}
 			subtitle={subtitle}
       count={count}
-      url={url}
+      search={search}
 		/>
 	);
 }

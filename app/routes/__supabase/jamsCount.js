@@ -15,6 +15,7 @@ export const loader = async ({ request, params }) => {
 		.order('name_for_order', { ascending: true })
 
 	const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 
 	delete queryParams['show-ratings'];
@@ -62,7 +63,7 @@ export const loader = async ({ request, params }) => {
 		if (key.includes('limit')) {
 			limit = value;
 		}
-		if (key.includes('show-listenable')) {
+		if (key.includes('show-links')) {
 			showListenable = true;
 		}
 	}

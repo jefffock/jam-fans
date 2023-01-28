@@ -1,5 +1,11 @@
 import { Fragment, useState, useEffect, useRef } from 'react';
-import { Form, useSubmit, useFetcher, Link, useSearchParams } from '@remix-run/react';
+import {
+	Form,
+	useSubmit,
+	useFetcher,
+	Link,
+	useSearchParams,
+} from '@remix-run/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 import { Listbox, Transition, Dialog } from '@headlessui/react';
@@ -26,7 +32,7 @@ export default function JamFiltersSlideout({
 	open,
 	setOpen,
 	totalCount,
-  url
+	search,
 }) {
 	const [query, setQuery] = useState('');
 	const [songSelected, setSongSelected] = useState(null);
@@ -35,8 +41,8 @@ export default function JamFiltersSlideout({
 	const [limitSelected, setLimitSelected] = useState(limits[3]);
 	const submit = useSubmit();
 	const fetcher = useFetcher();
-  const [params] = useSearchParams();
-  const [count, setCount] = useState(totalCount);
+	const [params] = useSearchParams();
+	const [count, setCount] = useState(totalCount);
 
 	const dates = [];
 	let currentYear = new Date().getFullYear();
@@ -59,25 +65,55 @@ export default function JamFiltersSlideout({
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after';
 
-	function createQueryString(e, song) {
-		let queryString = '/jamscount?';
-		const form = document.querySelector('#jam-filter-form');
-		const inputs = form?.querySelectorAll('input, select');
-		inputs.forEach((input) => {
-			if (
-				(input.type === 'checkbox' && input.checked) ||
-				(input.type !== 'checkbox' && input.value !== '' && input.name)
-			) {
-				console.log('input', input);
-				queryString += `${input.name}=${input.value || input.id}&`;
-			}
-		});
-    console.log('song', song)
-    if (song) queryString += `song=${song.song},`;
-    console.log('song.song', song?.song)
-		queryString = queryString?.slice(0, -1);
-		console.log('queryString', queryString);
-		if (queryString) fetcher.load(queryString);
+	function createQueryString(e, param, initialString) {
+    if (initialString) fetcher.load(initialString);
+    else {
+
+      let queryString = '/jamscount?';
+      const form = document.querySelector('#jam-filter-form');
+      const inputs = form?.querySelectorAll('input, select');
+      inputs.forEach((input) => {
+        if (
+          (input.type === 'checkbox' && input.checked) ||
+          (input.type !== 'checkbox' && input.value !== '' && input.name)
+        ) {
+          queryString += `${input.name}=${input.value || input.id}&`;
+        }
+      });
+      if (param?.hasOwnProperty('song')) {
+        if (queryString.includes('song=')) {
+            let startIndex = queryString.indexOf('song=') + 5;
+            let endIndex = queryString.indexOf(',', startIndex);
+            endIndex = endIndex === -1 ? queryString.length : endIndex;
+            queryString = queryString.slice(0, startIndex) + param.song + queryString.slice(endIndex);
+        } else {
+            queryString += `song=${param.song},`;
+        }
+    }
+    if (param?.hasOwnProperty('before')) {
+        if (queryString.includes('before=')) {
+            let startIndex = queryString.indexOf('before=') + 7;
+            let endIndex = queryString.indexOf(',', startIndex);
+            endIndex = endIndex === -1 ? queryString.length : endIndex;
+            queryString = queryString.slice(0, startIndex) + param.before + queryString.slice(endIndex);
+        } else {
+            queryString += `before=${param.before},`;
+        }
+    }
+    if (param?.hasOwnProperty('after')) {
+        if (queryString.includes('after=')) {
+            let startIndex = queryString.indexOf('after=') + 6;
+            let endIndex = queryString.indexOf(',', startIndex);
+            endIndex = endIndex === -1 ? queryString.length : endIndex;
+            queryString = queryString.slice(0, startIndex) + param.after + queryString.slice(endIndex);
+        } else {
+            queryString += `after=${param.after},`;
+        }
+    }
+      queryString = queryString?.slice(0, -1);
+      console.log('queryString', queryString);
+      if (queryString) fetcher.load(queryString);
+    }
 	}
 
 	function clearFilters() {
@@ -89,40 +125,45 @@ export default function JamFiltersSlideout({
 			else {
 				input.value = '';
 			}
+      setBeforeYearSelected(null)
+      setAfterYearSelected(null)
+      setSongSelected(null)
 		});
-		setCount(totalCount)
+		setCount(totalCount);
 	}
 
 	useEffect(() => {
-    if (fetcher.data) setCount(fetcher.data.count);
-  }, [fetcher.data])
+		if (fetcher.data) setCount(fetcher.data.count);
+	}, [fetcher.data]);
 
-  useEffect(() => {
-    console.log('url', url)
-    if (url) {
-      console.log('url', url)
-      console.log('params', params)
-      const searchParams = new URLSearchParams(new URL(url).search);
-      console.log('searchParams', searchParams)
-      console.log(searchParams.get('sounds-bliss'));
-console.log(searchParams.get('artists-phish'));
-      for (const [name, value] of searchParams) {
-        console.log('param', [name, value])
-        // Get the form element with the matching name attribute
-        const formElement = document.querySelector(`[name="${name}"]`);
-
-        // If the form element is found
-        if (formElement) {
-          if (formElement.type === 'checkbox') {
-            formElement.checked = true;
-          } else {
-            // Set the value of the form element
-            formElement.value = value;
-          }
-        }
-    }
-    }
-  }, [url])
+	useEffect(() => {
+		if (search && typeof document !== 'undefined' && open) {
+        console.log('search', search)
+        // console.log('searchParams', searchParams)
+        // searchParams = new URLSearchParams(searchParams);
+        // console.log('document', document)
+        // console.log('params', params);
+        // console.log('searchParams', searchParams);
+        // console.log('sp.get(sb)', searchParams.get('sounds-bliss'));
+        // console.log(searchParams.get('artists-phish'));
+        // for (const [name, value] of searchParams) {
+        //   console.log('param', [name, value]);
+        //   // Get the form element with the matching name attribute
+        //   const formElement = document.querySelector(`[name="${name}"]`);
+        //   console.log('formElement', formElement)
+  
+        //   // If the form element is found
+        //   if (formElement) {
+        //     if (formElement.type === 'checkbox') {
+        //       formElement.checked = true;
+        //     } else {
+        //       // Set the value of the form element
+        //       formElement.value = value;
+        //     }
+        //   }
+        // }
+		}
+	});
 
 	return (
 		<Transition.Root
@@ -210,6 +251,7 @@ console.log(searchParams.get('artists-phish'));
 																								type='checkbox'
 																								className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
 																								onChange={createQueryString}
+                                                defaultChecked={search?.includes(sound.text)}
 																							/>
 																						</div>
 																					</div>
@@ -249,6 +291,7 @@ console.log(searchParams.get('artists-phish'));
 																							type='checkbox'
 																							className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
 																							onChange={createQueryString}
+                                              defaultChecked={search?.includes(artist.url)}
 																						/>
 																					</div>
 																				</div>
@@ -263,9 +306,9 @@ console.log(searchParams.get('artists-phish'));
 																as='div'
 																value={songSelected}
 																onChange={(e) => {
-                                  console.log('e', e);
+																	console.log('e', e);
 																	setSongSelected(e);
-																	createQueryString(e, {song: e});
+																	createQueryString(e, { song: e });
 																}}
 																name='song'
 															>
@@ -280,6 +323,7 @@ console.log(searchParams.get('artists-phish'));
 																			createQueryString();
 																		}}
 																		displayValue={(song) => song}
+                                    placeholder='Search for a song'
 																	/>
 																	<Combobox.Button className='absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none'>
 																		<ChevronUpDownIcon
@@ -349,10 +393,10 @@ console.log(searchParams.get('artists-phish'));
 																value={beforeYearSelected}
 																onChange={(e) => {
 																	setBeforeYearSelected(e);
-																	createQueryString();
+																	createQueryString(e, { before: e });
 																}}
 																className='max-w-sm'
-																name='before-year'
+																name='before'
 															>
 																{({ open }) => (
 																	<div>
@@ -442,10 +486,10 @@ console.log(searchParams.get('artists-phish'));
 																value={afterYearSelected}
 																onChange={(e) => {
 																	setAfterYearSelected(e);
-																	createQueryString();
+																	createQueryString(e, { after: e });
 																}}
 																className='max-w-sm'
-																name='after-year'
+																name='after'
 															>
 																{({ open }) => (
 																	<div>
@@ -542,6 +586,7 @@ console.log(searchParams.get('artists-phish'));
 																			type='checkbox'
 																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
 																			onChange={createQueryString}
+                                      defaultChecked={search?.includes('links')}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -569,6 +614,7 @@ console.log(searchParams.get('artists-phish'));
 																			type='checkbox'
 																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
 																			onChange={createQueryString}
+                                      defaultChecked={search?.includes('ratings')}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -591,17 +637,26 @@ console.log(searchParams.get('artists-phish'));
 													</div>
 												</div>
 												<div className='absolute flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
-													{count === 0 && <Link to='/add' className='underline mr-2 bottom-0 self-center'>Add a Jam?</Link>}
-									
+													{count === 0 && (
+														<Link
+															to='/add'
+															className='underline mr-2 bottom-0 self-center'
+														>
+															Add a Jam?
+														</Link>
+													)}
+
 													<button
 														type='submit'
-														className={count !== 0 ? 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2' : 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-not-allowed'}
+														className={
+															count !== 0
+																? 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+																: 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-not-allowed'
+														}
 														onClick={() => setOpen(false)}
 														disabled={count === 0}
 													>
-														{count !== 0
-															? `See ${count} jams`
-															: `0 😢`}
+														{count !== 0 ? `See ${count} jams` : `0 😢`}
 													</button>
 
 													<button

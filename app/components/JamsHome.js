@@ -16,7 +16,7 @@ export default function JamsHome({
 	title,
 	subtitle,
 	count,
-	url,
+	search,
 }) {
 	if (!artists) return <div>Loading...</div>;
 
@@ -36,7 +36,7 @@ export default function JamsHome({
 				open={open}
 				setOpen={setOpen}
 				totalCount={count}
-				url={url}
+				search={search}
 			/>
 			<JamList
 				jams={versions}
