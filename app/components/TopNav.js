@@ -18,7 +18,6 @@ function classNames(...classes) {
 }
 
 export default function TopNav({ title, supabase, session }) {
-	console.log('session', session);
 	const user = session?.user;
 
 	async function handleSignOut() {
@@ -26,7 +25,6 @@ export default function TopNav({ title, supabase, session }) {
 		if (error) {
 			console.error(error);
 		} else {
-			console.log('signed out');
 			navigate('/');
 		}
 	}
@@ -42,7 +40,6 @@ export default function TopNav({ title, supabase, session }) {
 							<div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
 								<div className='flex h-16 justify-between'>
 									<div className='flex'>
-       
 										<div className='flex flex-shrink-0 items-center'>
 											<img
 												className='block h-8 w-auto lg:hidden'
@@ -73,33 +70,31 @@ export default function TopNav({ title, supabase, session }) {
 											))}
 										</div>
 									</div>
-										<div className='self-center'>
-											{user && (
-												<div className=''>
-													{userNavigation.map((item) => (
-														<Disclosure.Button
-															key={item.name}
-															as='a'
-															href={item.href}
-															className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
-                              onClick={handleSignOut}
-														>
-															{item.name}
-														</Disclosure.Button>
-													))}
-												</div>
-											)}
-											{!user && (
-												<div className='ml-auto space-y-1 self-center'>
-													<a
-														href='/login'
+									<div className='hidden sm:inline self-center'>
+										{user && (
+											<div className=''>
+												{userNavigation.map((item) => (
+													<Disclosure.Button
+														key={item.name}
 														className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
+														onClick={handleSignOut}
 													>
-														Login
-													</a>
-												</div>
-											)}
-										</div>
+														{item.name}
+													</Disclosure.Button>
+												))}
+											</div>
+										)}
+										{!user && (
+											<div className='ml-auto space-y-1 self-center'>
+												<a
+													href='/login'
+													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
+												>
+													Login
+												</a>
+											</div>
+										)}
+									</div>
 									<div className='-mr-2 flex items-center sm:hidden'>
 										{/* Mobile menu button */}
 										<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'>
@@ -140,17 +135,51 @@ export default function TopNav({ title, supabase, session }) {
 									))}
 								</div>
 								<div className='border-t border-gray-200 pt-4 pb-3'>
-									<div className='mt-3 space-y-1'>
-										{userNavigation.map((item) => (
-											<Disclosure.Button
-												key={item.name}
-												as='a'
-												href={item.href}
-												className='block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800'
-											>
-												{item.name}
+									<div className=' space-y-1'>
+										{user &&
+											userNavigation.map((item) => (
+												<Disclosure.Button
+													key={item.name}
+													as='a'
+													href={item.href}
+													className={classNames(
+                            item?.current
+                              ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                              : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                          )}
+													onClick={handleSignOut}
+												>
+													{item.name}
+												</Disclosure.Button>
+											))}
+										{!user && (
+                      <div className=''>
+											<Disclosure.Button className='ml-auto space-y-1 self-center'>
+												<a
+													href='/login'
+													className={classNames(
+                            'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                          )}
+												>
+													Login
+												</a>
 											</Disclosure.Button>
-										))}
+                      <br/>
+                      <Disclosure.Button className='ml-auto space-y-1 self-center'>
+												<a
+													href='/join'
+													className={classNames(
+                            'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+                          )}
+												>
+													Sign up
+												</a>
+											</Disclosure.Button>
+                      </div>
+										)}
 									</div>
 								</div>
 							</Disclosure.Panel>

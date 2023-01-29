@@ -4,33 +4,33 @@ import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { useOutletContext, useNavigate } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { json } from '@remix-run/node';
-import SuccessAlert from '../../components/alerts/SuccessAlert';
+import SuccessAlert from 'app/components/alerts/successAlert';
 
-export default function SignIn() {
+export default function SignUp() {
 	const { supabase, session } = useOutletContext();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
+  const [passwordSignupSuccess, setPasswordSignupSuccess] = useState(false);
 	const [magicLinkSuccessText, setMagicLinkSuccessText] = useState('');
 	const [passwordResetSuccessText, setPasswordResetSuccessText] = useState('');
-	const navigate = useNavigate();
 
-	async function signInWithEmail(event) {
+	async function signUpWithEmail(event) {
 		setLoading(true);
 		setErrorMessage(null);
 
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email: email,
-			password: password,
-		});
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    })
 		if (error) {
 			setLoading(false);
 			setErrorMessage(error.message);
 		} else {
 			setLoading(false);
-			navigate('/');
-		}
+      setPasswordSignupSuccess(true)
+    }
 	}
 
 	function handleEmailChange(e) {
@@ -86,7 +86,7 @@ export default function SignIn() {
 					alt='Your Company'
 				/>
 				<h2 className='mt-6 text-center text-3xl font-bold tracking-tight text-gray-900'>
-					Sign in to rate jams
+					Sign up to rate jams
 				</h2>
 				<p className='mt-2 text-center text-sm text-gray-600'>
 					<a
@@ -95,10 +95,10 @@ export default function SignIn() {
 					>
 						Or{' '}
 						<Link
-							to='/join'
+							to='/login'
 							className='underline'
 						>
-							make an account - free! 🚢
+							sign in
 						</Link>
 					</a>
 				</p>
@@ -133,7 +133,7 @@ export default function SignIn() {
 							value='magic-link'
 							onClick={signInWithOtp}
 						>
-							Sign up/in with a magic link (no password!)
+							Sign up with a magic link (no password!)
 						</button>
 					</div>
 					{magicLinkSuccessText && (
@@ -148,7 +148,7 @@ export default function SignIn() {
 							htmlFor='password'
 							className='block text-sm font-medium text-gray-700'
 						>
-							Password (if you have one)
+							Password (if you want one)
 						</label>
 						<div className='mt-1'>
 							<input
@@ -161,6 +161,12 @@ export default function SignIn() {
 							/>
 						</div>
 					</div>
+          {passwordSignupSuccess &&
+          <SuccessAlert
+							title={'Confirmation email sent!'}
+							description={"Check your email to confirm you're you. If we didn't do this, some beautiful, passionate fans would make millions of fake accounts to manipulate the ratings. This only needs to be done once. Thanks!"}
+						/>
+          }
 
 					<div>
 						<button
@@ -168,9 +174,9 @@ export default function SignIn() {
 							className='flex w-full justify-center rounded-md border py-2 px-4 text-sm font-medium bg-white text-gray-500 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-4 hover:text-white'
 							name='_action'
 							value='email-password'
-							onClick={() => signInWithEmail()}
+							onClick={signUpWithEmail}
 						>
-							Sign in with email and password
+							Sign up with email and password
 						</button>
 					</div>
 					<div className='flex flex-row-reverse'>
@@ -197,7 +203,7 @@ export default function SignIn() {
 							</div>
 							<div className='relative flex justify-center text-sm'>
 								<span className='bg-white px-2 text-gray-500'>
-									Or sign in with
+									Or sign up with
 								</span>
 							</div>
 						</div>
