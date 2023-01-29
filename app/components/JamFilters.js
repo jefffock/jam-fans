@@ -219,7 +219,7 @@ export default function JamFiltersSlideout({
 																								id={`${sound.text}`}
 																								name={`sounds-${sound.text}`}
 																								type='checkbox'
-																								className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																								className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
 																								onChange={createQueryString}
                                                 defaultChecked={search?.includes(sound.text)}
 																							/>
@@ -259,7 +259,7 @@ export default function JamFiltersSlideout({
 																							value={`${artist.url}`}
 																							name={`artists-${artist.url}`}
 																							type='checkbox'
-																							className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+																							className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2 border-2'
 																							onChange={createQueryString}
                                               defaultChecked={search?.includes(artist.url)}
 																						/>
@@ -553,7 +553,7 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-links-description'
 																			name='show-links'
 																			type='checkbox'
-																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 border-2'
 																			onChange={createQueryString}
                                       defaultChecked={search?.includes('links')}
 																		/>
@@ -581,7 +581,7 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-ratings-description'
 																			name='show-ratings'
 																			type='checkbox'
-																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 border-2'
 																			onChange={createQueryString}
                                       defaultChecked={search?.includes('ratings')}
 																		/>

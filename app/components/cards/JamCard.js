@@ -70,7 +70,7 @@ export default function JamCard({ jam, sounds, user, profile }) {
 			<div className='flex justify-between mt-3'>
 				{!user && !profile && (
 					<Link
-						to='login'
+						to='/login'
 						className='underline self-center'
 					>
 						Login to rate
