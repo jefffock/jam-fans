@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useOutletContext } from '@remix-run/react';
+import { useOutletContext, Link } from '@remix-run/react';
 
 const navigation = [
 	{ name: 'Home', href: '/', current: true },
@@ -41,16 +41,20 @@ export default function TopNav({ title, supabase, session }) {
 								<div className='flex h-16 justify-between'>
 									<div className='flex'>
 										<div className='flex flex-shrink-0 items-center'>
+                      <Link to='/'>
 											<img
+												href='/'
 												className='block h-8 w-auto lg:hidden'
 												src='/icon-circle.png'
 												alt='Jam Fans'
 											/>
 											<img
+												href='/'
 												className='hidden h-8 w-auto lg:block'
 												src='/icon-circle.png'
 												alt='Jam Fans'
 											/>
+                      </Link>
 										</div>
 										<div className='hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8'>
 											{navigation.map((item) => (
@@ -143,42 +147,42 @@ export default function TopNav({ title, supabase, session }) {
 													as='a'
 													href={item.href}
 													className={classNames(
-                            item?.current
-                              ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                              : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-                          )}
+														item?.current
+															? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+													)}
 													onClick={handleSignOut}
 												>
 													{item.name}
 												</Disclosure.Button>
 											))}
 										{!user && (
-                      <div className=''>
-											<Disclosure.Button className='ml-auto space-y-1 self-center'>
-												<a
-													href='/login'
-													className={classNames(
-                            'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-                          )}
-												>
-													Login
-												</a>
-											</Disclosure.Button>
-                      <br/>
-                      <Disclosure.Button className='ml-auto space-y-1 self-center'>
-												<a
-													href='/join'
-													className={classNames(
-                            'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-                            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-                          )}
-												>
-													Sign up
-												</a>
-											</Disclosure.Button>
-                      </div>
+											<div className=''>
+												<Disclosure.Button className='ml-auto space-y-1 self-center'>
+													<a
+														href='/login'
+														className={classNames(
+															'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+														)}
+													>
+														Login
+													</a>
+												</Disclosure.Button>
+												<br />
+												<Disclosure.Button className='ml-auto space-y-1 self-center'>
+													<a
+														href='/join'
+														className={classNames(
+															'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+														)}
+													>
+														Sign up
+													</a>
+												</Disclosure.Button>
+											</div>
 										)}
 									</div>
 								</div>

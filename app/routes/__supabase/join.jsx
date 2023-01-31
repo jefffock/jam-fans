@@ -4,7 +4,7 @@ import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { useOutletContext, useNavigate } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { json } from '@remix-run/node';
-import SuccessAlert from 'app/components/alerts/successAlert';
+import SuccessAlert from 'app/components/alerts/SuccessAlert';
 
 export default function SignUp() {
 	const { supabase, session } = useOutletContext();
