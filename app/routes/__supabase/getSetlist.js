@@ -2,7 +2,6 @@ import { createServerClient } from '@supabase/auth-helpers-remix';
 import { json } from '@remix-run/node';
 
 export const loader = async ({ request, params }) => {
-	console.log('in getSetlist.js');
 	const response = new Response();
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
@@ -56,13 +55,11 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const artist = queryParams?.artist;
 	const date = queryParams?.date;
-	console.log('artist', artist, 'date', date);
 	const { data, error } = await supabaseClient
 		.from('versions')
 		.select('*')
 		.eq('artist', artist)
 		.eq('date', date);
-	console.log('data', data, 'error', error);
 	let setlist;
 	if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 		let artistId;

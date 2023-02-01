@@ -111,8 +111,8 @@ export default function AddJam() {
 	const [showsInYearFromSetlistFM, setShowsInYearFromSetlistFM] =
 		useState(false);
 	const [added, setAdded] = useState(false);
-  const [dateInput, setDateInput] = useState('');
-  const [dateInputError, setDateInputError] = useState(false);
+	const [dateInput, setDateInput] = useState('');
+	const [dateInputError, setDateInputError] = useState(false);
 
 	const sortedSongs = artist
 		? songs.sort((a, b) => {
@@ -132,6 +132,7 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
+		setSongSelected('');
 		if (artist && date && artist !== 'Squeaky Feet') {
 			//fetch setlist
 		} else if (artist && year && !date && artist !== 'Squeaky Feet') {
@@ -198,7 +199,7 @@ export default function AddJam() {
 
 	function clearSong() {
 		setSong('');
-    setSongSelected('')
+		setSongSelected('');
 	}
 
 	function clearDate() {
@@ -212,9 +213,9 @@ export default function AddJam() {
 	}
 
 	function handleLocationChange(e) {
-    if (e.target.value !== location) {
-      setLocation(e.target.value);
-    }
+		if (e.target.value !== location) {
+			setLocation(e.target.value);
+		}
 	}
 
 	function handleYearChange(e) {
@@ -241,7 +242,7 @@ export default function AddJam() {
 		yearsArr.push('Clear Year');
 	}
 
-  useEffect(() => {
+	useEffect(() => {
 		if (!date) {
 			setDateInput(null);
 		}
@@ -249,7 +250,7 @@ export default function AddJam() {
 
 	const handleDateInputChange = (e) => {
 		setDateInput(e.target.value);
-    let dateInput = e.target.value;
+		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
 			let month = dateInput.slice(0, 2);
 			let day = dateInput.slice(2, 4);
@@ -260,18 +261,34 @@ export default function AddJam() {
 			} else {
 				setDateInputError(false);
 				setDate(date.toJSON().slice(0, 10));
-        let urlToFetch = '/getSetlist?artist=' + artist.artist + '&date=' + date.toJSON().slice(0, 10);
-        console.log('url to fetch: ', urlToFetch)
-        fetcher.load(urlToFetch);
+				let urlToFetch =
+					'/getSetlist?artist=' +
+					artist.artist +
+					'&date=' +
+					date.toJSON().slice(0, 10);
+				console.log('url to fetch: ', urlToFetch);
+				fetcher.load(urlToFetch);
 			}
 		}
 	};
 
 	const shows = fetcher?.data?.shows;
 	const setlist = fetcher?.data?.setlist;
-  if (fetcher?.data?.location && !location) {
-    setLocation(fetcher?.data?.location)
+	if (fetcher?.data?.location && !location) {
+		setLocation(fetcher?.data?.location);
+	}
+  if (fetcher?.data?.jam && !jam) {
+    console.log('jam: ', fetcher?.data?.jam)
+    setJam(fetcher?.data?.jam);
   }
+
+	//check if song exists
+	useEffect(() => {
+		if (songSelected && artist && date) {
+      let urlToFetch = '/checkJamAdded?artist=' + artist.artist + '&song=' + songSelected + '&date=' + date;
+      fetcher.load(urlToFetch);
+		}
+	}, [songSelected, date]);
 
 	return (
 		<Form method='post'>
@@ -612,19 +629,20 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
-        {/* Date input */}
-        {!date && artist &&
-        <div>
-          <p>MMDDYYYY format</p>
-          <input
-            type="text"
-            value={dateInput}
-            onChange={handleDateInputChange}
-            className="border border-gray-300 rounded-md p-2"
-            />
-          </div>} 
+				{/* Date input */}
+				{!date && artist && (
+					<div>
+						<p>MMDDYYYY format</p>
+						<input
+							type='text'
+							value={dateInput}
+							onChange={handleDateInputChange}
+							className='border border-gray-300 rounded-md p-2'
+						/>
+					</div>
+				)}
 				{/* Show Picker */}
-				{shows && shows.length > 1 && !show && (!date && !location) && (
+				{shows && shows.length > 1 && !show && !date && !location && (
 					<div className='max-h-40'>
 						<Listbox
 							value={show}
@@ -832,13 +850,14 @@ export default function AddJam() {
 						</div>
 					</div>
 				)}
-        {artist && songSelected && date && location && (
-          <>
-				<p>Sounds</p>
-				<p>Rating</p>
-				<p>Comment</p>
-          </>
-          )}
+				{artist && songSelected && date && location && (
+					<>
+						<p>Optional</p>
+						<p>Sounds</p>
+						<p>Rating</p>
+						<p>Comment</p>
+					</>
+				)}
 				<div className='flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
 					<button
 						type='submit'
