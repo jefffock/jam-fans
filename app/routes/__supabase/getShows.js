@@ -283,7 +283,6 @@ export const loader = async ({ request, params }) => {
 						label: `${date.toLocaleDateString()} - ${location}`,
 					};
 				});
-				console.log(shows);
 			}
 		}
 	}
