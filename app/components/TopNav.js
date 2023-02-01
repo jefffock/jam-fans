@@ -6,7 +6,7 @@ import { useOutletContext, Link } from '@remix-run/react';
 const navigation = [
 	{ name: 'Home', href: '/', current: true },
 	{ name: 'Jams', href: '/jams', current: false },
-	{ name: 'Add', href: '/add', current: false },
+	{ name: 'Add', href: '/add/jam', current: false },
 ];
 const userNavigation = [
 	// { name: 'Settings', href: '#' },

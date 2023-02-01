@@ -57,7 +57,13 @@ export const loader = async ({ request, params }) => {
 	const year = queryParams?.year;
 	let shows;
 	let songId;
-	if (artist && song) {
+	//get all versions of a song (for select artists)
+	if (artist && song && !year) {
+		const { data, error } = await supabaseClient
+			.from('versions')
+			.select('*')
+			.eq('artist', artist)
+			.eq('song_name', song);
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 			const artistId = artist === 'Phish' ? '1' : '2';
@@ -85,18 +91,19 @@ export const loader = async ({ request, params }) => {
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
 						const date = new Date(show.showdate + 'T18:00:00Z');
+						const alreadyAdded = data.find((d) => d.date === show.showdate);
 						return {
 							showdate: show.showdate,
-							isjamchart: show.isjamchart,
 							location: `${show.venue}, ${show.city}, ${
 								show.country === 'USA' ? show.state : show.country
 							}`,
 							artistid: show.artistid,
-							label: `${show.showdate} - ${show.venue}, ${show.city}, ${
+							label: `${show.isjamchart === '1' ? '☆ ' : ''}${
+								alreadyAdded ? '(Added) ' : ''
+							}${show.showdate} - ${show.venue}, ${show.city}, ${
 								show.country === 'USA' ? show.state : show.country
 							}`,
-							value: show.showdate,
-							date,
+							existingJam: alreadyAdded ?? null,
 						};
 					});
 				shows = shows.reverse();
@@ -139,23 +146,147 @@ export const loader = async ({ request, params }) => {
 				shows = await shows.json();
 				shows = shows?.data.map((show) => {
 					const date = new Date(show.showdate + 'T18:00:00Z');
+					const alreadyAdded = data.find((d) => d.date === show.showdate);
 					return {
 						showdate: show.showdate,
 						location: `${show.venue}, ${show.city}, ${
 							show.country === 'USA' ? show.state : show.country
 						}`,
-						label: `${show.showdate} - ${show.venue}, ${show.city}, ${
+						label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
+							show.venue
+						}, ${show.city}, ${
 							show.country === 'USA' ? show.state : show.country
 						}`,
-						value: show.showdate,
-						date,
+						existingJam: alreadyAdded ?? null,
 					};
 				});
 				shows = shows.reverse();
 			}
 		}
+	} else if (artist && year) {
+		//get shows by year
+		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
+			let artistId;
+			switch (artist) {
+				case 'Phish':
+					artistId = '1';
+					break;
+				case 'Trey Anastasio, TAB':
+					artistId = '2';
+					break;
+				default:
+					artistId = '1';
+			}
+			const url = `https://api.phish.net/v5/shows/showyear/${year}.json?apikey=${process.env.PHISHNET_API_KEY}`;
+			await fetch(url)
+				.then((data) => data.json())
+				.then((showsData) => {
+					if (showsData && showsData.data && showsData.data.length > 0) {
+						const showsRes = showsData.data
+							.filter((song) => song.artistid === artistId)
+							.map((show) => {
+								const location = `${show.venue}, ${show.city}, ${
+									show.country === 'USA' ? show.state : show.country
+								}`;
+								const date = new Date(show.showdate + 'T18:00:00Z');
+								return {
+									location,
+									showdate: show.showdate,
+									label: `${date.toLocaleDateString()} - ${location}`,
+								};
+							});
+						shows = showsRes;
+					}
+				});
+		} else if (
+			artist === 'Goose' ||
+			artist === 'Eggy' ||
+			artist === 'Neighbor' ||
+			artist === "Umphrey's McGee"
+		) {
+			let baseUrl;
+			switch (artist) {
+				case 'Goose':
+					baseUrl = baseUrls.gooseBaseUrl;
+					break;
+				case 'Eggy':
+					baseUrl = baseUrls.eggyBaseUrl;
+					break;
+				case "Umphrey's McGee":
+					baseUrl = baseUrls.umphreysBaseUrl;
+					break;
+				case 'Neighbor':
+					baseUrl = baseUrls.neighborBaseUrl;
+					break;
+			}
+			// const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`
+			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`;
+			const showsData = await fetch(url);
+			const showsRes = await showsData.json();
+			if (showsRes && showsRes.data && showsRes.data.length > 0) {
+				shows = showsRes.data.map((show) => {
+					const location = `${show.venuename}, ${show.city}, ${
+						show.country === 'USA' ? show.state : show.country
+					}`;
+					const date = new Date(show.showdate + 'T18:00:00Z');
+					return {
+						location,
+						showdate: show.showdate,
+						label: `${date.toLocaleDateString()} - ${location}`,
+					};
+				});
+			}
+		} else {
+			//get shows from setlistfm for all other artists
+			const mbid = mbids[artist];
+			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
+			let apiKey = process.env.SETLISTFM_API_KEY;
+			function paginatedFetch(url, page = 1, previousResponse = []) {
+				return fetch(`${url}&p=${page}`, {
+					headers: {
+						'x-api-key': `${apiKey}`,
+						Accept: 'application/json',
+					},
+				}) // Append the page number to the base URL
+					.then((response) => response.json())
+					.then((newResponse) => {
+						console.log('newResponse', newResponse);
+						const setlist = newResponse?.setlist || [];
+
+						const response = [...setlist, ...previousResponse]; // Combine the two arrays
+
+						if (setlist?.length !== 0) {
+							page++;
+
+							return paginatedFetch(url, page, response);
+						}
+
+						return response;
+					});
+			}
+			if (mbid && year) {
+				const data = await paginatedFetch(url);
+				shows = data.map((show) => {
+					const location = `${show?.venue?.name ? show.venue.name + ', ' : ''}${
+						show.venue.city.name
+					}, ${
+						show.venue.city.country.code === 'US'
+							? show.venue.city.state
+							: show.venue.city.country.name
+					}`;
+					//convert date to yyyy-mm-dd from dd-mm-yyyy
+					const formattedDate = show.eventDate.split('-').reverse().join('-');
+					const date = new Date(formattedDate + 'T12:00:00Z');
+					return {
+						location,
+						showdate: formattedDate,
+						label: `${date.toLocaleDateString()} - ${location}`,
+					};
+				});
+				console.log(shows);
+			}
+		}
 	}
-  console.log(shows[0])
 	return json(
 		{ shows: shows || [] },
 		{
