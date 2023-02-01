@@ -17,12 +17,13 @@ export const loader = async ({ request, params }) => {
   let date = queryParams?.date;
   console.log('artist, song, date', artist, song, date)
 	let { data: jam } = await supabaseClient
-		.from('versions')
+		.from('versions_duplicate')
 		.select('*')
 		.eq('artist', artist)
 		.eq('song_name', song)
 		.eq('date', date)
 		.single();
+    console.log('jam', jam)
 	return json(
 		{ jam },
 		{

@@ -248,7 +248,7 @@ export default function AddJam() {
 		}
 	}, [date]);
 
-	const handleDateInputChange = (e) => {
+	function handleDateInputChange(e) {
 		setDateInput(e.target.value);
 		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
@@ -270,23 +270,34 @@ export default function AddJam() {
 				fetcher.load(urlToFetch);
 			}
 		}
-	};
+	}
+
+	function handleSoundsChange(e) {
+		console.log('handle sounds change: ', e.target.value);
+		// setSoundsSelected(e.target.value);
+	}
 
 	const shows = fetcher?.data?.shows;
 	const setlist = fetcher?.data?.setlist;
 	if (fetcher?.data?.location && !location) {
 		setLocation(fetcher?.data?.location);
 	}
-  if (fetcher?.data?.jam && !jam) {
-    console.log('jam: ', fetcher?.data?.jam)
-    setJam(fetcher?.data?.jam);
-  }
+	if (fetcher?.data?.jam && !jam) {
+		console.log('jam: ', fetcher?.data?.jam);
+		setJam(fetcher?.data?.jam);
+	}
 
 	//check if song exists
 	useEffect(() => {
 		if (songSelected && artist && date) {
-      let urlToFetch = '/checkJamAdded?artist=' + artist.artist + '&song=' + songSelected + '&date=' + date;
-      fetcher.load(urlToFetch);
+			let urlToFetch =
+				'/checkJamAdded?artist=' +
+				artist.artist +
+				'&song=' +
+				songSelected +
+				'&date=' +
+				date;
+			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date]);
 
@@ -852,8 +863,54 @@ export default function AddJam() {
 				)}
 				{artist && songSelected && date && location && (
 					<>
-						<p>Optional</p>
-						<p>Sounds</p>
+						<p>Everything below here is optional</p>
+						{/* Sound picker */}
+						<div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
+							<div className='sm:col-span-6 mx-4'>
+								<div className='mt-1 flex rounded-md shadow-sm'>
+									<fieldset>
+										<legend className='text-lg font-medium text-gray-900'>
+											Sounds
+										</legend>
+										<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll sm:col-span-6'>
+											{sounds &&
+												sounds?.map((sound, soundIdx) => {
+													if (!jam?.sounds?.includes(sound.label)) {
+														return (
+															<div
+																key={soundIdx}
+																className='relative flex items-start py-4'
+															>
+																<div className='min-w-0 flex-1 text-sm'>
+																	<label
+																		htmlFor={`${sound.text}`}
+																		className='select-none font-medium text-gray-700 mx-2'
+																	>
+																		{sound?.label}
+																	</label>
+																</div>
+																<div className='ml-3 flex h-5 items-center'>
+																	<input
+																		value={`${sound.text}`}
+																		id={`${sound.text}`}
+																		name={`sounds-${sound.text}`}
+																		disabled={jam?.sounds?.includes(
+																			sound.label
+																		)}
+																		type='checkbox'
+																		className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
+																		onChange={handleSoundsChange}
+																	/>
+																</div>
+															</div>
+														);
+													}
+												})}
+										</div>
+									</fieldset>
+								</div>
+							</div>
+						</div>
 						<p>Rating</p>
 						<p>Comment</p>
 					</>
