@@ -1,4 +1,9 @@
-import { Form, useLoaderData, useFetcher } from '@remix-run/react';
+import {
+	Form,
+	useLoaderData,
+	useFetcher,
+	useOutletContext,
+} from '@remix-run/react';
 import { json } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { Listbox, Transition, Dialog, Combobox } from '@headlessui/react';
@@ -14,7 +19,22 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	const {
+		data: { user },
+	} = await supabaseClient.auth.getUser();
+
+	let profile;
+	if (user && user?.id && user != null) {
+		const { data } = await supabaseClient
+			.from('profiles')
+			.select('*')
+			.eq('id', user.id)
+			.single();
+		profile = data;
+	}
+
 	//get artists
+	//get supabase session
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('*')
@@ -47,7 +67,7 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	return json(
-		{ artists, songs, sounds },
+		{ artists, songs, sounds, user, profile },
 		{
 			headers: response.headers,
 		}
@@ -73,8 +93,9 @@ export async function action({ request, params }) {
 }
 
 export default function AddJam() {
+	const { supabase, session } = useOutletContext();
 	const fetcher = useFetcher();
-	const { artists, songs, sounds, initialArtist, initialSong } =
+	const { artists, songs, sounds, initialArtist, initialSong, user, profile } =
 		useLoaderData();
 	const [songSelected, setSongSelected] = useState('');
 	const [soundsSelected, setSoundsSelected] = useState('');
@@ -113,6 +134,41 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
+
+	useEffect(() => {
+		if (user && typeof document !== 'undefined') {
+			let username;
+			async function checkUsername() {
+				username = window.prompt('Please choose a username', '');
+				if (username) {
+					console.log('username chosen', username);
+					const { data } = await supabase
+						.from('profiles')
+						.select('*')
+						.eq('name', username)
+						.single();
+					if (data) {
+						console.log('username exists', data);
+						alert(
+							'Looks like someone already snagged that username. Please choose another.'
+						);
+						checkUsername();
+					} else {
+						setUsername();
+					}
+				} else {
+					checkUsername();
+				}
+			}
+			async function setUsername() {
+				const { data, error } = await supabase
+					.from('profiles')
+					.insert([{ name: username, id: user.id }]);
+				console.log('data', data);
+			}
+			checkUsername();
+		}
+	}, []);
 
 	const sortedSongs = artist
 		? songs.sort((a, b) => {

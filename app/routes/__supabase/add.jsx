@@ -1,6 +1,7 @@
-import { Link, Outlet } from '@remix-run/react';
+import { Link, Outlet, useOutletContext } from '@remix-run/react';
 
 export default function Add() {
+  const { supabase, session } = useOutletContext();
 	//todo: parse
 	return (
 		<>
@@ -35,7 +36,7 @@ export default function Add() {
 					</Link>
 				</div>
 			</div>
-			<Outlet />
+			<Outlet context={{ supabase, session }} />
 		</>
 	);
 }
