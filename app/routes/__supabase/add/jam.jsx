@@ -141,14 +141,12 @@ export default function AddJam() {
 			async function checkUsername() {
 				username = window.prompt('Please choose a username', '');
 				if (username) {
-					console.log('username chosen', username);
 					const { data } = await supabase
 						.from('profiles')
 						.select('*')
 						.eq('name', username)
 						.single();
 					if (data) {
-						console.log('username exists', data);
 						alert(
 							'Looks like someone already snagged that username. Please choose another.'
 						);
@@ -164,7 +162,9 @@ export default function AddJam() {
 				const { data, error } = await supabase
 					.from('profiles')
 					.insert([{ name: username, id: user.id }]);
-				console.log('data', data);
+          if (!error) {
+            alert(`Welcome, ${username}! Have fun rating stuff and making great jams easier to find! (Username created successfully)`)
+          }
 			}
 			checkUsername();
 		}
