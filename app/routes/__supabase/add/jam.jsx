@@ -113,7 +113,7 @@ export default function AddJam() {
 	const [dateErrorText, setDateErrorText] = useState(null);
 	const [locationErrorText, setLocationErrorText] = useState(null);
 	const [successAlertText, setSuccessAlertText] = useState(null);
-  const [setlist, setSetlist] = useState(null);
+	const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
 	const [date, setDate] = useState('');
 	const [location, setLocation] = useState('');
@@ -135,7 +135,7 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-  const [shows, setShows] = useState(null);
+	const [shows, setShows] = useState(null);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -193,7 +193,8 @@ export default function AddJam() {
 
 	function handleArtistChange(artist) {
 		setSongSelected('');
-    if (shows) setShows(null)
+		setJam(null);
+		setShows(null);
 		if (artist && date && artist !== 'Squeaky Feet') {
 			//fetch setlist
 		} else if (artist && year && !date && artist !== 'Squeaky Feet') {
@@ -218,8 +219,7 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-    console.log('song selected changed', songSelected)
-    setShows(null)
+		setShows(null);
 		if (
 			artist &&
 			artist.artist !== 'Squeaky Feet' &&
@@ -233,19 +233,16 @@ export default function AddJam() {
 		) {
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
-        console.log('fetching shows', urlToFetch)
-        console.log('shows', shows)
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected]);
 
 	function handleShowChange(show) {
-    setSetlist(null)
+		setSetlist(null);
 		if (artist && artist !== 'Squeaky Feet') {
 			//fetch setlist
 			let urlToFetch =
 				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
-      console.log('fetching setlist', urlToFetch)
 			fetcher.load(urlToFetch);
 		}
 		setShow(show);
@@ -256,15 +253,23 @@ export default function AddJam() {
 		}
 	}
 
-  //if song not in setlist, remove it
-  useEffect(() => {
-    if (setlist && songSelected) {
-      let songInSetlist = setlist.find(song => song === songSelected)
-      if (!songInSetlist) {
-        setSongSelected('')
-      }
-    }
-  }, [setlist])
+	function handleRatingChange(rating) {
+		if (rating === 'No rating') {
+			setRating(null);
+		} else {
+			setRating(rating);
+		}
+	}
+
+	//if song not in setlist, remove it
+	useEffect(() => {
+		if (setlist && songSelected) {
+			let songInSetlist = setlist.find((song) => song === songSelected);
+			if (!songInSetlist) {
+				setSongSelected('');
+			}
+		}
+	}, [setlist]);
 
 	function clearArtist() {
 		setArtist('');
@@ -272,6 +277,8 @@ export default function AddJam() {
 		setDate('');
 		setShow('');
 		setLocation('');
+		setJam('');
+		setSongSelected('');
 	}
 
 	function clearSong() {
@@ -296,14 +303,12 @@ export default function AddJam() {
 	}
 
 	function handleYearChange(e) {
-    if (shows) setShows(null)
-		console.log('handle year change: ', e);
+		if (shows) setShows(null);
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
 			if (artist && artist !== 'Squeaky Feet') {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
-				console.log('url to fetch: ', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 			setYear(e);
@@ -344,34 +349,36 @@ export default function AddJam() {
 					artist.artist +
 					'&date=' +
 					date.toJSON().slice(0, 10);
-				console.log('url to fetch: ', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 		}
 	}
 
 	function handleSoundsChange(e) {
-		console.log('handle sounds change: ', e.target.value);
-		// setSoundsSelected(e.target.value);
+		// if e.target.value is not in soundsSelected, add it, else, remove it
+		if (soundsSelected.includes(e.target.value)) {
+			let newSoundsSelected = soundsSelected.filter(
+				(sound) => sound !== e.target.value
+			);
+			setSoundsSelected(newSoundsSelected);
+		} else {
+			const sortedSounds = [...soundsSelected, e.target.value].sort();
+			setSoundsSelected(sortedSounds);
+		}
 	}
 
 	if (fetcher?.data?.shows && !shows) {
-    console.log('fetcher.data.shows: ', fetcher?.data?.shows)
-    setShows(fetcher?.data?.shows);
-  }
+		setShows(fetcher?.data?.shows);
+	}
 	if (fetcher?.data?.setlist && !setlist) {
-    setSetlist(fetcher?.data?.setlist)
-  };
-  console.log('setlist: ', setlist)
-  console.log('fetcher.data: ', fetcher?.data)
-  console.log('shows: ', shows)
-  console.log('songSelected: ', songSelected)
+		setSetlist(fetcher?.data?.setlist);
+	}
 	if (fetcher?.data?.location && !location) {
 		setLocation(fetcher?.data?.location);
 	}
 	if (fetcher?.data?.jam && fetcher?.data?.jam !== jam) {
-		console.log('jam: ', fetcher?.data?.jam);
 		setJam(fetcher?.data?.jam);
+		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 
 	//check if song exists
@@ -388,9 +395,20 @@ export default function AddJam() {
 		}
 	}, [songSelected, date, setlist]);
 
+	//log artist, songSelected, date, location, jam, soundsSelected with strings for each
+	console.log('profile: ' + profile);
+	console.log('artist: ' + artist.artist);
+	console.log('songSelected: ' + songSelected);
+	console.log('date: ' + date);
+	console.log('location: ' + location);
+	console.log('jam sounds: ' + jam?.sounds?.length);
+	console.log('soundsSelected: ' + soundsSelected?.length);
+	console.log('rating: ' + rating);
+	console.log('comment: ' + comment);
+
 	return (
 		<Form method='post'>
-			<div className='flex flex-col space-y-4 p-4 pb-20'>
+			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
 				<input
 					type='hidden'
 					name='artist'
@@ -416,8 +434,14 @@ export default function AddJam() {
 					name='jam'
 					value={jam}
 				/>
+				<input
+					type='hidden'
+					name='sounds'
+					value={soundsSelected}
+				/>
+				{/* artist picker*/}
 				{!artist && (
-					<div className='max-h-40'>
+					<div className='max-h-40 max-w-sm'>
 						<Listbox
 							value={artist}
 							onChange={handleArtistChange}
@@ -497,8 +521,8 @@ export default function AddJam() {
 				)}
 				{/* display artist */}
 				{artist && (
-					<div className='flex justify-between'>
-						<p>{artist.artist}</p>
+					<div className='flex justify-between text-sm'>
+						<p className='text-base'>{artist.artist}</p>
 						<button
 							type='button'
 							onClick={clearArtist}
@@ -509,7 +533,7 @@ export default function AddJam() {
 				)}
 				{/* song picker (not setlist)*/}
 				{artist &&
-					!setlist &&
+					(!setlist || !date) &&
 					!songSelected &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
@@ -517,7 +541,7 @@ export default function AddJam() {
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
 						artist.artist === 'Trey Anastasio, TAB') && (
-						<div className='max-w-sm p-4'>
+						<div className='max-w-sm py-4'>
 							<Combobox
 								as='div'
 								value={songSelected}
@@ -526,10 +550,10 @@ export default function AddJam() {
 								}}
 								name='song'
 							>
-								<Combobox.Label className='block text-lg font-medium text-gray-900'>
+								<Combobox.Label className='block font-medium text-gray-900'>
 									Song
 								</Combobox.Label>
-								<div className='relative mt-1 px-30'>
+								<div className='relative mt-1'>
 									<Combobox.Input
 										className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
 										onChange={(event) => {
@@ -596,8 +620,8 @@ export default function AddJam() {
 					)}
 				{/* display song*/}
 				{songSelected && (
-					<div className='flex justify-between'>
-						<p>{songSelected}</p>
+					<div className='flex justify-between text-sm'>
+						<p className='text-base'>{songSelected}</p>
 						<button
 							type='button'
 							onClick={clearSong}
@@ -742,7 +766,7 @@ export default function AddJam() {
 				)}
 				{/* Year picker */}
 				{artist && !date && (
-					<div className='max-h-40'>
+					<div className='max-h-40 max-w-xs'>
 						<Listbox
 							value={year}
 							onChange={handleYearChange}
@@ -822,8 +846,8 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
-        {/* Show Picker if not from songfish artist + year*/}
-				{shows && shows.length > 1 && !show && !date && !location && year && (
+				{/* Show Picker if not from songfish artist + year*/}
+				{shows && shows?.length > 1 && !show && !date && !location && year && (
 					<div className='max-h-40'>
 						<Listbox
 							value={show}
@@ -907,7 +931,8 @@ export default function AddJam() {
 				{/* Date input */}
 				{!date && artist && (
 					<div>
-						<p>MMDDYYYY format</p>
+						<p>Or enter a date to get the setlist</p>
+						<p className='text-sm'>MMDDYYYY format</p>
 						<input
 							type='text'
 							value={dateInput}
@@ -998,9 +1023,10 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
+				{/* display date*/}
 				{date && (
-					<div className='flex justify-between'>
-						<p>{date}</p>
+					<div className='flex justify-between text-sm'>
+						<p className='text-base'>{date}</p>
 						<button
 							type='button'
 							onClick={clearDate}
@@ -1009,10 +1035,10 @@ export default function AddJam() {
 						</button>
 					</div>
 				)}
-
+				{/* display location */}
 				{location && !showLocationInput && (
-					<div className='flex justify-between'>
-						<p>{location}</p>
+					<div className='flex justify-between text-sm'>
+						<p className='text-base'>{location}</p>
 						<button
 							type='button'
 							onClick={showEditLocation}
@@ -1045,82 +1071,270 @@ export default function AddJam() {
 				)}
 				{artist && songSelected && date && location && (
 					<>
-						<p>Everything below here is optional</p>
-						{/* Sound picker */}
-						<div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
-							<div className='sm:col-span-6 mx-4'>
-								<div className='mt-1 flex rounded-md shadow-sm'>
-									<fieldset>
-										<legend className='text-lg font-medium text-gray-900'>
-											Sounds
-										</legend>
-										<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll sm:col-span-6'>
-											{sounds &&
-												sounds?.map((sound, soundIdx) => {
-													if (!jam?.sounds?.includes(sound.label)) {
-														return (
-															<div
-																key={soundIdx}
-																className='relative flex items-start py-4'
-															>
-																<div className='min-w-0 flex-1 text-sm'>
-																	<label
-																		htmlFor={`${sound.text}`}
-																		className='select-none font-medium text-gray-700 mx-2'
-																	>
-																		{sound?.label}
-																	</label>
-																</div>
-																<div className='ml-3 flex h-5 items-center'>
-																	<input
-																		value={`${sound.text}`}
-																		id={`${sound.text}`}
-																		name={`sounds-${sound.text}`}
-																		disabled={jam?.sounds?.includes(
-																			sound.label
-																		)}
-																		type='checkbox'
-																		className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
-																		onChange={handleSoundsChange}
-																	/>
-																</div>
+						<p>Optional fields:</p>
+						{/* Sounds picker */}
+						<div className=''>
+							<div className='mt-1 flex rounded-md shadow-sm max-w-fit'>
+								<fieldset>
+									<legend className='text-lg font-medium text-gray-900'>
+										Sounds to Add
+									</legend>
+									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll max-w-fit'>
+										{sounds &&
+											sounds?.map((sound, soundIdx) => {
+												if (!jam?.sounds?.includes(sound.label)) {
+													return (
+														<div
+															key={soundIdx}
+															className='relative flex items-start py-4'
+														>
+															<div className='min-w-0 flex-1 text-sm'>
+																<label
+																	htmlFor={`${sound.text}`}
+																	className='select-none font-medium text-gray-700 mx-2'
+																>
+																	{sound?.label}
+																</label>
 															</div>
-														);
-													}
-												})}
-										</div>
-									</fieldset>
-								</div>
+															<div className='ml-3 flex h-5 items-center'>
+																<input
+																	value={`${sound.label}`}
+																	id={`${sound.text}`}
+																	name={`sounds-${sound.text}`}
+																	disabled={jam?.sounds?.includes(sound.label)}
+																	type='checkbox'
+																	className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
+																	onChange={handleSoundsChange}
+																/>
+															</div>
+														</div>
+													);
+												}
+											})}
+									</div>
+								</fieldset>
 							</div>
 						</div>
-						<p>Rating</p>
-						<p>Comment</p>
 					</>
 				)}
-				<div className='flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
-					<button
-						type='submit'
-						className={
-							'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-						}
-						disabled={
-							!artist ||
-							!song ||
-							!date ||
-							!location ||
-							(jam && !rating && !comment && !soundsSelected)
-						}
-					>
-						{jam ? 'Rate this jam' : 'Add this jam'}
-					</button>
+				{soundsSelected && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{/* rating picker */}
+				{artist && songSelected && date && location && profile && (
+					<div className='max-h-40  max-w-xs'>
+						<Listbox
+							value={rating}
+							onChange={handleRatingChange}
+						>
+							{({ open }) => (
+								<>
+									<Listbox.Label className='block text-sm font-medium text-gray-700'>
+										Rating
+									</Listbox.Label>
+									<div className='relative mt-1'>
+										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+											<span className='block truncate'>
+												{rating || 'No rating'}
+											</span>
+											<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
+												<ChevronUpDownIcon
+													className='h-8 w-8 text-gray-400'
+													aria-hidden='true'
+												/>
+											</span>
+										</Listbox.Button>
 
-					<button
-						type='button'
-						className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-						onClick={clear}
-					>
-						Clear
-					</button>
+										<Transition
+											show={open}
+											as={Fragment}
+											leave='transition ease-in duration-100'
+											leaveFrom='opacity-100'
+											leaveTo='opacity-0'
+										>
+											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
+												{[10, 9, 8, 7, 6, 5, 4, 'No rating'].map(
+													(rating, ratingIdx) => (
+														<Listbox.Option
+															key={ratingIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-indigo-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={rating}
+														>
+															{({ selected, active }) => (
+																<>
+																	<span
+																		className={classNames(
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
+																		)}
+																	>
+																		{rating}
+																	</span>
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active
+																					? 'text-white'
+																					: 'text-indigo-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : null}
+																</>
+															)}
+														</Listbox.Option>
+													)
+												)}
+											</Listbox.Options>
+										</Transition>
+									</div>
+								</>
+							)}
+						</Listbox>
+						<div className='my-4 max-w-md'>
+							<label
+								htmlFor='comment'
+								className='block text-sm font-medium text-gray-700'
+							>
+								Comment
+							</label>
+							<div className='mt-1'>
+								<textarea
+									type='text'
+									name='comment'
+									id='comment'
+									cols={30}
+									rows={5}
+									defaultValue={''}
+									onChange={setComment}
+									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+									aria-describedby='comment'
+								></textarea>
+							</div>
+						</div>
+					</div>
+				)}
+				{/* submit buttons */}
+				{/* 
+        not logged in:
+        Add jam 
+        Update jam, (jam added, add sounds)
+        logged in:
+        add jam
+        update jam, (jam added, add sounds)
+        Add jam and comment/rating (not added yet), with rating
+        Add rating/comments jam (already added), with rating
+
+        
+        */}
+				<div className='flex justify-around py-4 bg-white w-full px-2'>
+					{/* not logged in, add new jam*/}
+					{!profile && !jam && artist && songSelected && date && location && (
+						<button
+							type='submit'
+							name='_action'
+							value='add'
+							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+						>
+							Add this jam
+						</button>
+					)}
+					{/* not logged in, jam exists, update sounds*/}
+					{!profile && jam && jam?.sounds?.length !== soundsSelected?.length && (
+						<button
+							type='submit'
+							name='_action'
+							value='add'
+							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+						>
+							Add sounds to this jam
+						</button>
+					)}
+					{/*logged in, add new jam, no rating*/}
+					{profile &&
+						artist &&
+						songSelected &&
+						date &&
+						location &&
+						!jam &&
+						!rating &&
+						!comment && (
+							<button
+								type='submit'
+								name='_action'
+								value='add'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							>
+								Add this jam
+							</button>
+						)}
+					{/*logged in, add new jam, no rating*/}
+					{profile &&
+						jam &&
+						jam?.sounds?.length !== soundsSelected?.length &&
+						!rating &&
+						!comment && (
+							<button
+								type='submit'
+								name='_action'
+								value='add'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							>
+								Add sounds to this jam
+							</button>
+						)}
+					{/*logged in, add new jam, with rating/comment*/}
+					{profile && !jam && (rating || comment) && (
+						<button
+							type='submit'
+							name='_action'
+							value='add'
+							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+						>
+							Add jam and rating/comment
+						</button>
+					)}
+					{/*logged in, jam exists, add rating/comment, no new sounds*/}
+					{profile &&
+						jam &&
+						(rating || comment) &&
+						(jams?.sounds?.length === soundsSelected?.length) && (
+							<button
+								type='submit'
+								name='_action'
+								value='add'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							>
+								Add rating/comment
+							</button>
+						)}
+					{/*logged in, jam exists, add rating/comment and sounds*/}
+					{profile &&
+						jam &&
+						(rating || comment) &&
+						jam?.sounds?.length !== soundsSelected?.length && (
+							<button
+								type='submit'
+								name='_action'
+								value='add'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							>
+								Add rating/comment and update sounds
+							</button>
+						)}
 				</div>
 			</div>
 		</Form>

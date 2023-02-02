@@ -6,7 +6,7 @@ export default function Add() {
 	return (
 		<>
 				<div className='block m-4'>
-					<p className='text-center text-xl'>Rate and/or add a Jam</p>
+					<p className='text-center text-xl'>Add and/or Rate a Jam</p>
 				</div>
 			{/* <div className='flex justify-around mx-auto my-4'>
 				<div className='rounded-md shadow-sm'>
