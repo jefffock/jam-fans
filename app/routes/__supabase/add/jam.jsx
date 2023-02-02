@@ -354,6 +354,10 @@ export default function AddJam() {
 		}
 	}
 
+	function handleCommentChange(e) {
+		setComment(e.target.value);
+	}
+
 	function handleSoundsChange(e) {
 		// if e.target.value is not in soundsSelected, add it, else, remove it
 		if (soundsSelected.includes(e.target.value)) {
@@ -1219,7 +1223,7 @@ export default function AddJam() {
 									cols={30}
 									rows={5}
 									defaultValue={''}
-									onChange={setComment}
+									onChange={handleCommentChange}
 									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
 									aria-describedby='comment'
 								></textarea>
@@ -1311,7 +1315,7 @@ export default function AddJam() {
 					{profile &&
 						jam &&
 						(rating || comment) &&
-						(jams?.sounds?.length === soundsSelected?.length) && (
+						jams?.sounds?.length === soundsSelected?.length && (
 							<button
 								type='submit'
 								name='_action'
