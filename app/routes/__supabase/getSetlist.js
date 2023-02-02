@@ -152,6 +152,7 @@ export const loader = async ({ request, params }) => {
         setlist = titles
       }
 	}
+  console.log('setlist in getSetlist', setlist)
 	return json(
 		{ setlist: setlist || [],
     location },

@@ -6,9 +6,9 @@ export default function Add() {
 	return (
 		<>
 				<div className='block m-4'>
-					<p className='text-center'>Rate and/or add a</p>
+					<p className='text-center text-xl'>Rate and/or add a Jam</p>
 				</div>
-			<div className='flex justify-around mx-auto my-4'>
+			{/* <div className='flex justify-around mx-auto my-4'>
 				<div className='rounded-md shadow-sm'>
 					<Link to='/add/jam'>
 						<button
@@ -34,8 +34,8 @@ export default function Add() {
 							Show
 						</button>
 					</Link>
-				</div>
-			</div>
+				</div> */}
+			{/* </div> */}
 			<Outlet context={{ supabase, session }} />
 		</>
 	);

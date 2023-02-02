@@ -113,6 +113,7 @@ export default function AddJam() {
 	const [dateErrorText, setDateErrorText] = useState(null);
 	const [locationErrorText, setLocationErrorText] = useState(null);
 	const [successAlertText, setSuccessAlertText] = useState(null);
+  const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
 	const [date, setDate] = useState('');
 	const [location, setLocation] = useState('');
@@ -134,9 +135,10 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
+  const [shows, setShows] = useState(null);
 
 	useEffect(() => {
-		if (user && typeof document !== 'undefined') {
+		if (user && !profile && typeof document !== 'undefined') {
 			let username;
 			async function checkUsername() {
 				username = window.prompt('Please choose a username', '');
@@ -162,9 +164,11 @@ export default function AddJam() {
 				const { data, error } = await supabase
 					.from('profiles')
 					.insert([{ name: username, id: user.id }]);
-          if (!error) {
-            alert(`Welcome, ${username}! Have fun rating stuff and making great jams easier to find! (Username created successfully)`)
-          }
+				if (!error) {
+					alert(
+						`Welcome, ${username}! Have fun rating stuff and making great jams easier to find! (Username created successfully)`
+					);
+				}
 			}
 			checkUsername();
 		}
@@ -189,6 +193,7 @@ export default function AddJam() {
 
 	function handleArtistChange(artist) {
 		setSongSelected('');
+    if (shows) setShows(null)
 		if (artist && date && artist !== 'Squeaky Feet') {
 			//fetch setlist
 		} else if (artist && year && !date && artist !== 'Squeaky Feet') {
@@ -213,9 +218,11 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
+    console.log('song selected changed', songSelected)
+    setShows(null)
 		if (
 			artist &&
-			artist !== 'Squeaky Feet' &&
+			artist.artist !== 'Squeaky Feet' &&
 			songSelected &&
 			(artist.artist === 'Goose' ||
 				artist.artist === 'Eggy' ||
@@ -226,15 +233,19 @@ export default function AddJam() {
 		) {
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
+        console.log('fetching shows', urlToFetch)
+        console.log('shows', shows)
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected]);
 
 	function handleShowChange(show) {
+    setSetlist(null)
 		if (artist && artist !== 'Squeaky Feet') {
 			//fetch setlist
 			let urlToFetch =
 				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+      console.log('fetching setlist', urlToFetch)
 			fetcher.load(urlToFetch);
 		}
 		setShow(show);
@@ -244,6 +255,16 @@ export default function AddJam() {
 			setJam(show.existingJam);
 		}
 	}
+
+  //if song not in setlist, remove it
+  useEffect(() => {
+    if (setlist && songSelected) {
+      let songInSetlist = setlist.find(song => song === songSelected)
+      if (!songInSetlist) {
+        setSongSelected('')
+      }
+    }
+  }, [setlist])
 
 	function clearArtist() {
 		setArtist('');
@@ -275,6 +296,7 @@ export default function AddJam() {
 	}
 
 	function handleYearChange(e) {
+    if (shows) setShows(null)
 		console.log('handle year change: ', e);
 		if (e === 'Clear Year') {
 			setYear('');
@@ -333,19 +355,28 @@ export default function AddJam() {
 		// setSoundsSelected(e.target.value);
 	}
 
-	const shows = fetcher?.data?.shows;
-	const setlist = fetcher?.data?.setlist;
+	if (fetcher?.data?.shows && !shows) {
+    console.log('fetcher.data.shows: ', fetcher?.data?.shows)
+    setShows(fetcher?.data?.shows);
+  }
+	if (fetcher?.data?.setlist && !setlist) {
+    setSetlist(fetcher?.data?.setlist)
+  };
+  console.log('setlist: ', setlist)
+  console.log('fetcher.data: ', fetcher?.data)
+  console.log('shows: ', shows)
+  console.log('songSelected: ', songSelected)
 	if (fetcher?.data?.location && !location) {
 		setLocation(fetcher?.data?.location);
 	}
-	if (fetcher?.data?.jam && !jam) {
+	if (fetcher?.data?.jam && fetcher?.data?.jam !== jam) {
 		console.log('jam: ', fetcher?.data?.jam);
 		setJam(fetcher?.data?.jam);
 	}
 
 	//check if song exists
 	useEffect(() => {
-		if (songSelected && artist && date) {
+		if (songSelected && artist && date && setlist && shows) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -355,7 +386,7 @@ export default function AddJam() {
 				date;
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date]);
+	}, [songSelected, date, setlist]);
 
 	return (
 		<Form method='post'>
@@ -575,6 +606,101 @@ export default function AddJam() {
 						</button>
 					</div>
 				)}
+				{/* show picker if songfish artist and no date/year*/}
+				{songSelected &&
+					artist &&
+					!date &&
+					!year &&
+					(artist.artist === 'Goose' ||
+						artist.artist === 'Eggy' ||
+						artist.artist === 'Neighbor' ||
+						artist.artist === "Umphrey's McGee" ||
+						artist.artist === 'Phish' ||
+						artist.artist === 'Trey Anastasio, TAB') && (
+						<div className='max-h-40'>
+							<Listbox
+								value={show}
+								onChange={handleShowChange}
+							>
+								{({ open }) => (
+									<>
+										<Listbox.Label className='block text-sm font-medium text-gray-700'>
+											Shows with a {songSelected}
+										</Listbox.Label>
+										<div className='relative mt-1'>
+											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+												<span className='block truncate'>
+													{show?.label || 'Choose a show'}
+												</span>
+												<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
+													<ChevronUpDownIcon
+														className='h-8 w-8 text-gray-400'
+														aria-hidden='true'
+													/>
+												</span>
+											</Listbox.Button>
+
+											<Transition
+												show={open}
+												as={Fragment}
+												leave='transition ease-in duration-100'
+												leaveFrom='opacity-100'
+												leaveTo='opacity-0'
+											>
+												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
+													{shows?.map((show, showIdx) => (
+														<Listbox.Option
+															key={showIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-indigo-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={show}
+														>
+															{({ selected, active }) => (
+																<>
+																	<span
+																		className={classNames(
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
+																		)}
+																	>
+																		{show?.label}
+																	</span>
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active
+																					? 'text-white'
+																					: 'text-indigo-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : null}
+																</>
+															)}
+														</Listbox.Option>
+													))}
+												</Listbox.Options>
+											</Transition>
+										</div>
+									</>
+								)}
+							</Listbox>
+						</div>
+					)}
 				{/* Add Song if doesnt exist*/}
 				{query && filteredSongs?.length === 0 && (
 					<div>
@@ -696,20 +822,8 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
-				{/* Date input */}
-				{!date && artist && (
-					<div>
-						<p>MMDDYYYY format</p>
-						<input
-							type='text'
-							value={dateInput}
-							onChange={handleDateInputChange}
-							className='border border-gray-300 rounded-md p-2'
-						/>
-					</div>
-				)}
-				{/* Show Picker */}
-				{shows && shows.length > 1 && !show && !date && !location && (
+        {/* Show Picker if not from songfish artist + year*/}
+				{shows && shows.length > 1 && !show && !date && !location && year && (
 					<div className='max-h-40'>
 						<Listbox
 							value={show}
@@ -718,7 +832,7 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-sm font-medium text-gray-700'>
-										Show
+										Shows from {year}
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
@@ -790,8 +904,20 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
+				{/* Date input */}
+				{!date && artist && (
+					<div>
+						<p>MMDDYYYY format</p>
+						<input
+							type='text'
+							value={dateInput}
+							onChange={handleDateInputChange}
+							className='border border-gray-300 rounded-md p-2'
+						/>
+					</div>
+				)}
 				{/* song picker from setlist */}
-				{setlist && !songSelected && (
+				{setlist && !songSelected && date && artist && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
@@ -800,7 +926,7 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-sm font-medium text-gray-700'>
-										Song
+										Songs in Setlist
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
