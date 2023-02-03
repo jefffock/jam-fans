@@ -5,9 +5,9 @@ export default function Contact() {
        <div className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6">
       <h3 className="text-lg font-medium leading-6 text-gray-900 m-4">Contact</h3>
     </div>
-			<h1 className='text-lg m-4'>Open to all suggestions: new artists, design, wording, features, etc. Also, please let me know if you encounter any bugs. Thank you!</h1>
-      <p className='m-4'>Twitter: <a href='https://twitter.com/jeffphox' className='underline'>@jeffphox</a></p>
-      <p className='m-4'>Email: <a className='underline' href='mailto:hi@jam.fans'>hi@jam.fans</a></p>
+			<h1 className='m-4'>Open to all suggestions: new artists, design, wording, features, etc. Also, please let me know if you encounter any bugs or anything annoying. Thank you!</h1>
+      <p className='mx-4 mb-4'>Twitter: <a href='https://twitter.com/jeffphox' className='underline'>@jeffphox</a></p>
+      <p className='mx-4'>Email: <a className='underline' href='mailto:hi@jam.fans'>hi@jam.fans</a></p>
 		</div>
     </div>
 	);
