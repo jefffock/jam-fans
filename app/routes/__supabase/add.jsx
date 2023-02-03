@@ -5,9 +5,9 @@ export default function Add() {
 	//todo: parse
 	return (
 		<>
-				<div className='block m-4'>
-					<p className='text-center text-xl'>Add and/or Rate a Jam</p>
-				</div>
+				{/* <div className='block m-4'>
+					<p className='text-center m-4 text-xl'>Add and/or Rate a Jam</p>
+				</div> */}
 			{/* <div className='flex justify-around mx-auto my-4'>
 				<div className='rounded-md shadow-sm'>
 					<Link to='/add/jam'>

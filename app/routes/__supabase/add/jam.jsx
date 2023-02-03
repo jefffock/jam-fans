@@ -758,6 +758,8 @@ export default function AddJam() {
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
+      <p className='text-center m-4 text-xl'>Add {profile ? 'and/or Rate ' : ''}a Jam</p>
+
 				<input
 					type='hidden'
 					name='artist'
