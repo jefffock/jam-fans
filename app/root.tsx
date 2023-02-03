@@ -20,7 +20,8 @@ export const links: LinksFunction = () => [
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "New Remix App",
+  title: "Jam Fans | Find and add great jams by Phish, The Grateful Dead, SCI, UM, moe. WSMFP, BMFS, Goose, and more",
+  description: "Find and add great jams by Phish, The Grateful Dead, SCI, UM, moe. WSMFP, BMFS, Goose, and more",
   viewport: "width=device-width,initial-scale=1",
 });
 
