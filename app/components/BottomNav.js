@@ -33,7 +33,7 @@ export default function BottomNav({ supabase, session }) {
 						</Link>
 					</div>
 					<Link
-						to='/add'
+						to='/add/jam'
 						className='text-center text-neutral-700 hover:text-neutral-900 flex flex-col text-sm'
 					>
 						<div  className='mx-auto'>
