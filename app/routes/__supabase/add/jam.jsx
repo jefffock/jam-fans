@@ -39,25 +39,25 @@ export const loader = async ({ request, params }) => {
 	let initialDate;
 	let initialLocation;
 	let initialSounds;
-  let initialSongObj;
+	let initialSongObj;
 	if (jam) {
 		initialSong = jam.song_name;
 		initialDate = jam.date;
 		initialLocation = jam.location;
 		initialSounds = jam.sounds;
-    const { data: songObj } = await supabaseClient
-      .from('songs')
-      .select('*')
-      .eq('name', jam.song_name)
-      .single();
-    initialSongObj = songObj;
-    //get artist obj
-    const { data: artistObj } = await supabaseClient
-      .from('artists')
-      .select('*')
-      .eq('artist', jam.artist)
-      .single();
-    initialArtist = artistObj;
+		const { data: songObj } = await supabaseClient
+			.from('songs')
+			.select('*')
+			.eq('name', jam.song_name)
+			.single();
+		initialSongObj = songObj;
+		//get artist obj
+		const { data: artistObj } = await supabaseClient
+			.from('artists')
+			.select('*')
+			.eq('artist', jam.artist)
+			.single();
+		initialArtist = artistObj;
 	}
 	const {
 		data: { user },
@@ -106,7 +106,7 @@ export const loader = async ({ request, params }) => {
 			end_year: 1995,
 		},
 	].concat(artists);
-  console.log('initialSounds in loader', initialSounds)
+	console.log('initialSounds in loader', initialSounds);
 	return json(
 		{
 			artists,
@@ -119,7 +119,7 @@ export const loader = async ({ request, params }) => {
 			initialDate,
 			initialLocation,
 			initialSounds,
-      initialSongObj,
+			initialSongObj,
 			initialJam: jam,
 		},
 		{
@@ -430,10 +430,10 @@ export default function AddJam() {
 		initialDate,
 		initialLocation,
 		initialSounds,
-    initialSongObj,
+		initialSongObj,
 		user,
 		profile,
-    initialJam,
+		initialJam,
 	} = useLoaderData();
 	const [songSelected, setSongSelected] = useState(initialSong ?? '');
 	const [soundsSelected, setSoundsSelected] = useState(initialSounds ?? '');
@@ -534,9 +534,10 @@ export default function AddJam() {
 		setSongSelected('');
 		setJam(null);
 		setShows(null);
-		if (artist && date && artist !== 'Squeaky Feet') {
-			//fetch setlist
-		} else if (artist && year && !date && artist !== 'Squeaky Feet') {
+		setLocation('');
+		setDate('');
+		setYear('');
+		if (artist && year && !date && artist !== 'Squeaky Feet') {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
 			fetcher.load(urlToFetch);

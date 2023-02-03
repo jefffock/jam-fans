@@ -4,11 +4,11 @@ export default function BottomNav({ supabase, session }) {
 	return (
 		<section
 			id='bottom-navigation'
-			className='block fixed inset-x-0 bottom-0 z-10 bg-white shadow h-14'
+			className='block fixed inset-x-0 bottom-0 z-10 bg-white shadow h-14 border-t'
 		>
 			<nav className='flex justify-around max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
 				<div className='-mb-px flex space-x-8 justify-center align-middle pt-1'>
-					<div className='text-center text-neutral-700 hover:text-neutral-900 flex flex-col'>
+					<div className='text-center text-sm text-neutral-700 hover:text-neutral-900 flex flex-col'>
 						<Link
 							to='/jams'
 							className='text-center text-neutral-700 hover:text-neutral-900 flex flex-col'
@@ -34,7 +34,7 @@ export default function BottomNav({ supabase, session }) {
 					</div>
 					<Link
 						to='/add'
-						className='text-center text-neutral-700 hover:text-neutral-900 flex flex-col'
+						className='text-center text-neutral-700 hover:text-neutral-900 flex flex-col text-sm'
 					>
 						<div  className='mx-auto'>
 							<svg

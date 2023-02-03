@@ -96,8 +96,6 @@ export const loader = async ({ request, params }) => {
 		urlToShow = '/jams/lists/' + list.data.id;
 	}
 	let jams = supabaseClient.from('versions').select('*');
-  console.log('artists', artists)
-  console.log('artistsInQuery', artistsInQuery)
 	let artistsInQueryNames = [];
 	if (artistsInQuery?.length > 0) {
 		//if first element is null, break
