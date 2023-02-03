@@ -106,6 +106,7 @@ export const loader = async ({ request, params }) => {
 			end_year: 1995,
 		},
 	].concat(artists);
+  console.log('initialSounds in loader', initialSounds)
 	return json(
 		{
 			artists,
@@ -119,7 +120,7 @@ export const loader = async ({ request, params }) => {
 			initialLocation,
 			initialSounds,
       initialSongObj,
-			jam,
+			initialJam: jam,
 		},
 		{
 			headers: response.headers,
@@ -432,6 +433,7 @@ export default function AddJam() {
     initialSongObj,
 		user,
 		profile,
+    initialJam,
 	} = useLoaderData();
 	const [songSelected, setSongSelected] = useState(initialSong ?? '');
 	const [soundsSelected, setSoundsSelected] = useState(initialSounds ?? '');
@@ -461,7 +463,7 @@ export default function AddJam() {
 	const [loadingShows, setLoadingShows] = useState(false);
 	const [loadingSetlist, setLoadingSetlist] = useState(false);
 	const [jams, setJams] = useState(null);
-	const [jam, setJam] = useState('');
+	const [jam, setJam] = useState(initialJam ?? '');
 	const [year, setYear] = useState('');
 	const [showLocationInput, setShowLocationInput] = useState(false);
 	const [noSetlistFound, setNoSetlistFound] = useState(false);
