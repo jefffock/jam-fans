@@ -120,7 +120,7 @@ export default function AddJam() {
 	const [tagsText, setTagsText] = useState('');
 	const [rating, setRating] = useState('');
 	const [comment, setComment] = useState('');
-	const [listenLink, setListenLink] = useState(null);
+	const [listenLink, setListenLink] = useState('');
 	const [show, setShow] = useState('');
 	const [loadingShows, setLoadingShows] = useState(false);
 	const [loadingSetlist, setLoadingSetlist] = useState(false);
@@ -371,6 +371,10 @@ export default function AddJam() {
 		}
 	}
 
+	function handleLinkChange(e) {
+		setListenLink(e.target.value);
+	}
+
 	if (fetcher?.data?.shows && !shows) {
 		setShows(fetcher?.data?.shows);
 	}
@@ -398,17 +402,6 @@ export default function AddJam() {
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist]);
-
-	//log artist, songSelected, date, location, jam, soundsSelected with strings for each
-	console.log('profile: ' + profile);
-	console.log('artist: ' + artist.artist);
-	console.log('songSelected: ' + songSelected);
-	console.log('date: ' + date);
-	console.log('location: ' + location);
-	console.log('jam sounds: ' + jam?.sounds?.length);
-	console.log('soundsSelected: ' + soundsSelected?.length);
-	console.log('rating: ' + rating);
-	console.log('comment: ' + comment);
 
 	return (
 		<Form method='post'>
@@ -443,6 +436,11 @@ export default function AddJam() {
 					name='sounds'
 					value={soundsSelected}
 				/>
+        <input
+          type='hidden'
+          name='listenLink'
+          value={listenLink}
+        />
 				{/* artist picker*/}
 				{!artist && (
 					<div className='max-h-40 max-w-sm'>
@@ -526,7 +524,7 @@ export default function AddJam() {
 				{/* display artist */}
 				{artist && (
 					<div className='flex justify-between text-sm'>
-						<p className='text-base'>{artist.artist}</p>
+						<p className='text-lg'>{artist.artist}</p>
 						<button
 							type='button'
 							onClick={clearArtist}
@@ -554,7 +552,7 @@ export default function AddJam() {
 								}}
 								name='song'
 							>
-								<Combobox.Label className='block font-medium text-gray-900'>
+								<Combobox.Label className='block text-sm font-medium text-gray-700'>
 									Song
 								</Combobox.Label>
 								<div className='relative mt-1'>
@@ -625,7 +623,7 @@ export default function AddJam() {
 				{/* display song*/}
 				{songSelected && (
 					<div className='flex justify-between text-sm'>
-						<p className='text-base'>{songSelected}</p>
+						<p className='text-lg'>{songSelected}</p>
 						<button
 							type='button'
 							onClick={clearSong}
@@ -1030,7 +1028,7 @@ export default function AddJam() {
 				{/* display date*/}
 				{date && (
 					<div className='flex justify-between text-sm'>
-						<p className='text-base'>{date}</p>
+						<p className='text-lg'>{date}</p>
 						<button
 							type='button'
 							onClick={clearDate}
@@ -1042,7 +1040,7 @@ export default function AddJam() {
 				{/* display location */}
 				{location && !showLocationInput && (
 					<div className='flex justify-between text-sm'>
-						<p className='text-base'>{location}</p>
+						<p className='text-lg'>{location}</p>
 						<button
 							type='button'
 							onClick={showEditLocation}
@@ -1075,12 +1073,12 @@ export default function AddJam() {
 				)}
 				{artist && songSelected && date && location && (
 					<>
-						<p>Optional fields:</p>
+						<p className='text-sm'>Optional fields:</p>
 						{/* Sounds picker */}
 						<div className=''>
 							<div className='mt-1 flex rounded-md shadow-sm max-w-fit'>
 								<fieldset>
-									<legend className='text-lg font-medium text-gray-900'>
+									<legend className='block text-sm font-medium text-gray-700'>
 										Sounds to Add
 									</legend>
 									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll max-w-fit'>
@@ -1122,9 +1120,35 @@ export default function AddJam() {
 					</>
 				)}
 				{soundsSelected && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{/* listen link */}
+				{artist &&
+					songSelected &&
+					date &&
+					location &&
+					profile &&
+					(!jam || (jam && !jam?.listen_link)) && (
+						<div className='mt-6'>
+							<label
+								htmlFor='listen-link'
+								className='block text-sm font-medium text-gray-700'
+							>
+								Listen Link
+							</label>
+							<div className='mt-1'>
+								<input
+									type='text'
+									name='listen-link'
+									id='listen-link'
+									className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'
+									value={listenLink}
+									onChange={handleLinkChange}
+								/>
+							</div>
+						</div>
+					)}
 				{/* rating picker */}
 				{artist && songSelected && date && location && profile && (
-					<div className='max-h-40  max-w-xs'>
+					<div className='max-w-xs'>
 						<Listbox
 							value={rating}
 							onChange={handleRatingChange}
@@ -1241,10 +1265,8 @@ export default function AddJam() {
         update jam, (jam added, add sounds)
         Add jam and comment/rating (not added yet), with rating
         Add rating/comments jam (already added), with rating
-
-        
         */}
-				<div className='flex justify-around py-4 bg-white w-full px-2'>
+				<div className='flex justify-around bg-white w-full px-2'>
 					{/* not logged in, add new jam*/}
 					{!profile && !jam && artist && songSelected && date && location && (
 						<button
@@ -1285,10 +1307,10 @@ export default function AddJam() {
 								Add this jam
 							</button>
 						)}
-					{/*logged in, add new jam, no rating*/}
+					{/*logged in, existing jam, no rating*/}
 					{profile &&
 						jam &&
-						jam?.sounds?.length !== soundsSelected?.length &&
+						(jam?.sounds?.length !== soundsSelected?.length || !jam?.listen_link && listenLink) &&
 						!rating &&
 						!comment && (
 							<button
@@ -1297,7 +1319,7 @@ export default function AddJam() {
 								value='add'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
-								Add sounds to this jam
+								Update this jam
 							</button>
 						)}
 					{/*logged in, add new jam, with rating/comment*/}
@@ -1315,7 +1337,7 @@ export default function AddJam() {
 					{profile &&
 						jam &&
 						(rating || comment) &&
-						jams?.sounds?.length === soundsSelected?.length && (
+						jam?.sounds?.length === soundsSelected?.length && (jam.listen_link || !listenLink) && (
 							<button
 								type='submit'
 								name='_action'
@@ -1329,14 +1351,14 @@ export default function AddJam() {
 					{profile &&
 						jam &&
 						(rating || comment) &&
-						jam?.sounds?.length !== soundsSelected?.length && (
+						(jam?.sounds?.length !== soundsSelected?.length || !jam?.listen_link && listenLink) && (
 							<button
 								type='submit'
 								name='_action'
 								value='add'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
-								Add rating/comment and update sounds
+								Update jam and add rating/comment
 							</button>
 						)}
 				</div>
