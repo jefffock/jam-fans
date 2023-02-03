@@ -83,12 +83,47 @@ export async function action({ request, params }) {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	console.log('values', values);
+  let sounds = []
+  if (values.sounds) {
+    values.sounds.split(',').forEach(sound => {
+      sounds.push(sound)
+    })
+  }
 	if (_action === 'new-song') {
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.insert({ song: values['new-song'], artist: values.artist });
 	}
-
+	if (_action === 'add-not-logged-in') {
+		if (!values.artist || !values.song || !values.date || !values.location) {
+			return json({ status: 400, body: 'missing required fields' });
+		}
+		const { data, error } = await supabaseClient
+			.from('versions_duplicate')
+			.insert({
+				artist: values.artist,
+				song_name: values.song,
+				date: values.date,
+				location: values.location,
+				sounds: sounds,
+        song_id: values.songId,
+			});
+		console.log('data', data);
+		console.log('error', error);
+	}
+	if (_action === 'update-not-logged-in') {
+	}
+	if (_action === 'add-logged-in') {
+	}
+	if (_action === 'update-logged-in') {
+	}
+	if (_action === 'add-and-rating') {
+	}
+	if (_action === 'rating') {
+	}
+	if (_action === 'rating-update') {
+	}
 	return { status: 200, body: 'ok' };
 }
 
@@ -136,6 +171,7 @@ export default function AddJam() {
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
 	const [shows, setShows] = useState(null);
+	const [songId, setSongId] = useState(null);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -235,6 +271,17 @@ export default function AddJam() {
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
 			fetcher.load(urlToFetch);
 		}
+		async function getSongId() {
+			const { data, error } = await supabase
+				.from('songs')
+				.select('id')
+				.eq('song', songSelected)
+				.single();
+			if (data) {
+				setSongId(data.id);
+			}
+		}
+		getSongId();
 	}, [songSelected]);
 
 	function handleShowChange(show) {
@@ -429,18 +476,23 @@ export default function AddJam() {
 				<input
 					type='hidden'
 					name='jam'
-					value={jam}
+					value={JSON.stringify(jam)}
 				/>
 				<input
 					type='hidden'
 					name='sounds'
 					value={soundsSelected}
 				/>
-        <input
-          type='hidden'
-          name='listenLink'
-          value={listenLink}
-        />
+				<input
+					type='hidden'
+					name='rating'
+					value={rating}
+				/>
+				<input
+					type='hidden'
+					name='songId'
+					value={songId}
+				/>
 				{/* artist picker*/}
 				{!artist && (
 					<div className='max-h-40 max-w-sm'>
@@ -1272,7 +1324,7 @@ export default function AddJam() {
 						<button
 							type='submit'
 							name='_action'
-							value='add'
+							value='add-not-logged-in'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 						>
 							Add this jam
@@ -1283,7 +1335,7 @@ export default function AddJam() {
 						<button
 							type='submit'
 							name='_action'
-							value='add'
+							value='update-not-logged-in'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 						>
 							Add sounds to this jam
@@ -1301,7 +1353,7 @@ export default function AddJam() {
 							<button
 								type='submit'
 								name='_action'
-								value='add'
+								value='add-logged-in'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
 								Add this jam
@@ -1310,13 +1362,14 @@ export default function AddJam() {
 					{/*logged in, existing jam, no rating*/}
 					{profile &&
 						jam &&
-						(jam?.sounds?.length !== soundsSelected?.length || !jam?.listen_link && listenLink) &&
+						(jam?.sounds?.length !== soundsSelected?.length ||
+							(!jam?.listen_link && listenLink)) &&
 						!rating &&
 						!comment && (
 							<button
 								type='submit'
 								name='_action'
-								value='add'
+								value='update-logged-in'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
 								Update this jam
@@ -1327,7 +1380,7 @@ export default function AddJam() {
 						<button
 							type='submit'
 							name='_action'
-							value='add'
+							value='add-and-rating'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 						>
 							Add jam and rating/comment
@@ -1337,11 +1390,12 @@ export default function AddJam() {
 					{profile &&
 						jam &&
 						(rating || comment) &&
-						jam?.sounds?.length === soundsSelected?.length && (jam.listen_link || !listenLink) && (
+						jam?.sounds?.length === soundsSelected?.length &&
+						(jam.listen_link || !listenLink) && (
 							<button
 								type='submit'
 								name='_action'
-								value='add'
+								value='rating'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
 								Add rating/comment
@@ -1351,11 +1405,12 @@ export default function AddJam() {
 					{profile &&
 						jam &&
 						(rating || comment) &&
-						(jam?.sounds?.length !== soundsSelected?.length || !jam?.listen_link && listenLink) && (
+						(jam?.sounds?.length !== soundsSelected?.length ||
+							(!jam?.listen_link && listenLink)) && (
 							<button
 								type='submit'
 								name='_action'
-								value='add'
+								value='rating-update'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
 							>
 								Update jam and add rating/comment
