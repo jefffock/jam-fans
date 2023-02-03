@@ -3,6 +3,7 @@ import {
 	useLoaderData,
 	useFetcher,
 	useOutletContext,
+	useActionData,
 } from '@remix-run/react';
 import { json } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
@@ -10,6 +11,7 @@ import { Listbox, Transition, Dialog, Combobox } from '@headlessui/react';
 import { Fragment, useState, useEffect, useRef } from 'react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import InfoAlert from '../../../components/alerts/InfoAlert';
+import SuccessAlert from '../../../components/alerts/SuccessAlert';
 import { textSpanContainsPosition } from 'typescript';
 
 export const loader = async ({ request, params }) => {
@@ -19,6 +21,44 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	const url = new URL(request.url);
+	const searchParams = new URLSearchParams(url.search);
+	const queryParams = Object.fromEntries(searchParams);
+	console.log('queryParams', queryParams);
+	let jam;
+	if (queryParams?.jamid) {
+		const { data } = await supabaseClient
+			.from('versions')
+			.select('*')
+			.eq('id', JSON.parse(queryParams.jamid))
+			.single();
+		jam = data;
+	}
+	let initialArtist;
+	let initialSong;
+	let initialDate;
+	let initialLocation;
+	let initialSounds;
+  let initialSongObj;
+	if (jam) {
+		initialSong = jam.song_name;
+		initialDate = jam.date;
+		initialLocation = jam.location;
+		initialSounds = jam.sounds;
+    const { data: songObj } = await supabaseClient
+      .from('songs')
+      .select('*')
+      .eq('name', jam.song_name)
+      .single();
+    initialSongObj = songObj;
+    //get artist obj
+    const { data: artistObj } = await supabaseClient
+      .from('artists')
+      .select('*')
+      .eq('artist', jam.artist)
+      .single();
+    initialArtist = artistObj;
+	}
 	const {
 		data: { user },
 	} = await supabaseClient.auth.getUser();
@@ -67,7 +107,20 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	return json(
-		{ artists, songs, sounds, user, profile },
+		{
+			artists,
+			songs,
+			sounds,
+			user,
+			profile,
+			initialArtist,
+			initialSong,
+			initialDate,
+			initialLocation,
+			initialSounds,
+      initialSongObj,
+			jam,
+		},
 		{
 			headers: response.headers,
 		}
@@ -83,6 +136,76 @@ export async function action({ request, params }) {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	async function addOnePoint(profileName) {
+		const { error } = await supabaseClient.rpc('add_one_point', {
+			username: profileName,
+		});
+		if (error) {
+			console.error('error adding one point', error);
+		} else console.log('added one point');
+	}
+
+	async function addTenPoints(profileName) {
+		const { error } = await supabaseClient.rpc('add_ten_points', {
+			username: profileName,
+		});
+		if (error) {
+			console.error('error adding ten points', error);
+		} else {
+			console.log('added ten points');
+		}
+	}
+
+	async function addRatingCountToArtist(artistId) {
+		const { error } = await supabaseClient.rpc('add_rating_count_artist', {
+			artistid: artistId,
+		});
+		if (error) {
+			console.error('error adding rating count to artist', error);
+		} else {
+			console.log('added rating count to artist');
+		}
+	}
+
+	async function addRatingCountToSong(songId) {
+		let song_id = parseInt(songId);
+		const { error } = await supabaseClient.rpc('increment_song_rating_count', {
+			songid: song_id,
+		});
+		if (error) {
+			console.error('error adding incrementing song rating count', error);
+		} else {
+			console.log('added rating count to song');
+		}
+	}
+
+	async function addRatingCountToVersion(versionId) {
+		let version_id = parseInt(versionId);
+		const { error } = await supabaseClient.rpc(
+			'increment_version_rating_count',
+			{
+				versionid: version_id,
+			}
+		);
+		if (error) {
+			console.error('error adding incrementing version rating count', error);
+		} else {
+			console.log('added rating count to version');
+		}
+	}
+
+	async function calcAverageForVersion(versionId) {
+		let version = parseInt(versionId);
+		const { error } = await supabaseClient.rpc('calc_average', {
+			versionid: version,
+		});
+		if (error) {
+			console.error('error calculating average', error);
+		} else {
+			console.log('calculated average');
+		}
+	}
+
 	console.log('values', values);
 	let sounds = [];
 	if (values.sounds) {
@@ -109,6 +232,9 @@ export async function action({ request, params }) {
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.insert({ song: values['new-song'], artist: values.artist });
+		if (profile?.name) {
+			addTenPoints(profile.name);
+		}
 	}
 	if (_action === 'add-not-logged-in') {
 		if (!values.artist || !values.song || !values.date || !values.location) {
@@ -125,6 +251,7 @@ export async function action({ request, params }) {
 		});
 		console.log('data', data);
 		console.log('error', error);
+		addOnePoint(songObj?.submitter_name);
 	}
 	if (_action === 'update-not-logged-in') {
 		const { data, error } = await supabaseClient
@@ -150,6 +277,8 @@ export async function action({ request, params }) {
 		});
 		console.log('data', data);
 		console.log('error', error);
+		addTenPoints(profile?.name);
+		addOnePoint(songObj?.submitter_name);
 	}
 	if (_action === 'update-logged-in') {
 		if (values['listen-link']) {
@@ -160,15 +289,14 @@ export async function action({ request, params }) {
 					listen_link: values.listen - link,
 				})
 				.eq('id', jam?.id);
+			addTenPoints(profile?.name);
 			console.log('data', data);
 			console.log('error', error);
 		} else {
-			const { data, error } = await supabaseClient
-				.from('versions')
-				.update({
-					sounds: sounds,
-				})
-				.eq('id', jam?.id);
+			const { data, error } = await supabaseClient.from('versions').update({
+				sounds: sounds,
+			});
+			addOnePoint(profile?.name).eq('id', jam?.id);
 			console.log('data', data);
 			console.log('error', error);
 		}
@@ -206,6 +334,13 @@ export async function action({ request, params }) {
 				.select();
 			console.log('data add rating', dataFromAddRating);
 			console.log('error add rating', error);
+			addTenPoints(profile?.name);
+			addTenPoints(profile?.name);
+			addOnePoint(songObj?.submitter_name);
+			addRatingCountToArtist(values.artist);
+			addRatingCountToSong(values.song);
+			addRatingCountToVersion(jamId);
+			calcAverageForVersion(jamId);
 		}
 		console.log('error add jam', error);
 	}
@@ -223,6 +358,13 @@ export async function action({ request, params }) {
 			.select();
 		console.log('data', data);
 		console.log('error', error);
+		addTenPoints(profile?.name);
+		addOnePoint(songObj?.submitter_name);
+		addOnePoint(jam?.submitter_name);
+		addRatingCountToArtist(values.artist);
+		addRatingCountToSong(values.song);
+		addRatingCountToVersion(jam?.id);
+		calcAverageForVersion(jam?.id);
 	}
 	if (_action === 'rating-update') {
 		//insert rating
@@ -262,6 +404,13 @@ export async function action({ request, params }) {
 				.select();
 			console.log('dataFromUpdate', dataFromUpdate);
 			console.log('errorFromUpdate', errorFromUpdate);
+			addTenPoints(profile?.name);
+			addOnePoint(songObj?.submitter_name);
+			addOnePoint(jam?.submitter_name);
+			addRatingCountToArtist(values.artist);
+			addRatingCountToSong(values.song);
+			addRatingCountToVersion(jam?.id);
+			calcAverageForVersion(jam?.id);
 		}
 	}
 	return { status: 200, body: 'ok' };
@@ -270,16 +419,28 @@ export async function action({ request, params }) {
 export default function AddJam() {
 	const { supabase, session } = useOutletContext();
 	const fetcher = useFetcher();
-	const { artists, songs, sounds, initialArtist, initialSong, user, profile } =
-		useLoaderData();
-	const [songSelected, setSongSelected] = useState('');
-	const [soundsSelected, setSoundsSelected] = useState('');
+	const actionData = useActionData();
+	const {
+		artists,
+		songs,
+		sounds,
+		initialArtist,
+		initialSong,
+		initialDate,
+		initialLocation,
+		initialSounds,
+    initialSongObj,
+		user,
+		profile,
+	} = useLoaderData();
+	const [songSelected, setSongSelected] = useState(initialSong ?? '');
+	const [soundsSelected, setSoundsSelected] = useState(initialSounds ?? '');
 	const [jamDate, setJamDate] = useState('');
 	const [jamLocation, setJamLocation] = useState('');
 	const [query, setQuery] = useState('');
 	const [artist, setArtist] = useState(initialArtist ?? '');
 	const [song, setSong] = useState(initialSong ?? '');
-	const [songObj, setSongObj] = useState(null);
+	const [songObj, setSongObj] = useState(initialSongObj ?? '');
 	const [songExists, setSongExists] = useState(false);
 	const [loading, setLoading] = useState(null);
 	const [open, setOpen] = useState(false);
@@ -290,8 +451,8 @@ export default function AddJam() {
 	const [successAlertText, setSuccessAlertText] = useState(null);
 	const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
-	const [date, setDate] = useState('');
-	const [location, setLocation] = useState('');
+	const [date, setDate] = useState(initialDate ?? '');
+	const [location, setLocation] = useState(initialLocation ?? '');
 	const [tagsText, setTagsText] = useState('');
 	const [rating, setRating] = useState('');
 	const [comment, setComment] = useState('');
@@ -591,9 +752,6 @@ export default function AddJam() {
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist]);
-
-	console.log('songObj', songObj);
-
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
@@ -1566,6 +1724,25 @@ export default function AddJam() {
 							</button>
 						)}
 				</div>
+				{actionData && actionData?.status === 200 && (
+					<SuccessAlert
+						title={'Success!'}
+						description={
+							'You successfully did what you were trying to do! Thank you for your contribution'
+						}
+					/>
+				)}
+				{actionData && actionData?.status !== 200 && (
+					<>
+						<ErrorAlert
+							title={'Error :('}
+							description={
+								'Something went wrong. Please try again and/or let me know on twitter'
+							}
+						/>
+						<a href='https://twitter.com/jeffphox'>@jeffphox on twitter</a>
+					</>
+				)}
 			</div>
 		</Form>
 	);

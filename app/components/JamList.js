@@ -1,6 +1,6 @@
 import JamCard from './cards/JamCard';
 
-export default function JamList({ jams, sounds, title }) {
+export default function JamList({ jams, sounds, title, user, profile }) {
 	if (!jams) return <div>No jams</div>;
 	return (
 		<div>
@@ -14,6 +14,8 @@ export default function JamList({ jams, sounds, title }) {
 							key={index}
 							jam={version}
 							sounds={sounds}
+              user={user}
+              profile={profile}
 						/>
 					);
 				})}

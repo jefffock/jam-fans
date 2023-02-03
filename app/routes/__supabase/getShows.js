@@ -132,13 +132,15 @@ export const loader = async ({ request, params }) => {
 			}
 			let songId;
 			//get song id from supabase
+			console.log('dbName', dbName);
+			console.log('song', song);
 			const { data, error } = await supabaseClient
 				.from(dbName)
 				.select('id')
 				.eq('name', song);
 			if (error || data.length === 0) {
 				console.error('error getting songfish songid from supabase', error);
-				res.status(500).send([]);
+				//todo: handle error
 			} else {
 				songId = data[0]?.id;
 				const url = `${baseUrl}/setlists/song_id/${songId}`;
@@ -149,11 +151,11 @@ export const loader = async ({ request, params }) => {
 					const alreadyAdded = data.find((d) => d.date === show.showdate);
 					return {
 						showdate: show.showdate,
-						location: `${show.venue}, ${show.city}, ${
+						location: `${show.venuename}, ${show.city}, ${
 							show.country === 'USA' ? show.state : show.country
 						}`,
 						label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
-							show.venue
+							show.venuename
 						}, ${show.city}, ${
 							show.country === 'USA' ? show.state : show.country
 						}`,

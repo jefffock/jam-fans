@@ -24,6 +24,8 @@ export default function JamCard({ jam, sounds, user, profile }) {
 	}
 	soundsString = soundsString.slice(0, -2);
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
+
+  const link = `/add/jam?jamid=${jam.id}`;
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>
@@ -63,9 +65,11 @@ export default function JamCard({ jam, sounds, user, profile }) {
 				{soundsString && (
 					<p className='mb-3 font-normal text-gray-700'>{soundsString}</p>
 				)}
-				<p className='font-normal text-gray-700'>
-					{'Added by ' + jam.submitter_name}
-				</p>
+				{jam?.submitter_name && (
+					<p className='font-normal text-gray-700'>
+						{'Added by ' + jam.submitter_name}
+					</p>
+				)}
 			</div>
 			<div className='flex justify-between mt-3'>
 				{!user && !profile && (
@@ -76,37 +80,30 @@ export default function JamCard({ jam, sounds, user, profile }) {
 						Login to rate
 					</Link>
 				)}
-				{user && profile && <button>Rate</button>}
+				{user && profile && <Link to={link}>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
 				<div>
-          {jam.listen_link &&
-					<a
-						href='#'
-						className='inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300'
-					>
-						Listen
-						<svg
-							aria-hidden='true'
-							className='w-4 h-4 ml-2 -mr-1'
-							fill='currentColor'
-							viewBox='0 0 20 20'
-							xmlns='http://www.w3.org/2000/svg'
+					{jam.listen_link && (
+						<a
+							href={jam.listen_link}
+							className='inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300'
 						>
-							<path
-								fillRule='evenodd'
-								d='M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z'
-								clipRule='evenodd'
-							></path>
-						</svg>
-					</a>
-          }
-          {!jam.listen_link &&
-          <button
-          type="button"
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Add a link
-        </button>
-          }
+							Listen
+							<svg
+								aria-hidden='true'
+								className='w-4 h-4 ml-2 -mr-1'
+								fill='currentColor'
+								viewBox='0 0 20 20'
+								xmlns='http://www.w3.org/2000/svg'
+							>
+								<path
+									fillRule='evenodd'
+									d='M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z'
+									clipRule='evenodd'
+								></path>
+							</svg>
+						</a>
+					)}
+
 				</div>
 			</div>
 		</div>

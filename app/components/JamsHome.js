@@ -16,6 +16,8 @@ export default function JamsHome({
 	title,
 	count,
 	search,
+  user,
+  profile
 }) {
 	if (!artists) return <div>Loading...</div>;
 
@@ -41,6 +43,8 @@ export default function JamsHome({
 				jams={versions}
 				sounds={sounds}
 				title={title}
+        user={user}
+        profile={profile}
 			/>
 		</div>
 	);

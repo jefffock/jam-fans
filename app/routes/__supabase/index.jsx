@@ -17,6 +17,20 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+
+  const {
+		data: { user },
+	} = await supabaseClient.auth.getUser();
+
+	let profile;
+	if (user && user?.id && user != null) {
+		const { data } = await supabaseClient
+			.from('profiles')
+			.select('*')
+			.eq('id', user.id)
+			.single();
+		profile = data;
+	}
 	//get artists
 	let { data: artists } = await supabaseClient
 		.from('artists')
@@ -59,7 +73,7 @@ export const loader = async ({ request, params }) => {
 		.select('*', { count: 'exact', head: true });
 	count = count.count;
 	return json(
-		{ artists, songs, versions, sounds, count },
+		{ artists, songs, versions, sounds, count, user, profile },
 		{
 			headers: response.headers,
 		}
@@ -67,7 +81,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, versions, sounds, title, count } = useLoaderData();
+	const { artists, songs, versions, sounds, title, count, user, profile } = useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
 
@@ -82,7 +96,8 @@ export default function Index({ supabase, session }) {
 			open={open}
 			setOpen={setOpen}
 			count={count}
-      
+      user={user}
+      profile={profile}
 		/>
 	);
 }

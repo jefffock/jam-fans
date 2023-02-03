@@ -16,6 +16,20 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+  
+  const {
+		data: { user },
+	} = await supabaseClient.auth.getUser();
+
+	let profile;
+	if (user && user?.id && user != null) {
+		const { data } = await supabaseClient
+			.from('profiles')
+			.select('*')
+			.eq('id', user.id)
+			.single();
+		profile = data;
+	}
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('nickname, emoji_code, url, artist')
@@ -205,7 +219,7 @@ export const loader = async ({ request, params }) => {
 	const search = url.search;
 
 	return json(
-		{ artists, songs, versions, sounds, fullTitle, title, count, search },
+		{ artists, songs, versions, sounds, fullTitle, title, count, search, user, profile },
 		{
 			headers: response.headers,
 		}
@@ -213,7 +227,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title, count, search } =
+	const { artists, songs, versions, sounds, fullTitle, title, count, search, user, profile } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -232,6 +246,8 @@ export default function Jams({ supabase, session }) {
 			title={title}
 			count={count}
 			search={search}
+      user={user}
+      profile={profile}
 		/>
 	);
 }
