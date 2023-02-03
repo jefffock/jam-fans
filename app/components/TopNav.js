@@ -1,12 +1,14 @@
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useOutletContext, Link } from '@remix-run/react';
+import { useOutletContext, Link, NavLink } from '@remix-run/react';
 
 const navigation = [
 	{ name: 'Home', href: '/', current: true },
 	{ name: 'Jams', href: '/jams', current: false },
 	{ name: 'Add', href: '/add/jam', current: false },
+	{ name: 'Roadmap', href: '/roadmap', current: false },
+	{ name: 'Contact', href: '/contact', current: false },
 ];
 const userNavigation = [
 	// { name: 'Settings', href: '#' },
@@ -16,6 +18,10 @@ const userNavigation = [
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ');
 }
+
+const activeClassName = 'border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
+const inactiveClassName =
+	'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 
 export default function TopNav({ title, supabase, session }) {
 	const user = session?.user;
@@ -41,36 +47,51 @@ export default function TopNav({ title, supabase, session }) {
 								<div className='flex h-16 justify-between'>
 									<div className='flex'>
 										<div className='flex flex-shrink-0 items-center'>
-                      <Link to='/'>
-											<img
-												href='/'
-												className='block h-8 w-auto lg:hidden'
-												src='/icon-circle.png'
-												alt='Jam Fans'
-											/>
-											<img
-												href='/'
-												className='hidden h-8 w-auto lg:block'
-												src='/icon-circle.png'
-												alt='Jam Fans'
-											/>
-                      </Link>
+											<Link to='/'>
+												<img
+													href='/'
+													className='block h-8 w-auto lg:hidden'
+													src='/icon-circle.png'
+													alt='Jam Fans'
+												/>
+												<img
+													href='/'
+													className='hidden h-8 w-auto lg:block'
+													src='/icon-circle.png'
+													alt='Jam Fans'
+												/>
+											</Link>
 										</div>
 										<div className='hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8'>
-											{navigation.map((item) => (
-												<a
-													key={item.name}
-													href={item.href}
-													className={classNames(
-														item.current
-															? 'border-indigo-500 text-gray-900'
-															: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-														'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
-													)}
-													aria-current={item.current ? 'page' : undefined}
+											{navigation.map((item, itemIndex) => (
+												<NavLink
+													key={item.itemIndex}
+													to={item.href}
+													className={({ isActive }) =>
+														isActive ? activeClassName : inactiveClassName
+													}
+													//  className={classNames(
+													//   isActive
+													//     ? 'border-indigo-500 text-gray-900'
+													//     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+													//   'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
+													// )}
 												>
 													{item.name}
-												</a>
+												</NavLink>
+												// <a
+												// 	key={item.name}
+												// 	href={item.href}
+												// 	className={classNames(
+												// 		item.current
+												// 			? 'border-indigo-500 text-gray-900'
+												// 			: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+												// 		'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
+												// 	)}
+												// 	aria-current={item.current ? 'page' : undefined}
+												// >
+												// 	{item.name}
+												// </a>
 											))}
 										</div>
 									</div>

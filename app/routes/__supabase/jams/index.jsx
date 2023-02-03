@@ -16,7 +16,7 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
-  
+
   const {
 		data: { user },
 	} = await supabaseClient.auth.getUser();
@@ -96,17 +96,20 @@ export const loader = async ({ request, params }) => {
 		urlToShow = '/jams/lists/' + list.data.id;
 	}
 	let jams = supabaseClient.from('versions').select('*');
-
+  console.log('artists', artists)
+  console.log('artistsInQuery', artistsInQuery)
 	let artistsInQueryNames = [];
 	if (artistsInQuery?.length > 0) {
 		//if first element is null, break
 		if (artistsInQuery[0] !== 'null') {
 			artistsInQuery.forEach((artist) => {
+        console.log('artist', artist)
 				artistsInQueryNames.push(artists.find((a) => a.url === artist)?.artist);
 			});
 			jams = jams.in('artist', artistsInQueryNames);
 		}
 	}
+  console.log('artistsInQueryNames', artistsInQueryNames)
 	if (song) {
 		jams = jams.eq('song_name', song);
 	}
@@ -196,6 +199,9 @@ export const loader = async ({ request, params }) => {
 			if (j === artistsInQueryNames.length - 2) title += ' and ';
 		}
 	}
+  if (artistsInQueryNames?.length === 0) {
+    title += ' by All Bands';
+  }
 	if (beforeDate && afterDate) {
 		if (beforeDate === afterDate) {
 			title += ' from ' + beforeDate;

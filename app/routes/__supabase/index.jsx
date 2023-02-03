@@ -68,12 +68,13 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	//make title
+  let title = 'Jams by All Bands'
 	let count = await supabaseClient
 		.from('versions')
 		.select('*', { count: 'exact', head: true });
 	count = count.count;
 	return json(
-		{ artists, songs, versions, sounds, count, user, profile },
+		{ artists, songs, versions, sounds, count, user, profile, title },
 		{
 			headers: response.headers,
 		}
@@ -98,6 +99,7 @@ export default function Index({ supabase, session }) {
 			count={count}
       user={user}
       profile={profile}
+      title={title}
 		/>
 	);
 }
