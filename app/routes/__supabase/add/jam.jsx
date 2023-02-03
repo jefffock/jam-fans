@@ -84,16 +84,27 @@ export async function action({ request, params }) {
 		{ request, response }
 	);
 	console.log('values', values);
-  let sounds = []
-  if (values.sounds) {
-    values.sounds.split(',').forEach(sound => {
-      sounds.push(sound)
-    })
-  }
-  let jam
-  if (values.jam) {
-    jam = JSON.parse(values.jam)
-  }
+	let sounds = [];
+	if (values.sounds) {
+		values.sounds.split(',').forEach((sound) => {
+			sounds.push(sound);
+		});
+	}
+	let jam;
+	if (values.jam) {
+		jam = JSON.parse(values.jam);
+	}
+	let profile;
+	if (values.profile) {
+		profile = JSON.parse(values.profile);
+	}
+	let songObj;
+	if (values.songObj) {
+		songObj = JSON.parse(values.songObj);
+	}
+	console.log('songObj', songObj);
+	console.log('song_id', songObj?.id);
+	console.log('profile', profile);
 	if (_action === 'new-song') {
 		const { data, error } = await supabaseClient
 			.from('songs')
@@ -103,38 +114,155 @@ export async function action({ request, params }) {
 		if (!values.artist || !values.song || !values.date || !values.location) {
 			return json({ status: 400, body: 'missing required fields' });
 		}
+		const { data, error } = await supabaseClient.from('versions').insert({
+			artist: values.artist,
+			song_name: values.song,
+			date: values.date,
+			location: values.location,
+			sounds: sounds,
+			song_id: songObj?.id,
+			song_submitter_name: songObj?.submitter_name,
+		});
+		console.log('data', data);
+		console.log('error', error);
+	}
+	if (_action === 'update-not-logged-in') {
 		const { data, error } = await supabaseClient
-			.from('versions_duplicate')
+			.from('versions')
+			.update({
+				sounds: sounds,
+			})
+			.eq('id', jam?.id);
+		console.log('data', data);
+		console.log('error', error);
+	}
+	if (_action === 'add-logged-in') {
+		const { data, error } = await supabaseClient.from('versions').insert({
+			artist: values.artist,
+			song_name: values.song,
+			date: values.date,
+			location: values.location,
+			sounds: sounds,
+			user_id: profile?.id,
+			submitter_name: profile?.name,
+			song_id: songObj?.id,
+			song_submitter_name: songObj?.submitter_name,
+		});
+		console.log('data', data);
+		console.log('error', error);
+	}
+	if (_action === 'update-logged-in') {
+		if (values['listen-link']) {
+			const { data, error } = await supabaseClient
+				.from('versions')
+				.update({
+					sounds: sounds,
+					listen_link: values.listen - link,
+				})
+				.eq('id', jam?.id);
+			console.log('data', data);
+			console.log('error', error);
+		} else {
+			const { data, error } = await supabaseClient
+				.from('versions')
+				.update({
+					sounds: sounds,
+				})
+				.eq('id', jam?.id);
+			console.log('data', data);
+			console.log('error', error);
+		}
+	}
+	if (_action === 'add-and-rating') {
+		console.log('in add and rating');
+		const { data, error } = await supabaseClient
+			.from('versions')
 			.insert({
 				artist: values.artist,
 				song_name: values.song,
 				date: values.date,
 				location: values.location,
 				sounds: sounds,
-        song_id: values.songId,
-			});
+				listen_link: values['listen-link'] || null,
+				user_id: profile?.id,
+				submitter_name: profile?.name,
+				song_id: songObj?.id,
+				song_submitter_name: songObj?.submitter_name,
+			})
+			.select();
+		console.log('data', data);
+		if (data && data.length > 0) {
+			console.log('going to add rating to this jam', data);
+			const jamId = data[0].id;
+			const { dataFromAddRating, error } = await supabaseClient
+				.from('ratings')
+				.insert({
+					user_id: profile?.id,
+					version_id: jamId,
+					rating: values.rating,
+					comment: values.comment,
+					submitter_name: profile?.name,
+				})
+				.select();
+			console.log('data add rating', dataFromAddRating);
+			console.log('error add rating', error);
+		}
+		console.log('error add jam', error);
+	}
+	if (_action === 'rating') {
+		console.log('in rating');
+		const { data, error } = await supabaseClient
+			.from('ratings')
+			.insert({
+				user_id: profile?.id,
+				version_id: jam?.id,
+				rating: values.rating,
+				comment: values.comment,
+				submitter_name: profile?.name,
+			})
+			.select();
 		console.log('data', data);
 		console.log('error', error);
 	}
-	if (_action === 'update-not-logged-in') {
-    const { data, error } = await supabaseClient
-      .from('versions_duplicate')
-      .update({
-        sounds: sounds,
-      })
-      .eq('id', jam?.id);
-      console.log('data', data);
-      console.log('error', error);
-	}
-	if (_action === 'add-logged-in') {
-	}
-	if (_action === 'update-logged-in') {
-	}
-	if (_action === 'add-and-rating') {
-	}
-	if (_action === 'rating') {
-	}
 	if (_action === 'rating-update') {
+		//insert rating
+		//update version
+		console.log('in rating update');
+		const { data, error } = await supabaseClient
+			.from('ratings')
+			.insert({
+				user_id: profile?.id,
+				version_id: jam?.id,
+				rating: values.rating,
+				comment: values.comment,
+				submitter_name: profile?.name,
+			})
+			.select();
+		console.log('data', data);
+		console.log('error', error);
+		if (values['listen-link']) {
+			const { dataFromUpdateWithLink, errorFromUpdateWithLink } =
+				await supabaseClient
+					.from('versions')
+					.update({
+						listen_link: values['listen-link'],
+						sounds: sounds,
+					})
+					.eq('id', jam?.id)
+					.select();
+			console.log('dataFromUpdateWithLink', dataFromUpdateWithLink);
+			console.log('errorFromUpdateWithLink', errorFromUpdateWithLink);
+		} else {
+			const { dataFromUpdate, errorFromUpdate } = await supabaseClient
+				.from('versions')
+				.update({
+					sounds: sounds,
+				})
+				.eq('id', jam?.id)
+				.select();
+			console.log('dataFromUpdate', dataFromUpdate);
+			console.log('errorFromUpdate', errorFromUpdate);
+		}
 	}
 	return { status: 200, body: 'ok' };
 }
@@ -283,17 +411,17 @@ export default function AddJam() {
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
 			fetcher.load(urlToFetch);
 		}
-		async function getSongId() {
+		async function getSongObj() {
 			const { data, error } = await supabase
 				.from('songs')
-				.select('id')
+				.select('*')
 				.eq('song', songSelected)
 				.single();
 			if (data) {
-				setSongId(data.id);
+				setSongObj(data);
 			}
 		}
-		getSongId();
+		getSongObj();
 	}, [songSelected]);
 
 	function handleShowChange(show) {
@@ -419,14 +547,16 @@ export default function AddJam() {
 
 	function handleSoundsChange(e) {
 		// if e.target.value is not in soundsSelected, add it, else, remove it
-		if (soundsSelected.includes(e.target.value)) {
+		if (soundsSelected?.includes(e.target.value)) {
 			let newSoundsSelected = soundsSelected.filter(
 				(sound) => sound !== e.target.value
 			);
 			setSoundsSelected(newSoundsSelected);
-		} else {
+		} else if (soundsSelected) {
 			const sortedSounds = [...soundsSelected, e.target.value].sort();
 			setSoundsSelected(sortedSounds);
+		} else {
+			setSoundsSelected([e.target.value]);
 		}
 	}
 
@@ -461,6 +591,8 @@ export default function AddJam() {
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist]);
+
+	console.log('songObj', songObj);
 
 	return (
 		<Form method='post'>
@@ -502,8 +634,13 @@ export default function AddJam() {
 				/>
 				<input
 					type='hidden'
-					name='songId'
-					value={songId}
+					name='songObj'
+					value={JSON.stringify(songObj)}
+				/>
+				<input
+					type='hidden'
+					name='profile'
+					value={JSON.stringify(profile)}
 				/>
 				{/* artist picker*/}
 				{!artist && (
