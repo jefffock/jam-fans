@@ -90,6 +90,10 @@ export async function action({ request, params }) {
       sounds.push(sound)
     })
   }
+  let jam
+  if (values.jam) {
+    jam = JSON.parse(values.jam)
+  }
 	if (_action === 'new-song') {
 		const { data, error } = await supabaseClient
 			.from('songs')
@@ -113,6 +117,14 @@ export async function action({ request, params }) {
 		console.log('error', error);
 	}
 	if (_action === 'update-not-logged-in') {
+    const { data, error } = await supabaseClient
+      .from('versions_duplicate')
+      .update({
+        sounds: sounds,
+      })
+      .eq('id', jam?.id);
+      console.log('data', data);
+      console.log('error', error);
 	}
 	if (_action === 'add-logged-in') {
 	}
