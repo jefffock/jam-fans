@@ -1,7 +1,7 @@
 export default function Contact() {
 	return (
     <div className='w-100 h-100'>
-		<div className='p-4 bg-white border border-gray-200 rounded-lg shadow m-4 mt-20 w-80 flex flex-col justify-between mx-auto'>
+		<div className='p-4 bg-white border border-gray-200 rounded-lg shadow m-4 mt-6 w-80 flex flex-col justify-between mx-auto sm:px-6'>
        <div className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6">
       <h3 className="text-lg font-medium leading-6 text-gray-900 m-4">Contact</h3>
     </div>

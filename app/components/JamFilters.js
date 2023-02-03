@@ -543,7 +543,7 @@ export default function JamFiltersSlideout({
 															</Listbox>
 														</div>
 														{/* Checkbox options (show ratings, only show links) */}
-														<div className='px-4 py-2'>
+														<div className='px-4 py-2 pb-20'>
 															<fieldset className='space-y-5'>
 																<legend className='sr-only'>Options</legend>
 																<div className='relative flex items-start'>
@@ -574,7 +574,7 @@ export default function JamFiltersSlideout({
 																		</p>
 																	</div>
 																</div>
-																<div className='relative flex items-start'>
+																{/* <div className='relative flex items-start'>
 																	<div className='flex h-5 items-center'>
 																		<input
 																			id='show-ratings'
@@ -600,7 +600,7 @@ export default function JamFiltersSlideout({
 																			Show jam ratings on the cards.
 																		</p>
 																	</div>
-																</div>
+																</div> */}
 															</fieldset>
 														</div>
 													</div>
