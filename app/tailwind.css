@@ -875,6 +875,10 @@ select {
   display: block;
 }
 
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
@@ -925,6 +929,11 @@ select {
 
 .h-12 {
   height: 3rem;
+}
+
+.h-min {
+  height: -moz-min-content;
+  height: min-content;
 }
 
 .h-10 {
@@ -1504,6 +1513,11 @@ select {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
+  line-height: 1;
 }
 
 .text-xs {

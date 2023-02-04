@@ -89,20 +89,20 @@ export default function SignIn() {
 				<h2 className='mt-6 text-center text-3xl font-bold tracking-tight text-gray-900'>
 					Sign in to rate jams
 				</h2>
-				<p className='mt-2 text-center text-sm text-gray-600'>
-					<a
-						href='#'
-						className='font-medium text-indigo-600 hover:text-indigo-500'
+				<div className='mt-2 flex justify-center text-sm text-gray-600'>
+					<p
+						className='font-medium text-indigo-600 hover:text-indigo-500 inline align-middle h-min'
 					>
 						Or{' '}
 						<Link
 							to='/join'
 							className='underline'
 						>
-							make an account - free! 🚢
+							make an account:
+          <p className='text-6xl text-center align-middle'>🚢</p>
 						</Link>
-					</a>
-				</p>
+					</p>
+				</div>
 			</div>
 
 			<div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
