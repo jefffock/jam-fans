@@ -80,7 +80,7 @@ export default function JamCard({ jam, sounds, user, profile }) {
 						Login to rate
 					</Link>
 				)}
-				{user && profile && <Link to={link} className='underline self-center align-middle'>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
+				{user && <Link to={link} className='underline self-center align-middle'>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
 				<div>
 					{jam.listen_link && (
 						<a
