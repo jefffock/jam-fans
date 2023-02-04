@@ -25,7 +25,7 @@ export const loader = async ({ request, params }) => {
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(searchParams);
 	console.log('queryParams', queryParams);
-	let jam = null
+	let jam = null;
 	if (queryParams?.jamid) {
 		const { data } = await supabaseClient
 			.from('versions')
@@ -65,7 +65,7 @@ export const loader = async ({ request, params }) => {
 			.select('*')
 			.eq('song', queryParams.song)
 			.single();
-    initialSongObj = songObj;
+		initialSongObj = songObj;
 	}
 	if (queryParams?.artist) {
 		const { data: artistObj } = await supabaseClient
@@ -129,7 +129,7 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	console.log('initialSong in loader', initialSong);
-  console.log('initialSongObj', initialSongObj)
+	console.log('initialSongObj', initialSongObj);
 	return json(
 		{
 			artists,
@@ -550,18 +550,19 @@ export default function AddJam() {
 			}
 			checkUsername();
 		}
-    if (initialSong && !songObj) {
-      async function getSongObj() {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .eq('song', initialSong)
-        .single();
-      if (data) {
-        setSongObj(data);
-      }
-    } getSongObj()
-    }
+		if (initialSong && !songObj) {
+			async function getSongObj() {
+				const { data, error } = await supabase
+					.from('songs')
+					.select('*')
+					.eq('song', initialSong)
+					.single();
+				if (data) {
+					setSongObj(data);
+				}
+			}
+			getSongObj();
+		}
 	}, []);
 
 	const sortedSongs = artist
@@ -643,7 +644,7 @@ export default function AddJam() {
 			if (data) {
 				setSongObj(data);
 				if (actionData?.body.includes('added song')) {
-					navigate;
+					navigate('/');
 				}
 			}
 		}
@@ -716,7 +717,7 @@ export default function AddJam() {
 		}
 	}
 
-	function handleYearChange(e) {
+	async function handleYearChange(e) {
 		if (shows) setShows(null);
 		if (e === 'Clear Year') {
 			setYear('');
@@ -790,8 +791,13 @@ export default function AddJam() {
 	function handleLinkChange(e) {
 		setListenLink(e.target.value);
 	}
-
-	if (fetcher?.data?.shows && !shows) {
+	//& fetcher.data.shows[0].showdate.normalize() !== shows?[0]?.showdate.normalize()
+	if (
+		fetcher?.data?.shows &&
+		(!shows ||
+			fetcher.data.shows[0].showdate.normalize() !==
+				shows[0]?.showdate.normalize())
+	) {
 		setShows(fetcher?.data?.shows);
 	}
 	if (fetcher?.data?.setlist && !setlist) {
@@ -823,12 +829,12 @@ export default function AddJam() {
 		'not logged in add jam show submit',
 		Boolean(!profile && !jam && artist && songSelected && date && location)
 	);
-  console.log('jam', jam)
+	console.log('jam', jam);
 	console.log('artist', artist);
 	console.log('date', date);
 	console.log('location', location);
 	console.log('songSelected', songSelected);
-  
+
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
@@ -1288,87 +1294,105 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* Show Picker if not from songfish artist + year*/}
-				{shows && shows?.length > 1 && !show && !date && !location && year && (
-					<div className='max-h-40'>
-						<Listbox
-							value={show}
-							onChange={handleShowChange}
-						>
-							{({ open }) => (
-								<>
-									<Listbox.Label className='block text-sm font-medium text-gray-700'>
-										Shows from {year}
-									</Listbox.Label>
-									<div className='relative mt-1'>
-										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
-											<span className='block truncate'>
-												{show?.label || 'Choose a show'}
-											</span>
-											<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
-												<ChevronUpDownIcon
-													className='h-8 w-8 text-gray-400'
-													aria-hidden='true'
-												/>
-											</span>
-										</Listbox.Button>
+				{shows &&
+					shows?.length > 1 &&
+					!show &&
+					!date &&
+					!location &&
+					year &&
+					(!fetcher ||
+						(fetcher && fetcher.state && fetcher.state !== 'loading')) && (
+						<div className='max-h-40'>
+							<Listbox
+								value={show}
+								onChange={handleShowChange}
+							>
+								{({ open }) => (
+									<>
+										<Listbox.Label className='block text-sm font-medium text-gray-700'>
+											Shows from {year}
+										</Listbox.Label>
+										<div className='relative mt-1'>
+											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+												<span className='block truncate'>
+													{show?.label || 'Choose a show'}
+												</span>
+												<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
+													<ChevronUpDownIcon
+														className='h-8 w-8 text-gray-400'
+														aria-hidden='true'
+													/>
+												</span>
+											</Listbox.Button>
 
-										<Transition
-											show={open}
-											as={Fragment}
-											leave='transition ease-in duration-100'
-											leaveFrom='opacity-100'
-											leaveTo='opacity-0'
-										>
-											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-												{shows?.map((show, showIdx) => (
-													<Listbox.Option
-														key={showIdx}
-														className={({ active }) =>
-															classNames(
-																active
-																	? 'text-white bg-indigo-600'
-																	: 'text-gray-900',
-																'relative cursor-default select-none py-2 pl-3 pr-9'
-															)
-														}
-														value={show}
-													>
-														{({ selected, active }) => (
-															<>
-																<span
-																	className={classNames(
-																		selected ? 'font-semibold' : 'font-normal',
-																		'block truncate'
-																	)}
-																>
-																	{show?.label}
-																</span>
-
-																{selected ? (
+											<Transition
+												show={open}
+												as={Fragment}
+												leave='transition ease-in duration-100'
+												leaveFrom='opacity-100'
+												leaveTo='opacity-0'
+											>
+												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
+													{shows?.map((show, showIdx) => (
+														<Listbox.Option
+															key={showIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-indigo-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={show}
+														>
+															{({ selected, active }) => (
+																<>
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-indigo-600',
-																			'absolute inset-y-0 right-0 flex items-center pr-4'
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
 																		)}
 																	>
-																		<CheckIcon
-																			className='h-5 w-5'
-																			aria-hidden='true'
-																		/>
+																		{show?.label}
 																	</span>
-																) : null}
-															</>
-														)}
-													</Listbox.Option>
-												))}
-											</Listbox.Options>
-										</Transition>
-									</div>
-								</>
-							)}
-						</Listbox>
-					</div>
-				)}
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active
+																					? 'text-white'
+																					: 'text-indigo-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : null}
+																</>
+															)}
+														</Listbox.Option>
+													))}
+												</Listbox.Options>
+											</Transition>
+										</div>
+									</>
+								)}
+							</Listbox>
+						</div>
+					)}
+          {/* Loading shows*/}
+          {fetcher && fetcher.state && fetcher.state === 'loading' && (
+            <div className='flex flex-col justify-center'>
+              <InfoAlert title={'Loading'} description={"Thanks for your patience! I've requested an increase in the rate limit that would allow me to speed up these loading times significantly."} />
+              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
+            </div>
+          )}
 				{/* Date input */}
 				{!date && artist && (
 					<div>
@@ -1562,7 +1586,7 @@ export default function AddJam() {
 								!
 							</p>
 						) : (
-							"Sorry, getting shows for a year might take a bit. We're limited to 2 requests per second and need multiple requests, so it takes longer. If you have info, please add missing setlists and shows to setlist.fm. Thanks for contributing!"
+							"Getting shows for a year might take a bit: we're limited (for now) to 2 requests per second and need multiple requests, so it takes longer. If info fails to load, please try again or refresh the page. If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing here and there!"
 						)}
 					</p>
 				)}
