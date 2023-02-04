@@ -528,21 +528,20 @@ export default function AddJam() {
 		if (user && !profile && typeof document !== 'undefined') {
 			let username;
 			async function checkUsername() {
-				username = window.prompt('Please choose a username', '');
+				username = window.prompt('Welcome! By what name shall we call thee?', '');
 				if (username) {
 					const { data } = await supabase
 						.from('profiles')
 						.select('*')
 						.eq('name', username)
-						.single();
 					if (data) {
 						alert(
-							'Looks like someone already snagged that username. Please choose another.'
+							'Oh my... someone already snagged that name. Time to get creative!'
 						);
 						checkUsername();
-					} else {
-						setUsername();
-					}
+					} else if (!data || data.length === 0) {
+            setUsername();
+          }
 				} else {
 					checkUsername();
 				}
@@ -553,7 +552,7 @@ export default function AddJam() {
 					.insert([{ name: username, id: user.id }]);
 				if (!error) {
 					alert(
-						`Welcome, ${username}! Have fun rating stuff and making great jams easier to find! (Username created successfully)`
+						`Hi, ${username}! You can now rate jams and add links to them. Thanks for helping make music you love easier to find!`
 					);
 				}
 			}
