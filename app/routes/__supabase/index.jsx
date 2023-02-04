@@ -91,21 +91,28 @@ export default function Index({ supabase, session }) {
 		if (user && !profile && typeof document !== 'undefined') {
 			let username;
 			async function checkUsername() {
-				username = window.prompt('Welcome! By what name shall we call thee?', '');
+				username = window.prompt(
+					'Welcome! By what name shall we call thee?',
+					''
+				);
 				if (username) {
-					const { data } = await supabase
+					const { data, error } = await supabase
 						.from('profiles')
 						.select('*')
-						.eq('name', username)
+						.eq('name', username);
 					if (data) {
+						console.log('data', data);
 						alert(
 							'Oh my... someone already snagged that name. Time to get creative!'
 						);
 						checkUsername();
-					} else if (!data || data.length === 0) {
-            setUsername();
-          }
+					}
+					if (error) console.error(error);
+					if (!data || data.length === 0) {
+						setUsername();
+					}
 				} else {
+          console.log('checking username')
 					checkUsername();
 				}
 			}
