@@ -526,37 +526,7 @@ export default function AddJam() {
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
-			let username;
-			async function checkUsername() {
-				username = window.prompt('Welcome! By what name shall we call thee?', '');
-				if (username) {
-					const { data } = await supabase
-						.from('profiles')
-						.select('*')
-						.eq('name', username)
-					if (data) {
-						alert(
-							'Oh my... someone already snagged that name. Time to get creative!'
-						);
-						checkUsername();
-					} else if (!data || data.length === 0) {
-            setUsername();
-          }
-				} else {
-					checkUsername();
-				}
-			}
-			async function setUsername() {
-				const { data, error } = await supabase
-					.from('profiles')
-					.insert([{ name: username, id: user.id }]);
-				if (!error) {
-					alert(
-						`Hi, ${username}! You can now rate jams and add links to them. Thanks for helping make music you love easier to find!`
-					);
-				}
-			}
-			checkUsername();
+        navigate('/welcome')
 		}
 		if (initialSong && !songObj) {
 			async function getSongObj() {

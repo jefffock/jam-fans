@@ -1,7 +1,7 @@
-import { Link, Outlet } from '@remix-run/react';
+import { Link, Outlet, useNavigate } from '@remix-run/react';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { useLoaderData } from '@remix-run/react';
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import ArtistBar from '../../components/ArtistBar';
 import JamList from '../../components/JamList';
 import JamFilters from '../../components/JamFilters';
@@ -31,6 +31,13 @@ export const loader = async ({ request, params }) => {
 			.single();
 		profile = data;
 	}
+  console.log('user', user)
+  console.log('profile', profile)
+  if (user && !profile) {
+    console.log('redirecting to /welcome')
+    return redirect('/welcome');
+  }
+
 	//get artists
 	let { data: artists } = await supabaseClient
 		.from('artists')
@@ -84,51 +91,15 @@ export const loader = async ({ request, params }) => {
 export default function Index({ supabase, session }) {
 	const { artists, songs, versions, sounds, title, count, user, profile } =
 		useLoaderData();
+    const navigate = useNavigate();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
 
-	useEffect(() => {
-		if (user && !profile && typeof document !== 'undefined') {
-			let username;
-			async function checkUsername() {
-				username = window.prompt(
-					'Welcome! By what name shall we call thee?',
-					''
-				);
-				if (username) {
-					const { data, error } = await supabase
-						.from('profiles')
-						.select('*')
-						.eq('name', username);
-					if (data) {
-						console.log('data', data);
-						alert(
-							'Oh my... someone already snagged that name. Time to get creative!'
-						);
-						checkUsername();
-					}
-					if (error) console.error(error);
-					if (!data || data.length === 0) {
-						setUsername();
-					}
-				} else {
-          console.log('checking username')
-					checkUsername();
-				}
-			}
-			async function setUsername() {
-				const { data, error } = await supabase
-					.from('profiles')
-					.insert([{ name: username, id: user.id }]);
-				if (!error) {
-					alert(
-						`Hi, ${username}! You can now rate jams and add links to them. Thanks for helping make music you love easier to find!`
-					);
-				}
-			}
-			setTimeout(checkUsername, 2000);
-		}
-	}, [user, profile]);
+	// useEffect(() => {
+	// 	if (user && !profile && typeof document !== 'undefined') {
+	// 		navigate('/welcome')
+	// 	}
+	// }, [user, profile]);
 
 	return (
 		<JamsHome

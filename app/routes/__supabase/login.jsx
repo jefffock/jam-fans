@@ -25,6 +25,7 @@ export default function SignIn() {
 			password: password,
 		});
 		if (error) {
+      console.log('error', error)
 			setLoading(false);
 			setErrorMessage(error.message);
 		} else {
