@@ -585,7 +585,7 @@ export default function AddJam() {
 	}
 
 	function handleAddMethodChange(addMethod) {
-		setUseApis(addMethod.id === 'auto');
+		setUseApis(addMethod === 'auto');
 	}
 
 	console.log('useApis', useApis);
@@ -841,19 +841,13 @@ export default function AddJam() {
 								{ id: 'auto', title: 'Automagically' },
 								{ id: 'manual', title: 'Manually' },
 							].map((addingMethod) => (
-								<>
+								<div key={addingMethod?.id}>
 									<input
 										key={addingMethod.id}
 										id={addingMethod.id}
 										name='adding-method'
 										type='radio'
 										defaultChecked={addingMethod.id === 'auto'}
-										checked={
-											(addingMethod.id === 'auto' && useApis) ||
-											(addingMethod.id === 'manual' && !useApis)
-												? true
-												: false
-										}
 										className='h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500'
 										onClick={() => handleAddMethodChange(addingMethod.id)}
 									/>
@@ -863,7 +857,7 @@ export default function AddJam() {
 									>
 										{addingMethod.title}
 									</label>
-								</>
+								</div>
 							))}
 						</div>
 					</fieldset>
