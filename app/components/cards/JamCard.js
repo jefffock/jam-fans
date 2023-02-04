@@ -1,6 +1,6 @@
 import { Link } from '@remix-run/react';
 
-export default function JamCard({ jam, sounds, user, profile }) {
+export default function JamCard({ jam, sounds, user, profile, setShowIframe, setIframeUrl }) {
 	let soundsString = '';
 	//itereate through jam, if key in jam matches text in sounds, add sound label to sounds String
 	for (const [key, value] of Object.entries(jam)) {
@@ -25,7 +25,12 @@ export default function JamCard({ jam, sounds, user, profile }) {
 	soundsString = soundsString.slice(0, -2);
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
 
-  const link = `/add/jam?jamid=${jam.id}`;
+  function handleListenClick() {
+    setIframeUrl(jam?.listen_link);
+    setShowIframe(true);
+  }
+
+  const link = `/add/jam?jamid=${jam?.id}`;
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>
@@ -82,9 +87,9 @@ export default function JamCard({ jam, sounds, user, profile }) {
 				)}
 				{user && <Link to={link} className='underline self-center align-middle'>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
 				<div>
-					{jam.listen_link && (
-						<a
-							href={jam.listen_link}
+					{jam?.listen_link && (
+						<button
+							onClick={() => handleListenClick()}
 							className='inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300'
 						>
 							Listen
@@ -101,7 +106,7 @@ export default function JamCard({ jam, sounds, user, profile }) {
 									clipRule='evenodd'
 								></path>
 							</svg>
-						</a>
+						</button>
 					)}
 
 				</div>

@@ -740,6 +740,10 @@ select {
   z-index: 10;
 }
 
+.z-20 {
+  z-index: 20;
+}
+
 .float-right {
   float: right;
 }
@@ -754,6 +758,10 @@ select {
 
 .m-6 {
   margin: 1.5rem;
+}
+
+.m-0 {
+  margin: 0px;
 }
 
 .mx-auto {
@@ -1360,6 +1368,10 @@ select {
   padding: 1.5rem;
 }
 
+.p-0 {
+  padding: 0px;
+}
+
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -1896,6 +1908,12 @@ select {
 
   .sm\:duration-700 {
     transition-duration: 700ms;
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:w-full {
+    width: 100%;
   }
 }
 
