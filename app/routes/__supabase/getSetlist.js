@@ -44,7 +44,7 @@ export const loader = async ({ request, params }) => {
 		'My Morning Jacket': 'ea5883b7-68ce-48b3-b115-61746ea53b8c',
 		Osees: '194272cc-dcc8-4640-a4a6-66da7d250d5c',
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
-    'Pigeons Playing Ping Pong': 'f5a881d7-9c6f-4135-88e6-677aa29547ca',
+    'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
     Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',

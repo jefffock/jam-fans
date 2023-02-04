@@ -523,8 +523,10 @@ export default function AddJam() {
 	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
-	console.log('useApis', useApis);
-
+	const addingMethods = [
+		{ id: 'auto', title: 'Automagically' },
+		{ id: 'manual', title: 'Manually' },
+	];
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
 			let username;
@@ -600,7 +602,6 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
-		console.log('artist', artist);
 		setSongSelected('');
 		setJam(null);
 		setShows(null);
@@ -666,18 +667,19 @@ export default function AddJam() {
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
-		if (useApis && artist && artist !== 'Squeaky Feet') {
-			console.log('show', show);
-			//fetch setlist
-			let urlToFetch =
-				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
-			fetcher.load(urlToFetch);
-		}
-		setShow(show);
-		setDate(show.showdate);
-		setLocation(show.location);
-		if (show.existingJam) {
-			setJam(show.existingJam);
+		if (show) {
+			setSetlist(null);
+			if (useApis && artist && artist !== 'Squeaky Feet') {
+				let urlToFetch =
+					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+				fetcher.load(urlToFetch);
+			}
+			setShow(show);
+			setDate(show.showdate);
+			setLocation(show.location);
+			if (show.existingJam) {
+				setJam(show.existingJam);
+			}
 		}
 	}
 
@@ -703,8 +705,9 @@ export default function AddJam() {
 		setArtist('');
 		setSong('');
 		setDate('');
-		setShow('');
 		setLocation('');
+		setShowLocationInput(false);
+		setShow('');
 		setJam('');
 		setSongSelected('');
 	}
@@ -721,7 +724,6 @@ export default function AddJam() {
 	}
 
 	function showEditLocation() {
-		console.log('showEditLocation');
 		setShowLocationInput(true);
 	}
 
@@ -733,6 +735,8 @@ export default function AddJam() {
 
 	async function handleYearChange(e) {
 		if (shows) setShows(null);
+		if (location) setLocation('');
+		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
@@ -771,7 +775,7 @@ export default function AddJam() {
 	}, [date]);
 
 	function handleDateInputChange(e) {
-		console.log('date input change', e.target.value);
+		if (setlist) setSetlist(null);
 		setDateInput(e.target.value);
 		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
@@ -818,9 +822,7 @@ export default function AddJam() {
 	function handleLinkChange(e) {
 		setListenLink(e.target.value);
 	}
-	//& fetcher.data.shows[0].showdate.normalize() !== shows?[0]?.showdate.normalize()
 
-	console.log(fetcher?.data?.shows);
 	if (
 		fetcher &&
 		fetcher.data &&
@@ -835,7 +837,7 @@ export default function AddJam() {
 	if (fetcher?.data?.setlist && !setlist) {
 		setSetlist(fetcher?.data?.setlist);
 	}
-	if (fetcher?.data?.location && !location) {
+	if (fetcher?.data?.location && artist && !location) {
 		setLocation(fetcher?.data?.location);
 	}
 	if (fetcher?.data?.jam && fetcher?.data?.jam !== jam) {
@@ -857,21 +859,8 @@ export default function AddJam() {
 		}
 	}, [songSelected, date, setlist]);
 
-	console.log(
-		'not logged in add jam show submit',
-		Boolean(!profile && !jam && artist && songSelected && date && location)
-	);
-	console.log('jam', jam);
-	console.log('artist', artist);
-	console.log('date', date);
-	console.log('location', location);
-	console.log('showLocationInput', showLocationInput);
-	console.log('songSelected', songSelected);
+	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
-	const addingMethods = [
-		{ id: 'auto', title: 'Automagically' },
-		{ id: 'manual', title: 'Manually' },
-	];
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
@@ -1601,7 +1590,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* display location */}
-				{location && (
+				{location && location !== '' && (
 					<div className='flex justify-between text-sm'>
 						<p className='text-lg'>{location}</p>
 						<button
@@ -1612,7 +1601,8 @@ export default function AddJam() {
 						</button>
 					</div>
 				)}
-				{((showLocationInput && useApis) || (!useApis && date)) && (
+				{((useApis && (showLocationInput || (date && !location))) ||
+					(!useApis && date)) && (
 					<div>
 						<label
 							htmlFor='location'
@@ -1638,14 +1628,6 @@ export default function AddJam() {
 							/>
 						</div>
 					</div>
-				)}
-				{showLoadingInfo && (
-					<InfoAlert
-						title={'Thanks for your patience!'}
-						description={
-							"I've requested an increase in the rate limit that would allow me to speed up these loading times significantly."
-						}
-					/>
 				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
@@ -1705,7 +1687,14 @@ export default function AddJam() {
 						)}
 					</p>
 				)}
-				{!artist}
+				{showLoadingInfo && (
+					<InfoAlert
+						title={'Thanks for your patience!'}
+						description={
+							"I've requested an increase in how often we can request data from setlist.fm. If it is approved, getting show info will be much faster"
+						}
+					/>
+				)}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
@@ -1909,6 +1898,7 @@ export default function AddJam() {
 							name='_action'
 							value='add-not-logged-in'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							disabled={showAddSong}
 						>
 							Add this jam
 						</button>
@@ -1920,6 +1910,7 @@ export default function AddJam() {
 							name='_action'
 							value='update-not-logged-in'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							disabled={showAddSong}
 						>
 							Add sounds to this jam
 						</button>
@@ -1938,6 +1929,7 @@ export default function AddJam() {
 								name='_action'
 								value='add-logged-in'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								disabled={showAddSong}
 							>
 								Add this jam
 							</button>
@@ -1954,6 +1946,7 @@ export default function AddJam() {
 								name='_action'
 								value='update-logged-in'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								disabled={showAddSong}
 							>
 								Update this jam
 							</button>
@@ -1965,6 +1958,7 @@ export default function AddJam() {
 							name='_action'
 							value='add-and-rating'
 							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							disabled={showAddSong}
 						>
 							Add jam and rating/comment
 						</button>
@@ -1980,6 +1974,7 @@ export default function AddJam() {
 								name='_action'
 								value='rating'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								disabled={showAddSong}
 							>
 								Add rating/comment
 							</button>
@@ -1995,6 +1990,7 @@ export default function AddJam() {
 								name='_action'
 								value='rating-update'
 								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								disabled={showAddSong}
 							>
 								Update jam and add rating/comment
 							</button>

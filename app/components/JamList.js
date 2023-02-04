@@ -2,16 +2,17 @@ import JamCard from './cards/JamCard';
 import { Link } from '@remix-run/react';
 import InfoAlert from './alerts/InfoAlert';
 
-export default function JamList({ jams, sounds, title, user, profile, search }) {
-  console.log('search', search)
-
-  // const urlStartIndex = search.indexOf("=") + 1;
-  // const artistUrl = searchQuery.substring(urlStartIndex);
-  // console.log(artistUrl); // Output: "aqueous"
-  // const link = artistUrl ? `/add/jam?artistUrl=${artistUrl}` : '/add/jam';
-  const artistStartIndex = search?.indexOf("artists-") + "artists-".length;
-const urlStartIndex = search?.indexOf("=", artistStartIndex);
-const artistUrl = search?.substring(artistStartIndex, urlStartIndex);
+export default function JamList({
+	jams,
+	sounds,
+	title,
+	user,
+	profile,
+	search,
+}) {
+	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length;
+	const urlStartIndex = search?.indexOf('=', artistStartIndex);
+	const artistUrl = search?.substring(artistStartIndex, urlStartIndex);
 
 	return (
 		<div className='pb-16'>
@@ -35,7 +36,12 @@ const artistUrl = search?.substring(artistStartIndex, urlStartIndex);
 					})}
 				{jams?.length === 0 && (
 					<div className='flex flex-col m-4 justify-center'>
-						<InfoAlert title={`No ${title} (yet)`} description={'If you could go ahead and add one, yeah, that\'d be great (no account needed!)'}/>
+						<InfoAlert
+							title={`No ${title} (yet)`}
+							description={
+								"If you could go ahead and add one, yeah, that'd be great (no account needed!)"
+							}
+						/>
 						<Link
 							to={artistUrl ? `/add/jam?artistUrl=${artistUrl}` : '/add/jam'}
 							className='text-center text-xl underline'
