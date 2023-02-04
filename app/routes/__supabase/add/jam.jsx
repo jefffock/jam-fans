@@ -1512,7 +1512,7 @@ export default function AddJam() {
 				)}
 				{/* api attribution */}
 				{artist.artist && (
-					<p className='text-xs text-gray-500'>
+					<p className='text-sm text-gray-500'>
 						Shows and setlists from{' '}
 						<a
 							href={
@@ -1544,7 +1544,7 @@ export default function AddJam() {
 								? 'thecarton.net'
 								: 'setlist.fm'}
 						</a>
-						.
+						.{' '}
 						{artist.artist === 'Phish' ||
 						artist.artist === 'Trey Anastasio, TAB' ||
 						artist === 'Goose' ||
@@ -1562,7 +1562,7 @@ export default function AddJam() {
 								!
 							</p>
 						) : (
-							"If no setlist is found, consider adding it there? If you're awesome"
+							"Sorry, getting shows for a year might take a bit. We're limited to 2 requests per second and need multiple requests, so it takes longer. If you have info, please add missing setlists and shows to setlist.fm. Thanks for contributing!"
 						)}
 					</p>
 				)}

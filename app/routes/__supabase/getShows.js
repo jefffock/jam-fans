@@ -8,6 +8,15 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+
+  async function wait500() {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('resolved');
+      }, 500);
+    });
+  }
+
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
@@ -246,7 +255,9 @@ export const loader = async ({ request, params }) => {
 			const mbid = mbids[artist];
 			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
 			let apiKey = process.env.SETLISTFM_API_KEY;
-			function paginatedFetch(url, page = 1, previousResponse = []) {
+			async function paginatedFetch(url, page = 1, previousResponse = []) {
+        console.log('in paginated fetch', url, page, previousResponse)
+        await new Promise((resolve) => setTimeout(resolve, 500))
 				return fetch(`${url}&p=${page}`, {
 					headers: {
 						'x-api-key': `${apiKey}`,
@@ -262,6 +273,8 @@ export const loader = async ({ request, params }) => {
 
 						if (setlist?.length !== 0) {
 							page++;
+
+              wait500()
 
 							return paginatedFetch(url, page, response);
 						}
