@@ -748,12 +748,12 @@ select {
   margin: 0.5rem;
 }
 
-.m-6 {
-  margin: 1.5rem;
-}
-
 .m-4 {
   margin: 1rem;
+}
+
+.m-6 {
+  margin: 1.5rem;
 }
 
 .mx-auto {
@@ -859,16 +859,12 @@ select {
   margin-left: -1px;
 }
 
-.mt-8 {
-  margin-top: 2rem;
-}
-
-.mt-20 {
-  margin-top: 5rem;
-}
-
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
 }
 
 .block {
@@ -985,14 +981,6 @@ select {
 
 .w-8 {
   width: 2rem;
-}
-
-.w-10 {
-  width: 2.5rem;
-}
-
-.w-40 {
-  width: 10rem;
 }
 
 .min-w-0 {
@@ -1373,11 +1361,6 @@ select {
   padding-bottom: 0.75rem;
 }
 
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
-}
-
 .py-12 {
   padding-top: 3rem;
   padding-bottom: 3rem;
@@ -1426,6 +1409,10 @@ select {
   padding-top: 1rem;
 }
 
+.pb-20 {
+  padding-bottom: 5rem;
+}
+
 .pb-16 {
   padding-bottom: 4rem;
 }
@@ -1436,14 +1423,6 @@ select {
 
 .pb-3 {
   padding-bottom: 0.75rem;
-}
-
-.pb-20 {
-  padding-bottom: 5rem;
-}
-
-.pt-20 {
-  padding-top: 5rem;
 }
 
 .text-left {
@@ -1627,12 +1606,6 @@ select {
 .shadow-xl {
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.shadow-md {
-  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 

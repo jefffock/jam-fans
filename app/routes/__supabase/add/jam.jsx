@@ -5,7 +5,7 @@ import {
 	useOutletContext,
 	useActionData,
 } from '@remix-run/react';
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { Listbox, Transition, Dialog, Combobox } from '@headlessui/react';
 import { Fragment, useState, useEffect, useRef } from 'react';
@@ -25,7 +25,7 @@ export const loader = async ({ request, params }) => {
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(searchParams);
 	console.log('queryParams', queryParams);
-	let jam;
+	let jam = null
 	if (queryParams?.jamid) {
 		const { data } = await supabaseClient
 			.from('versions')
@@ -58,6 +58,28 @@ export const loader = async ({ request, params }) => {
 			.eq('artist', jam.artist)
 			.single();
 		initialArtist = artistObj;
+	} else if (queryParams?.song) {
+		initialSong = queryParams.song;
+		const { data: songObj } = await supabaseClient
+			.from('songs')
+			.select('*')
+			.eq('song', queryParams.song)
+			.single();
+    initialSongObj = songObj;
+	}
+	if (queryParams?.artist) {
+		const { data: artistObj } = await supabaseClient
+			.from('artists')
+			.select('*')
+			.eq('artist', queryParams.artist)
+			.single();
+		initialArtist = artistObj;
+	}
+	if (queryParams?.date) {
+		initialDate = queryParams.date;
+	}
+	if (queryParams?.location) {
+		initialLocation = queryParams.location;
 	}
 	const {
 		data: { user },
@@ -106,7 +128,8 @@ export const loader = async ({ request, params }) => {
 			end_year: 1995,
 		},
 	].concat(artists);
-	console.log('initialSounds in loader', initialSounds);
+	console.log('initialSong in loader', initialSong);
+  console.log('initialSongObj', initialSongObj)
 	return json(
 		{
 			artists,
@@ -225,6 +248,13 @@ export async function action({ request, params }) {
 	let songObj;
 	if (values.songObj) {
 		songObj = JSON.parse(values.songObj);
+	} else if (!values.songObj || values.songObj === '"') {
+		const { data, error } = await supabaseClient
+			.from('songs')
+			.select('*')
+			.eq('song', values['new-song'])
+			.single();
+		songObj = data;
 	}
 	console.log('songObj', songObj);
 	console.log('song_id', songObj?.id);
@@ -236,7 +266,15 @@ export async function action({ request, params }) {
 		if (profile?.name) {
 			addTenPoints(profile.name);
 		}
-    return json({ status: 200, body: 'added song' });
+		//make search params string with artist, song, date, location
+		let searchParams = new URLSearchParams();
+		searchParams.append('artist', values.artist);
+		searchParams.append('song', values['new-song']);
+		if (values?.date) searchParams.append('date', values.date);
+		if (values?.location) searchParams.append('location', values.location);
+		console.log('searchParams', searchParams.toString());
+		console.log('params', searchParams.toString());
+		return redirect(`/add/jam?${searchParams.toString()}`);
 	}
 	if (_action === 'add-not-logged-in') {
 		if (!values.artist || !values.song || !values.date || !values.location) {
@@ -443,7 +481,7 @@ export default function AddJam() {
 	const [query, setQuery] = useState('');
 	const [artist, setArtist] = useState(initialArtist ?? '');
 	const [song, setSong] = useState(initialSong ?? '');
-	const [songObj, setSongObj] = useState(initialSongObj ?? '');
+	const [songObj, setSongObj] = useState(initialSongObj ?? null);
 	const [songExists, setSongExists] = useState(false);
 	const [loading, setLoading] = useState(null);
 	const [open, setOpen] = useState(false);
@@ -464,7 +502,7 @@ export default function AddJam() {
 	const [loadingShows, setLoadingShows] = useState(false);
 	const [loadingSetlist, setLoadingSetlist] = useState(false);
 	const [jams, setJams] = useState(null);
-	const [jam, setJam] = useState(initialJam ?? '');
+	const [jam, setJam] = useState(initialJam);
 	const [year, setYear] = useState('');
 	const [showLocationInput, setShowLocationInput] = useState(false);
 	const [noSetlistFound, setNoSetlistFound] = useState(false);
@@ -512,6 +550,18 @@ export default function AddJam() {
 			}
 			checkUsername();
 		}
+    if (initialSong && !songObj) {
+      async function getSongObj() {
+      const { data, error } = await supabase
+        .from('songs')
+        .select('*')
+        .eq('song', initialSong)
+        .single();
+      if (data) {
+        setSongObj(data);
+      }
+    } getSongObj()
+    }
 	}, []);
 
 	const sortedSongs = artist
@@ -528,7 +578,10 @@ export default function AddJam() {
 		query === ''
 			? songSelected
 				? sortedSongs?.filter((song) => {
-						return song.song.toLowerCase().includes(songSelected.toLowerCase()) && song.song.length === songSelected.length;
+						return (
+							song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
+							song.song.length === songSelected.length
+						);
 				  })
 				: sortedSongs
 			: sortedSongs?.filter((song) => {
@@ -563,7 +616,6 @@ export default function AddJam() {
 		setJamLocation('');
 	}
 
-  
 	//get shows by song for select artists
 	useEffect(() => {
 		setShows(null);
@@ -590,6 +642,9 @@ export default function AddJam() {
 				.single();
 			if (data) {
 				setSongObj(data);
+				if (actionData?.body.includes('added song')) {
+					navigate;
+				}
 			}
 		}
 		if (filteredSongs?.length !== 0) {
@@ -750,10 +805,6 @@ export default function AddJam() {
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 
-	console.log('songSelected: ' + songSelected);
-	console.log('query: ' + query);
-	console.log('filteredSong.lengths: ' + filteredSongs.length);
-
 	//check if song exists
 	useEffect(() => {
 		if (songSelected && artist && date && setlist && shows) {
@@ -769,11 +820,15 @@ export default function AddJam() {
 	}, [songSelected, date, setlist]);
 
 	console.log(
-		'(query || songSelected) && filteredSongs?.length === 0',
-		Boolean((query || songSelected) && filteredSongs?.length === 0)
+		'not logged in add jam show submit',
+		Boolean(!profile && !jam && artist && songSelected && date && location)
 	);
-  console.log('filteredSongs', filteredSongs)
-
+  console.log('jam', jam)
+	console.log('artist', artist);
+	console.log('date', date);
+	console.log('location', location);
+	console.log('songSelected', songSelected);
+  
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
@@ -1129,7 +1184,7 @@ export default function AddJam() {
 								type='text'
 								name='new-song'
 								id='new-song'
-								defaultValue={query ?? songSelected}
+								defaultValue={query !== '' ? query : songSelected}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
 								aria-describedby='new-song'
 							/>
