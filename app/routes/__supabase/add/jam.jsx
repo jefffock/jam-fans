@@ -75,6 +75,14 @@ export const loader = async ({ request, params }) => {
 			.single();
 		initialArtist = artistObj;
 	}
+	if (queryParams?.artistUrl) {
+		const { data: artistObj } = await supabaseClient
+			.from('artists')
+			.select('*')
+			.eq('url', queryParams.artistUrl)
+			.single();
+		initialArtist = artistObj;
+	}
 	if (queryParams?.date) {
 		initialDate = queryParams.date;
 	}
@@ -483,7 +491,7 @@ export default function AddJam() {
 	const [song, setSong] = useState(initialSong ?? '');
 	const [songObj, setSongObj] = useState(initialSongObj ?? null);
 	const [songExists, setSongExists] = useState(false);
-	const [loading, setLoading] = useState(null);
+	const [showLoadingInfo, setShowLoadingInfo] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [songErrorText, setSongErrorText] = useState(null);
 	const [artistErrorText, setArtistErrorText] = useState(null);
@@ -514,6 +522,8 @@ export default function AddJam() {
 	const [dateInputError, setDateInputError] = useState(false);
 	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
+	const [useApis, setUseApis] = useState(true);
+	console.log('useApis', useApis);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -590,6 +600,7 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
+		console.log('artist', artist);
 		setSongSelected('');
 		setJam(null);
 		setShows(null);
@@ -624,6 +635,7 @@ export default function AddJam() {
 			artist &&
 			artist.artist !== 'Squeaky Feet' &&
 			songSelected &&
+			useApis &&
 			(artist.artist === 'Goose' ||
 				artist.artist === 'Eggy' ||
 				artist.artist === 'Neighbor' ||
@@ -654,7 +666,8 @@ export default function AddJam() {
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
-		if (artist && artist !== 'Squeaky Feet') {
+		if (useApis && artist && artist !== 'Squeaky Feet') {
+			console.log('show', show);
 			//fetch setlist
 			let urlToFetch =
 				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
@@ -708,6 +721,7 @@ export default function AddJam() {
 	}
 
 	function showEditLocation() {
+		console.log('showEditLocation');
 		setShowLocationInput(true);
 	}
 
@@ -722,11 +736,21 @@ export default function AddJam() {
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
-			if (artist && artist !== 'Squeaky Feet') {
+			if (useApis && artist && artist !== 'Squeaky Feet') {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
 				fetcher.load(urlToFetch);
 			}
 			setYear(e);
+			if (
+				artist !== 'Phish' &&
+				artist !== "Umphrey's McGee" &&
+				artist !== 'Trey Anastasio, TAB' &&
+				artist !== 'Goose' &&
+				artist !== 'Eggy' &&
+				artist !== 'Neighbor'
+			) {
+				setShowLoadingInfo(true);
+			}
 		}
 	}
 
@@ -747,6 +771,7 @@ export default function AddJam() {
 	}, [date]);
 
 	function handleDateInputChange(e) {
+		console.log('date input change', e.target.value);
 		setDateInput(e.target.value);
 		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
@@ -759,12 +784,14 @@ export default function AddJam() {
 			} else {
 				setDateInputError(false);
 				setDate(date.toJSON().slice(0, 10));
-				let urlToFetch =
-					'/getSetlist?artist=' +
-					artist.artist +
-					'&date=' +
-					date.toJSON().slice(0, 10);
-				fetcher.load(urlToFetch);
+				if (useApis) {
+					let urlToFetch =
+						'/getSetlist?artist=' +
+						artist.artist +
+						'&date=' +
+						date.toJSON().slice(0, 10);
+					fetcher.load(urlToFetch);
+				}
 			}
 		}
 	}
@@ -792,8 +819,13 @@ export default function AddJam() {
 		setListenLink(e.target.value);
 	}
 	//& fetcher.data.shows[0].showdate.normalize() !== shows?[0]?.showdate.normalize()
+
+	console.log(fetcher?.data?.shows);
 	if (
-		fetcher?.data?.shows &&
+		fetcher &&
+		fetcher.data &&
+		fetcher.data.shows &&
+		fetcher.data.shows[0] &&
 		(!shows ||
 			fetcher.data.shows[0].showdate.normalize() !==
 				shows[0]?.showdate.normalize())
@@ -833,14 +865,48 @@ export default function AddJam() {
 	console.log('artist', artist);
 	console.log('date', date);
 	console.log('location', location);
+	console.log('showLocationInput', showLocationInput);
 	console.log('songSelected', songSelected);
 
+	const addingMethods = [
+		{ id: 'auto', title: 'Automagically' },
+		{ id: 'manual', title: 'Manually' },
+	];
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
-				<p className='text-center m-4 text-xl'>
+				<p className='text-center mt-4 text-xl'>
 					Add {profile ? 'and/or Rate ' : ''}a Jam
 				</p>
+				<div className='flex justify-around'>
+					<fieldset className='mt-0'>
+						<legend className='sr-only'>Jam Adding Method</legend>
+						{/* <div className='space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10'> */}
+						<div className='space-y-0 space-x-4 flex items-center'>
+							{addingMethods.map((addingMethod) => (
+								<div
+									key={addingMethod.id}
+									className='flex items-center'
+								>
+									<input
+										id={addingMethod.id}
+										name='adding-method'
+										type='radio'
+										defaultChecked={addingMethod.id === 'auto'}
+										className='h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500'
+										onChange={() => setUseApis(addingMethod.id === 'auto')}
+									/>
+									<label
+										htmlFor={addingMethod.id}
+										className='ml-3 block text-sm font-medium text-gray-700'
+									>
+										{addingMethod.title}
+									</label>
+								</div>
+							))}
+						</div>
+					</fieldset>
+				</div>
 				<input
 					type='hidden'
 					name='artist'
@@ -895,7 +961,7 @@ export default function AddJam() {
 						>
 							{({ open }) => (
 								<>
-									<Listbox.Label className='block text-sm font-medium text-gray-700'>
+									<Listbox.Label className='block text-md font-medium text-gray-700'>
 										Band
 									</Listbox.Label>
 									<div className='relative mt-1'>
@@ -980,14 +1046,15 @@ export default function AddJam() {
 				)}
 				{/* song picker (not setlist)*/}
 				{artist &&
-					(!setlist || !date) &&
+					(!setlist || !date || !useApis) &&
 					!songSelected &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
-						artist.artist === 'Trey Anastasio, TAB') && (
+						artist.artist === 'Trey Anastasio, TAB' ||
+						!useApis) && (
 						<div className='max-w-sm py-4'>
 							<Combobox
 								as='div'
@@ -997,7 +1064,7 @@ export default function AddJam() {
 								}}
 								name='song'
 							>
-								<Combobox.Label className='block text-sm font-medium text-gray-700'>
+								<Combobox.Label className='block text-md font-medium text-gray-700'>
 									Song
 								</Combobox.Label>
 								<div className='relative mt-1'>
@@ -1078,7 +1145,8 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* show picker if songfish artist and no date/year*/}
-				{songSelected &&
+				{useApis &&
+					songSelected &&
 					artist &&
 					!date &&
 					!year &&
@@ -1095,7 +1163,7 @@ export default function AddJam() {
 							>
 								{({ open }) => (
 									<>
-										<Listbox.Label className='block text-sm font-medium text-gray-700'>
+										<Listbox.Label className='block text-md font-medium text-gray-700'>
 											Shows with a {songSelected}
 										</Listbox.Label>
 										<div className='relative mt-1'>
@@ -1176,12 +1244,14 @@ export default function AddJam() {
 				{(query || songSelected) && filteredSongs?.length === 0 && (
 					<div>
 						<InfoAlert
-							title={`No songs containing ${query ?? songSelected} found`}
+							title={`No songs containing ${
+								query && query !== '' ? query : songSelected
+							} found`}
 							description={`This is a travesty! Please rectify this situation by adding a new song below`}
 						/>
 						<label
 							htmlFor='new-song'
-							className='block text-sm font-medium text-gray-700'
+							className='block text-md font-medium text-gray-700'
 						>
 							New song to add
 						</label>
@@ -1212,7 +1282,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* Year picker */}
-				{artist && !date && (
+				{useApis && artist && !date && (
 					<div className='max-h-40 max-w-xs'>
 						<Listbox
 							value={year}
@@ -1220,7 +1290,7 @@ export default function AddJam() {
 						>
 							{({ open }) => (
 								<>
-									<Listbox.Label className='block text-sm font-medium text-gray-700'>
+									<Listbox.Label className='block text-md font-medium text-gray-700'>
 										Year
 									</Listbox.Label>
 									<div className='relative mt-1'>
@@ -1294,7 +1364,8 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* Show Picker if not from songfish artist + year*/}
-				{shows &&
+				{useApis &&
+					shows &&
 					shows?.length > 1 &&
 					!show &&
 					!date &&
@@ -1309,7 +1380,7 @@ export default function AddJam() {
 							>
 								{({ open }) => (
 									<>
-										<Listbox.Label className='block text-sm font-medium text-gray-700'>
+										<Listbox.Label className='block text-md font-medium text-gray-700'>
 											Shows from {year}
 										</Listbox.Label>
 										<div className='relative mt-1'>
@@ -1386,15 +1457,14 @@ export default function AddJam() {
 							</Listbox>
 						</div>
 					)}
-          {/* Loading shows*/}
-          {fetcher && fetcher.state && fetcher.state === 'loading' && (
-            <div className='flex flex-col justify-center'>
-              <InfoAlert title={'Loading'} description={"Thanks for your patience! I've requested an increase in the rate limit that would allow me to speed up these loading times significantly."} />
-              <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
-            </div>
-          )}
+				{/* Loading spinner*/}
+				{fetcher && fetcher.state && fetcher.state === 'loading' && (
+					<div className='flex flex-col justify-center'>
+						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
+					</div>
+				)}
 				{/* Date input */}
-				{!date && artist && (
+				{useApis && !date && artist && (
 					<div>
 						<p>Or enter a date to get the setlist</p>
 						<p className='text-sm'>MMDDYYYY format</p>
@@ -1407,7 +1477,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* song picker from setlist */}
-				{setlist && !songSelected && date && artist && (
+				{useApis && setlist && !songSelected && date && artist && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
@@ -1415,7 +1485,7 @@ export default function AddJam() {
 						>
 							{({ open }) => (
 								<>
-									<Listbox.Label className='block text-sm font-medium text-gray-700'>
+									<Listbox.Label className='block text-md font-medium text-gray-700'>
 										Songs in Setlist
 									</Listbox.Label>
 									<div className='relative mt-1'>
@@ -1488,10 +1558,40 @@ export default function AddJam() {
 						</Listbox>
 					</div>
 				)}
+				{/* Date input */}
+				{!useApis && !date && artist && songSelected && (
+					<>
+						<label
+							htmlFor='datManual'
+							className='block text-md font-medium text-gray-700'
+						>
+							Date
+						</label>
+						<p
+							className='mt-2 text-sm text-gray-500'
+							id='date-description'
+						>
+							MMDDYYYY format please, no / or -
+						</p>
+						<div className='mt-1'>
+							<input
+								type='text'
+								name='date'
+								id='dateManual'
+								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+								aria-describedby='date-description'
+								value={dateInput}
+								onChange={handleDateInputChange}
+							/>
+						</div>
+					</>
+				)}
 				{/* display date*/}
 				{date && (
 					<div className='flex justify-between text-sm'>
-						<p className='text-lg'>{date}</p>
+						<p className='text-lg'>
+							{new Date(date + 'T16:00:00').toLocaleDateString()}
+						</p>
 						<button
 							type='button'
 							onClick={clearDate}
@@ -1501,25 +1601,31 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* display location */}
-				{location && !showLocationInput && (
+				{location && (
 					<div className='flex justify-between text-sm'>
 						<p className='text-lg'>{location}</p>
 						<button
 							type='button'
-							onClick={showEditLocation}
+							onClick={() => showEditLocation()}
 						>
 							Edit Location
 						</button>
 					</div>
 				)}
-				{showLocationInput && (
+				{((showLocationInput && useApis) || (!useApis && date)) && (
 					<div>
 						<label
 							htmlFor='location'
-							className='block text-sm font-medium text-gray-700'
+							className='block text-md font-medium text-gray-700'
 						>
 							Location
 						</label>
+						<p
+							className='mt-2 text-sm text-gray-500'
+							id='location-description'
+						>
+							Venue, City, State (or Country, if not US)
+						</p>
 						<div className='mt-1'>
 							<input
 								type='text'
@@ -1528,14 +1634,21 @@ export default function AddJam() {
 								defaultValue={location}
 								onChange={handleLocationChange}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
-								placeholder='you@example.com'
 								aria-describedby='location-description'
 							/>
 						</div>
 					</div>
 				)}
+				{showLoadingInfo && (
+					<InfoAlert
+						title={'Thanks for your patience!'}
+						description={
+							"I've requested an increase in the rate limit that would allow me to speed up these loading times significantly."
+						}
+					/>
+				)}
 				{/* api attribution */}
-				{artist.artist && (
+				{useApis && artist.artist && (
 					<p className='text-sm text-gray-500'>
 						Shows and setlists from{' '}
 						<a
@@ -1571,10 +1684,10 @@ export default function AddJam() {
 						.{' '}
 						{artist.artist === 'Phish' ||
 						artist.artist === 'Trey Anastasio, TAB' ||
-						artist === 'Goose' ||
-						artist === 'Eggy' ||
-						artist === 'Neighbor' ||
-						artist === "Umphrey's McGee" ? (
+						artist.artist === 'Goose' ||
+						artist.artist === 'Eggy' ||
+						artist.artist === 'Neighbor' ||
+						artist.artist === "Umphrey's McGee" ? (
 							<p>
 								Thanks{' '}
 								<a
@@ -1585,11 +1698,14 @@ export default function AddJam() {
 								</a>
 								!
 							</p>
+						) : !(artist && songSelected && date && location) ? (
+							"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"
 						) : (
-							"Getting shows for a year might take a bit: we're limited (for now) to 2 requests per second and need multiple requests, so it takes longer. If info fails to load, please try again or refresh the page. If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing here and there!"
+							''
 						)}
 					</p>
 				)}
+				{!artist}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>

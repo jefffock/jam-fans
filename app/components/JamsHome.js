@@ -45,6 +45,7 @@ export default function JamsHome({
 				title={title}
         user={user}
         profile={profile}
+        search={search}
 			/>
 		</div>
 	);
