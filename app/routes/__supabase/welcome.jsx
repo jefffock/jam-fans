@@ -88,7 +88,7 @@ export default function Welcome() {
         {success &&
         <>
           <SuccessAlert title={'Success!'} description={'Your profile has been created. Thank you for helping the music you love get into more ears!'} />
-          <Link className='underline' to='/add/jams'>Add or Rate Jams</Link>
+          <Link className='underline' to='/add/jam'>Add or Rate Jams</Link>
         </>
         }
         {!success &&
