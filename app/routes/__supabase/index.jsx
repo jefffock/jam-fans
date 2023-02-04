@@ -6,7 +6,7 @@ import ArtistBar from '../../components/ArtistBar';
 import JamList from '../../components/JamList';
 import JamFilters from '../../components/JamFilters';
 import JamFiltersSlideout from '../../components/JamFilters';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FiltersButton from '../../components/FiltersButton';
 import JamsHome from '../../components/JamsHome';
 
@@ -18,7 +18,7 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 
-  const {
+	const {
 		data: { user },
 	} = await supabaseClient.auth.getUser();
 
@@ -68,7 +68,7 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	//make title
-  let title = 'Jams by All Bands'
+	let title = 'Jams by All Bands';
 	let count = await supabaseClient
 		.from('versions')
 		.select('*', { count: 'exact', head: true });
@@ -82,9 +82,47 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, versions, sounds, title, count, user, profile } = useLoaderData();
+	const { artists, songs, versions, sounds, title, count, user, profile } =
+		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
+
+	useEffect(() => {
+		if (user && !profile && typeof document !== 'undefined') {
+			let username;
+			async function checkUsername() {
+				username = window.prompt('Please choose a username', '');
+				if (username) {
+					const { data } = await supabase
+						.from('profiles')
+						.select('*')
+						.eq('name', username)
+						.single();
+					if (data) {
+						alert(
+							'Looks like someone already snagged that username. Please choose another.'
+						);
+						checkUsername();
+					} else {
+						setUsername();
+					}
+				} else {
+					checkUsername();
+				}
+			}
+			async function setUsername() {
+				const { data, error } = await supabase
+					.from('profiles')
+					.insert([{ name: username, id: user.id }]);
+				if (!error) {
+					alert(
+						`Welcome, ${username}! Have fun rating stuff and making great jams easier to find! (Username created successfully)`
+					);
+				}
+			}
+			checkUsername();
+		}
+	}, [user, profile]);
 
 	return (
 		<JamsHome
@@ -97,9 +135,9 @@ export default function Index({ supabase, session }) {
 			open={open}
 			setOpen={setOpen}
 			count={count}
-      user={user}
-      profile={profile}
-      title={title}
+			user={user}
+			profile={profile}
+			title={title}
 		/>
 	);
 }
