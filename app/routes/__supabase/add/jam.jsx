@@ -523,10 +523,12 @@ export default function AddJam() {
 	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
+
 	const addingMethods = [
 		{ id: 'auto', title: 'Automagically' },
 		{ id: 'manual', title: 'Manually' },
 	];
+
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
 			let username;
@@ -609,6 +611,7 @@ export default function AddJam() {
 		setDate('');
 		setYear('');
 		setSoundsSelected('');
+    setShowLoadingInfo(false)
 		if (artist && year && !date && artist !== 'Squeaky Feet') {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
@@ -617,16 +620,12 @@ export default function AddJam() {
 		setArtist(artist);
 	}
 
+  function handleAddMethodChange(addMethod) {
+    setUseApis(addMethod.id === 'auto');
+  }
+
 	function classNames(...classes) {
 		return classes.filter(Boolean).join(' ');
-	}
-
-	function clear() {
-		setArtist('');
-		setSongSelected('');
-		setSoundsSelected('');
-		setJamDate('');
-		setJamLocation('');
 	}
 
 	//get shows by song for select artists
@@ -883,7 +882,7 @@ export default function AddJam() {
 										type='radio'
 										defaultChecked={addingMethod.id === 'auto'}
 										className='h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500'
-										onChange={() => setUseApis(addingMethod.id === 'auto')}
+										onChange={() => handleAddMethodChange(addingMethod.id)}
 									/>
 									<label
 										htmlFor={addingMethod.id}
@@ -946,7 +945,7 @@ export default function AddJam() {
 					<div className='max-h-40 max-w-sm'>
 						<Listbox
 							value={artist}
-							onChange={handleArtistChange}
+							onChange={(e) => handleArtistChange(e)}
 						>
 							{({ open }) => (
 								<>
