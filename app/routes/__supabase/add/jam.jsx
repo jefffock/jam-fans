@@ -524,11 +524,6 @@ export default function AddJam() {
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
 
-	const addingMethods = [
-		{ id: 'auto', title: 'Automagically' },
-		{ id: 'manual', title: 'Manually' },
-	];
-
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
 			let username;
@@ -611,7 +606,7 @@ export default function AddJam() {
 		setDate('');
 		setYear('');
 		setSoundsSelected('');
-    setShowLoadingInfo(false)
+		setShowLoadingInfo(false);
 		if (artist && year && !date && artist !== 'Squeaky Feet') {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
@@ -620,9 +615,11 @@ export default function AddJam() {
 		setArtist(artist);
 	}
 
-  function handleAddMethodChange(addMethod) {
-    setUseApis(addMethod.id === 'auto');
-  }
+	function handleAddMethodChange(addMethod) {
+		setUseApis(addMethod.id === 'auto');
+	}
+
+	console.log('useApis', useApis);
 
 	function classNames(...classes) {
 		return classes.filter(Boolean).join(' ');
@@ -871,18 +868,25 @@ export default function AddJam() {
 						<legend className='sr-only'>Jam Adding Method</legend>
 						{/* <div className='space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10'> */}
 						<div className='space-y-0 space-x-4 flex items-center'>
-							{addingMethods.map((addingMethod) => (
-								<div
-									key={addingMethod.id}
-									className='flex items-center'
-								>
+							{[
+								{ id: 'auto', title: 'Automagically' },
+								{ id: 'manual', title: 'Manually' },
+							].map((addingMethod) => (
+								<>
 									<input
+										key={addingMethod.id}
 										id={addingMethod.id}
 										name='adding-method'
 										type='radio'
 										defaultChecked={addingMethod.id === 'auto'}
+										checked={
+											(addingMethod.id === 'auto' && useApis) ||
+											(addingMethod.id === 'manual' && !useApis)
+												? true
+												: false
+										}
 										className='h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500'
-										onChange={() => handleAddMethodChange(addingMethod.id)}
+										onClick={() => handleAddMethodChange(addingMethod.id)}
 									/>
 									<label
 										htmlFor={addingMethod.id}
@@ -890,7 +894,7 @@ export default function AddJam() {
 									>
 										{addingMethod.title}
 									</label>
-								</div>
+								</>
 							))}
 						</div>
 					</fieldset>
@@ -1034,7 +1038,7 @@ export default function AddJam() {
 				)}
 				{/* song picker (not setlist)*/}
 				{artist &&
-					(!setlist || !date || !useApis) &&
+					(!setlist || !date) &&
 					!songSelected &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
@@ -1686,11 +1690,11 @@ export default function AddJam() {
 						)}
 					</p>
 				)}
-				{showLoadingInfo && (
+				{useApis && showLoadingInfo && (
 					<InfoAlert
 						title={'Thanks for your patience!'}
 						description={
-							"I've requested an increase in how often we can request data from setlist.fm. If it is approved, getting show info will be much faster"
+							"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, deep breaths 😂"
 						}
 					/>
 				)}
