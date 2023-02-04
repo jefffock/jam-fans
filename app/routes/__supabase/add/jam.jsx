@@ -236,6 +236,7 @@ export async function action({ request, params }) {
 		if (profile?.name) {
 			addTenPoints(profile.name);
 		}
+    return json({ status: 200, body: 'added song' });
 	}
 	if (_action === 'add-not-logged-in') {
 		if (!values.artist || !values.song || !values.date || !values.location) {
@@ -384,27 +385,27 @@ export async function action({ request, params }) {
 		console.log('data', data);
 		console.log('error', error);
 		if (values['listen-link']) {
-			const { dataFromUpdateWithLink, errorFromUpdateWithLink } =
-				await supabaseClient
-					.from('versions')
-					.update({
-						listen_link: values['listen-link'],
-						sounds: sounds,
-					})
-					.eq('id', jam?.id)
-					.select();
-			console.log('dataFromUpdateWithLink', dataFromUpdateWithLink);
-			console.log('errorFromUpdateWithLink', errorFromUpdateWithLink);
+			console.log('has listen link');
+			const { data, error } = await supabaseClient
+				.from('versions')
+				.update({
+					listen_link: values['listen-link'],
+					sounds: sounds,
+				})
+				.eq('id', jam?.id)
+				.select();
+			console.log('data', data);
+			console.log('error', error);
 		} else {
-			const { dataFromUpdate, errorFromUpdate } = await supabaseClient
+			const { data, error } = await supabaseClient
 				.from('versions')
 				.update({
 					sounds: sounds,
 				})
 				.eq('id', jam?.id)
 				.select();
-			console.log('dataFromUpdate', dataFromUpdate);
-			console.log('errorFromUpdate', errorFromUpdate);
+			console.log('dataFromUpdate', data);
+			console.log('errorFromUpdate', error);
 			addTenPoints(profile?.name);
 			addOnePoint(songObj?.submitter_name);
 			addOnePoint(jam?.submitter_name);
@@ -525,7 +526,11 @@ export default function AddJam() {
 
 	const filteredSongs =
 		query === ''
-			? sortedSongs
+			? songSelected
+				? sortedSongs?.filter((song) => {
+						return song.song.toLowerCase().includes(songSelected.toLowerCase()) && song.song.length === songSelected.length;
+				  })
+				: sortedSongs
 			: sortedSongs?.filter((song) => {
 					return song.song.toLowerCase().includes(query.toLowerCase());
 			  });
@@ -537,6 +542,7 @@ export default function AddJam() {
 		setLocation('');
 		setDate('');
 		setYear('');
+		setSoundsSelected('');
 		if (artist && year && !date && artist !== 'Squeaky Feet') {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
@@ -557,6 +563,7 @@ export default function AddJam() {
 		setJamLocation('');
 	}
 
+  
 	//get shows by song for select artists
 	useEffect(() => {
 		setShows(null);
@@ -585,11 +592,12 @@ export default function AddJam() {
 				setSongObj(data);
 			}
 		}
-		getSongObj();
-	}, [songSelected]);
+		if (filteredSongs?.length !== 0) {
+			getSongObj();
+		}
+	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
-		setSetlist(null);
 		if (artist && artist !== 'Squeaky Feet') {
 			//fetch setlist
 			let urlToFetch =
@@ -742,6 +750,10 @@ export default function AddJam() {
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 
+	console.log('songSelected: ' + songSelected);
+	console.log('query: ' + query);
+	console.log('filteredSong.lengths: ' + filteredSongs.length);
+
 	//check if song exists
 	useEffect(() => {
 		if (songSelected && artist && date && setlist && shows) {
@@ -755,11 +767,19 @@ export default function AddJam() {
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist]);
+
+	console.log(
+		'(query || songSelected) && filteredSongs?.length === 0',
+		Boolean((query || songSelected) && filteredSongs?.length === 0)
+	);
+  console.log('filteredSongs', filteredSongs)
+
 	return (
 		<Form method='post'>
 			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
-      <p className='text-center m-4 text-xl'>Add {profile ? 'and/or Rate ' : ''}a Jam</p>
-
+				<p className='text-center m-4 text-xl'>
+					Add {profile ? 'and/or Rate ' : ''}a Jam
+				</p>
 				<input
 					type='hidden'
 					name='artist'
@@ -1092,10 +1112,10 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Add Song if doesnt exist*/}
-				{query && filteredSongs?.length === 0 && (
+				{(query || songSelected) && filteredSongs?.length === 0 && (
 					<div>
 						<InfoAlert
-							title={`No songs containing ${query} found`}
+							title={`No songs containing ${query ?? songSelected} found`}
 							description={`This is a travesty! Please rectify this situation by adding a new song below`}
 						/>
 						<label
@@ -1109,7 +1129,7 @@ export default function AddJam() {
 								type='text'
 								name='new-song'
 								id='new-song'
-								defaultValue={query}
+								defaultValue={query ?? songSelected}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
 								aria-describedby='new-song'
 							/>
@@ -1435,6 +1455,62 @@ export default function AddJam() {
 						</div>
 					</div>
 				)}
+				{/* api attribution */}
+				{artist.artist && (
+					<p className='text-xs text-gray-500'>
+						Shows and setlists from{' '}
+						<a
+							href={
+								artist.artist === 'Phish' ||
+								artist.artist === 'Trey Anastasio, TAB'
+									? 'https://phish.net'
+									: artist.artist === 'Goose'
+									? 'https://elgoose.net'
+									: artist.artist === "Umphrey's McGee"
+									? 'https://allthings.umphreys.com'
+									: artist.artist === 'Neighbor'
+									? 'https://neighbortunes.net'
+									: artist.artist === 'Eggy'
+									? 'https://thecarton.net'
+									: 'https://www.setlist.fm'
+							}
+							className='underline'
+						>
+							{artist.artist === 'Phish' ||
+							artist.artist === 'Trey Anastasio, TAB'
+								? 'phish.net'
+								: artist.artist === 'Goose'
+								? 'elgoose.net'
+								: artist.artist === "Umphrey's McGee"
+								? 'allthings.umphreys.com'
+								: artist.artist === 'Neighbor'
+								? 'neighbortunes.net'
+								: artist.artist === 'Eggy'
+								? 'thecarton.net'
+								: 'setlist.fm'}
+						</a>
+						.
+						{artist.artist === 'Phish' ||
+						artist.artist === 'Trey Anastasio, TAB' ||
+						artist === 'Goose' ||
+						artist === 'Eggy' ||
+						artist === 'Neighbor' ||
+						artist === "Umphrey's McGee" ? (
+							<p>
+								Thanks{' '}
+								<a
+									className='underline'
+									href='https://adamscheinberg.com'
+								>
+									Adam Scheinberg
+								</a>
+								!
+							</p>
+						) : (
+							"If no setlist is found, consider adding it there? If you're awesome"
+						)}
+					</p>
+				)}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
@@ -1733,7 +1809,7 @@ export default function AddJam() {
 					<SuccessAlert
 						title={'Success!'}
 						description={
-							'You successfully did what you were trying to do! Thank you for your contribution'
+							"Thanks for contributing! You're a great person making a positive impact in the world."
 						}
 					/>
 				)}
