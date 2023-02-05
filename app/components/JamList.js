@@ -17,6 +17,7 @@ export default function JamList({
 	const [showIframe, setShowIframe] = useState(false);
 	const [iframeUrl, setIframeUrl] = useState('');
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
+  const isRelisten = iframeUrl.includes('relist');
 
 	console.log('showIframe', showIframe);
 	console.log('iframeUrl', iframeUrl);
@@ -86,8 +87,8 @@ export default function JamList({
 					</div>
 				)}
 			</div>
-			{showIframe && formattedIframeUrl && (
-				<div className='z-20 fixed bottom-0 right-0 pt-1 pl-1 pb-1 m-0  max-w-80 max-h-50 drop-shadow-2xl rounded-tl-lg rounded-bl-lg mb-14 md:mb-0 md:pb-0 md:rounded-bl-none bg-white flex flex-col'>
+			{showIframe && formattedIframeUrl &&  (
+				<div className={`z-20 fixed bottom-0 right-0 pt-1 pl-1 pb-1 m-0 ${isRelisten ? 'w-full h-1/3' : 'max-w-80  max-h-50 md:mb-0'} drop-shadow-sm rounded-tl-lg rounded-bl-lg mb-14 md:pb-0 md:rounded-bl-none bg-white flex flex-col`}>
           <button onClick={closeIframe} className='text-right mr-2'>Close &#215;</button>
 					<iframe
 						src={formattedIframeUrl}

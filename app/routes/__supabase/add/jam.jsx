@@ -838,10 +838,10 @@ export default function AddJam() {
 						{/* <div className='space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10'> */}
 						<div className='space-y-0 space-x-4 flex items-center'>
 							{[
-								{ id: 'auto', title: 'Automagically' },
-								{ id: 'manual', title: 'Manually' },
+								{ id: 'auto', title: 'Easiest way' },
+								{ id: 'manual', title: 'Slightly less easy way' },
 							].map((addingMethod) => (
-								<div key={addingMethod?.id}>
+								<div key={addingMethod?.id} className='flex align-middle'>
 									<input
 										key={addingMethod.id}
 										id={addingMethod.id}
