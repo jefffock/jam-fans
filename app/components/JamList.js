@@ -16,32 +16,32 @@ export default function JamList({
 	const artistUrl = search?.substring(artistStartIndex, urlStartIndex);
 	const [showIframe, setShowIframe] = useState(false);
 	const [iframeUrl, setIframeUrl] = useState('');
-  const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
+	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
 
-  console.log('showIframe', showIframe)
-  console.log('iframeUrl', iframeUrl)
-  useEffect(() => {
-    let reformattedLink;
-    if (!reformattedLink && iframeUrl) {
-      if (iframeUrl.includes("youtu")) {
-        if (iframeUrl.includes("watch?v=")) {
-          reformattedLink = iframeUrl.replace("watch?v=", "embed/");
-        }
-        if (iframeUrl.includes("youtu.be")) {
-          let youTubeId;
-          let regExp =
-            /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-          let match = iframeUrl.match(regExp);
-          if (match && match[2].length == 11) {
-            youTubeId = match[2];
-            reformattedLink = `//www.youtube.com/embed/${youTubeId}`;
-          }
-        }
-      }
-    }
-    console.log('reformattedLink', reformattedLink)
-    setFormattedIframeUrl(reformattedLink ?? iframeUrl);
-  }, [iframeUrl]);
+	console.log('showIframe', showIframe);
+	console.log('iframeUrl', iframeUrl);
+	useEffect(() => {
+		let reformattedLink;
+		if (!reformattedLink && iframeUrl) {
+			if (iframeUrl.includes('youtu')) {
+				if (iframeUrl.includes('watch?v=')) {
+					reformattedLink = iframeUrl.replace('watch?v=', 'embed/');
+				}
+				if (iframeUrl.includes('youtu.be')) {
+					let youTubeId;
+					let regExp =
+						/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+					let match = iframeUrl.match(regExp);
+					if (match && match[2].length == 11) {
+						youTubeId = match[2];
+						reformattedLink = `//www.youtube.com/embed/${youTubeId}`;
+					}
+				}
+			}
+		}
+		console.log('reformattedLink', reformattedLink);
+		setFormattedIframeUrl(reformattedLink ?? iframeUrl);
+	}, [iframeUrl]);
 
 	return (
 		<div className='pb-16'>
@@ -83,14 +83,14 @@ export default function JamList({
 				)}
 			</div>
 			{showIframe && formattedIframeUrl && (
-        <div className='z-20 fixed bottom-0 right-0 w-50 p-0 m-0 md:w-full max-h-40'>
-				<iframe
-					src={formattedIframeUrl}
-					// title={`Listen to ${jam.song_name} from ${jam.date}`}
-					height={'100%'}
-					width={'100%'}
-				></iframe>
-        </div>
+				<div className='z-20 fixed bottom-0 right-0 p-0 m-0 w-50 max-h-40'>
+					<iframe
+						src={formattedIframeUrl}
+						// title={`Listen to ${jam.song_name} from ${jam.date}`}
+						height={'100%'}
+						width={'100%'}
+					></iframe>
+				</div>
 			)}
 		</div>
 	);
