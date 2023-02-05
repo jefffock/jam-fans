@@ -34,11 +34,9 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>
-				<a href='#'>
 					<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
 						{jam.song_name}
 					</h5>
-				</a>
 				<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
 					{jam.date}
 				</h5>
@@ -80,17 +78,17 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 				{!user && (
 					<Link
 						to='/login'
-						className='underline self-center align-middle'
+						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-20000 hover:pl-2'
 					>
 						Login to rate
 					</Link>
 				)}
 				{user && <Link to={link} className='underline self-center align-middle'>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
-				<div>
+				<div className='transition-all ease-in hover:scale-125 duration-20000'>
 					{jam?.listen_link && (
 						<button
 							onClick={() => handleListenClick()}
-							className='inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 focus:ring-4 focus:outline-none focus:ring-cyan-300'
+							className='inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-cyan-500 rounded-lg hover:bg-cyan-600 focus:ring-4 focus:outline-none focus:ring-cyan-50 motion-reduce:transition-none motion-reduce:hover:transform-none'
 						>
 							Listen
 							<svg
