@@ -81,7 +81,7 @@ export default function Welcome() {
 						id='username'
             value={username}
             onChange={e => setUsername(e.target.value)}
-						className='block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-10 px-2'
+						className='block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm h-10 px-2'
 						placeholder=''
 					/>
 				</div>
@@ -94,7 +94,7 @@ export default function Welcome() {
         {!success &&
 				<button
 					type='button'
-					className='inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-4'
+					className='inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4'
           onClick={handleSubmit}
           disable={!username}
 				>

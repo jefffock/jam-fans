@@ -536,10 +536,26 @@ video {
 }
 
 .google {
+  font-family: 'Roboto';
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
   --tw-border-opacity: 1;
   border-color: rgb(0 0 0 / var(--tw-border-opacity));
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+.gradient-background {
+  background-image: linear-gradient(to right, #00bcd4, #4caf50, #9c27b0);
+  background-size: 300% 100%;
+  transition: background-position 1s ease;
+}
+
+.gradient-background:hover {
+  background-position: -100% 0;
+}
+
+.bg-change:hover {
+  background-color: #4caf50;
+  transition: 'background-color' 2s ease;
 }

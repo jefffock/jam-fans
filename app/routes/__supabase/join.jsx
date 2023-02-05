@@ -91,7 +91,7 @@ export default function SignUp() {
 				<p className='mt-2 text-center text-sm text-gray-600'>
 					<a
 						href='#'
-						className='font-medium text-indigo-600 hover:text-indigo-500'
+						className='font-medium text-cyan-600 hover:text-cyan-500'
 					>
 						Or{' '}
 						<Link
@@ -120,7 +120,7 @@ export default function SignUp() {
 								type='email'
 								autoComplete='email'
 								required
-								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm'
 								onChange={handleEmailChange}
 							/>
 						</div>
@@ -128,7 +128,7 @@ export default function SignUp() {
 					<div>
 						<button
 							type='button'
-							className='flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-4'
+							className='flex w-full justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4'
 							name='_action'
 							value='magic-link'
 							onClick={signInWithOtp}
@@ -157,7 +157,7 @@ export default function SignUp() {
 								type='password'
 								autoComplete='current-password'
 								onChange={handlePasswordChange}
-								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm'
+								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm'
 							/>
 						</div>
 					</div>
@@ -171,7 +171,7 @@ export default function SignUp() {
 					<div>
 						<button
 							type='submit'
-							className='flex w-full justify-center rounded-md border py-2 px-4 text-sm font-medium bg-white text-gray-500 shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-4 hover:text-white'
+							className='flex w-full justify-center rounded-md border py-2 px-4 text-sm font-medium bg-white text-gray-500 shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4 hover:text-white'
 							name='_action'
 							value='email-password'
 							onClick={signUpWithEmail}
@@ -184,7 +184,7 @@ export default function SignUp() {
 							className='text-sm'
 							onClick={handlePasswordReset}
 						>
-							<p className='font-medium text-indigo-600 hover:text-indigo-500 hover:cursor-pointer'>
+							<p className='font-medium text-cyan-600 hover:text-cyan-500 hover:cursor-pointer'>
 								Forgot your password?
 							</p>
 						</div>
@@ -210,7 +210,7 @@ export default function SignUp() {
 						<div className='flex justify-center my-4 google'>
 							<button
 								type='button'
-								className='inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+								className='inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
 								onClick={signInWithGoogle}
 							>
 								<img

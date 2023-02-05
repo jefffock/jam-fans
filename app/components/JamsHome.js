@@ -23,7 +23,7 @@ export default function JamsHome({
 
 	return (
 		<div>
-			<div className='flex justify-end'>
+			<div className='flex justify-start'>
 				<FiltersButton
 					open={open}
 					setOpen={setOpen}

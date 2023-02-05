@@ -170,7 +170,7 @@ export default function JamFiltersSlideout({
 													<div className='ml-3 flex h-7 items-center'>
 														<button
 															type='button'
-															className='rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+															className='rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500'
 															onClick={() => setOpen(false)}
 														>
 															<span className='sr-only'>Close panel</span>
@@ -219,7 +219,7 @@ export default function JamFiltersSlideout({
 																								id={`${sound.text}`}
 																								name={`sounds-${sound.text}`}
 																								type='checkbox'
-																								className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
+																								className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
 																								onChange={createQueryString}
                                                 defaultChecked={search?.includes(sound.text)}
 																							/>
@@ -259,7 +259,7 @@ export default function JamFiltersSlideout({
 																							value={`${artist.url}`}
 																							name={`artists-${artist.url}`}
 																							type='checkbox'
-																							className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2 border-2'
+																							className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 mr-2 border-2'
 																							onChange={createQueryString}
                                               defaultChecked={search?.includes(artist.url)}
 																						/>
@@ -286,7 +286,7 @@ export default function JamFiltersSlideout({
 																</Combobox.Label>
 																<div className='relative mt-1 px-30'>
 																	<Combobox.Input
-																		className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
+																		className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'
 																		onChange={(event) => {
 																			setQuery(event.target.value);
 																			createQueryString();
@@ -311,7 +311,7 @@ export default function JamFiltersSlideout({
 																						classNames(
 																							'relative cursor-default select-none py-2 pl-3 pr-9',
 																							active
-																								? 'bg-indigo-600 text-white'
+																								? 'bg-cyan-600 text-white'
 																								: 'text-gray-900'
 																						)
 																					}
@@ -334,7 +334,7 @@ export default function JamFiltersSlideout({
 																										'absolute inset-y-0 right-0 flex items-center pr-4',
 																										active
 																											? 'text-white'
-																											: 'text-indigo-600'
+																											: 'text-cyan-600'
 																									)}
 																								>
 																									<CheckIcon
@@ -373,7 +373,7 @@ export default function JamFiltersSlideout({
 																			Before
 																		</Listbox.Label>
 																		<div className='relative mt-1'>
-																			<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
+																			<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
 																				<span className='block truncate'>
 																					{beforeYearDisplayValue}
 																				</span>
@@ -400,7 +400,7 @@ export default function JamFiltersSlideout({
 																								className={({ active }) =>
 																									classNames(
 																										active
-																											? 'text-white bg-indigo-600'
+																											? 'text-white bg-cyan-600'
 																											: 'text-gray-900',
 																										'relative cursor-default select-none py-2 pl-3 pr-9'
 																									)
@@ -428,7 +428,7 @@ export default function JamFiltersSlideout({
 																												className={classNames(
 																													active
 																														? 'text-white'
-																														: 'text-indigo-600',
+																														: 'text-cyan-600',
 																													'absolute inset-y-0 right-0 flex items-center pr-4'
 																												)}
 																											>
@@ -466,7 +466,7 @@ export default function JamFiltersSlideout({
 																			After
 																		</Listbox.Label>
 																		<div className='relative mt-1'>
-																			<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
+																			<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
 																				<span className='block truncate'>
 																					{afterYearDisplayValue}
 																				</span>
@@ -493,7 +493,7 @@ export default function JamFiltersSlideout({
 																								className={({ active }) =>
 																									classNames(
 																										active
-																											? 'text-white bg-indigo-600'
+																											? 'text-white bg-cyan-600'
 																											: 'text-gray-900',
 																										'relative cursor-default select-none py-2 pl-3 pr-9'
 																									)
@@ -521,7 +521,7 @@ export default function JamFiltersSlideout({
 																												className={classNames(
 																													active
 																														? 'text-white'
-																														: 'text-indigo-600',
+																														: 'text-cyan-600',
 																													'absolute inset-y-0 right-0 flex items-center pr-4'
 																												)}
 																											>
@@ -543,7 +543,7 @@ export default function JamFiltersSlideout({
 															</Listbox>
 														</div>
 														{/* Checkbox options (show ratings, only show links) */}
-														<div className='px-4 py-2 pb-20'>
+														<div className='px-4 py-2'>
 															<fieldset className='space-y-5'>
 																<legend className='sr-only'>Options</legend>
 																<div className='relative flex items-start'>
@@ -553,7 +553,7 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-links-description'
 																			name='show-links'
 																			type='checkbox'
-																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 border-2'
+																			className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 border-2'
 																			onChange={createQueryString}
                                       defaultChecked={search?.includes('links')}
 																		/>
@@ -581,7 +581,7 @@ export default function JamFiltersSlideout({
 																			aria-describedby='show-ratings-description'
 																			name='show-ratings'
 																			type='checkbox'
-																			className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 border-2'
+																			className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 border-2'
 																			onChange={createQueryString}
                                       defaultChecked={search?.includes('ratings')}
 																		/>
@@ -619,8 +619,8 @@ export default function JamFiltersSlideout({
 														type='submit'
 														className={
 															count !== 0
-																? 'inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-																: 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-not-allowed'
+																? 'inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
+																: 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-not-allowed'
 														}
 														onClick={() => setOpen(false)}
 														disabled={count === 0}
@@ -630,14 +630,14 @@ export default function JamFiltersSlideout({
 
 													<button
 														type='button'
-														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
 														onClick={clearFilters}
 													>
 														Clear Filters
 													</button>
 													<button
 														type='button'
-														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+														className='rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
 														onClick={() => setOpen(false)}
 													>
 														Cancel

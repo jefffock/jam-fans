@@ -848,7 +848,7 @@ export default function AddJam() {
 										name='adding-method'
 										type='radio'
 										defaultChecked={addingMethod.id === 'auto'}
-										className='h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500'
+										className='h-4 w-4 border-gray-300 text-cyan-600 focus:ring-cyan-500'
 										onClick={() => handleAddMethodChange(addingMethod.id)}
 									/>
 									<label
@@ -920,7 +920,7 @@ export default function AddJam() {
 										Band
 									</Listbox.Label>
 									<div className='relative mt-1'>
-										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 											<span className='block truncate'>{artist.artist}</span>
 											<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
 												<ChevronUpDownIcon
@@ -944,7 +944,7 @@ export default function AddJam() {
 														className={({ active }) =>
 															classNames(
 																active
-																	? 'text-white bg-indigo-600'
+																	? 'text-white bg-cyan-600'
 																	: 'text-gray-900',
 																'relative cursor-default select-none py-2 pl-3 pr-9'
 															)
@@ -965,7 +965,7 @@ export default function AddJam() {
 																{selected ? (
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-indigo-600',
+																			active ? 'text-white' : 'text-cyan-600',
 																			'absolute inset-y-0 right-0 flex items-center pr-4'
 																		)}
 																	>
@@ -1024,7 +1024,7 @@ export default function AddJam() {
 								</Combobox.Label>
 								<div className='relative mt-1'>
 									<Combobox.Input
-										className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
+										className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'
 										onChange={(event) => {
 											setQuery(event.target.value);
 										}}
@@ -1048,7 +1048,7 @@ export default function AddJam() {
 														classNames(
 															'relative cursor-default select-none py-2 pl-3 pr-9',
 															active
-																? 'bg-indigo-600 text-white'
+																? 'bg-cyan-600 text-white'
 																: 'text-gray-900'
 														)
 													}
@@ -1068,7 +1068,7 @@ export default function AddJam() {
 																<span
 																	className={classNames(
 																		'absolute inset-y-0 right-0 flex items-center pr-4',
-																		active ? 'text-white' : 'text-indigo-600'
+																		active ? 'text-white' : 'text-cyan-600'
 																	)}
 																>
 																	<CheckIcon
@@ -1122,7 +1122,7 @@ export default function AddJam() {
 											Shows with a {songSelected}
 										</Listbox.Label>
 										<div className='relative mt-1'>
-											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 												<span className='block truncate'>
 													{show?.label || 'Choose a show'}
 												</span>
@@ -1148,7 +1148,7 @@ export default function AddJam() {
 															className={({ active }) =>
 																classNames(
 																	active
-																		? 'text-white bg-indigo-600'
+																		? 'text-white bg-cyan-600'
 																		: 'text-gray-900',
 																	'relative cursor-default select-none py-2 pl-3 pr-9'
 																)
@@ -1173,7 +1173,7 @@ export default function AddJam() {
 																			className={classNames(
 																				active
 																					? 'text-white'
-																					: 'text-indigo-600',
+																					: 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
@@ -1216,7 +1216,7 @@ export default function AddJam() {
 								name='new-song'
 								id='new-song'
 								defaultValue={query !== '' ? query : songSelected}
-								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='new-song'
 							/>
 						</div>
@@ -1230,7 +1230,7 @@ export default function AddJam() {
 							type='submit'
 							name='_action'
 							value='new-song'
-							className=' my-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+							className=' my-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500'
 						>
 							Add Song
 						</button>
@@ -1249,7 +1249,7 @@ export default function AddJam() {
 										Year
 									</Listbox.Label>
 									<div className='relative mt-1'>
-										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 											<span className='block truncate'>
 												{year || 'Choose year'}
 											</span>
@@ -1275,7 +1275,7 @@ export default function AddJam() {
 														className={({ active }) =>
 															classNames(
 																active
-																	? 'text-white bg-indigo-600'
+																	? 'text-white bg-cyan-600'
 																	: 'text-gray-900',
 																'relative cursor-default select-none py-2 pl-3 pr-9'
 															)
@@ -1296,7 +1296,7 @@ export default function AddJam() {
 																{selected ? (
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-indigo-600',
+																			active ? 'text-white' : 'text-cyan-600',
 																			'absolute inset-y-0 right-0 flex items-center pr-4'
 																		)}
 																	>
@@ -1339,7 +1339,7 @@ export default function AddJam() {
 											Shows from {year}
 										</Listbox.Label>
 										<div className='relative mt-1'>
-											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 												<span className='block truncate'>
 													{show?.label || 'Choose a show'}
 												</span>
@@ -1365,7 +1365,7 @@ export default function AddJam() {
 															className={({ active }) =>
 																classNames(
 																	active
-																		? 'text-white bg-indigo-600'
+																		? 'text-white bg-cyan-600'
 																		: 'text-gray-900',
 																	'relative cursor-default select-none py-2 pl-3 pr-9'
 																)
@@ -1390,7 +1390,7 @@ export default function AddJam() {
 																			className={classNames(
 																				active
 																					? 'text-white'
-																					: 'text-indigo-600',
+																					: 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
@@ -1444,7 +1444,7 @@ export default function AddJam() {
 										Songs in Setlist
 									</Listbox.Label>
 									<div className='relative mt-1'>
-										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 											<span className='block truncate'>
 												{songSelected || 'Choose song'}
 											</span>
@@ -1470,7 +1470,7 @@ export default function AddJam() {
 														className={({ active }) =>
 															classNames(
 																active
-																	? 'text-white bg-indigo-600'
+																	? 'text-white bg-cyan-600'
 																	: 'text-gray-900',
 																'relative cursor-default select-none py-2 pl-3 pr-9'
 															)
@@ -1491,7 +1491,7 @@ export default function AddJam() {
 																{selected ? (
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-indigo-600',
+																			active ? 'text-white' : 'text-cyan-600',
 																			'absolute inset-y-0 right-0 flex items-center pr-4'
 																		)}
 																	>
@@ -1533,7 +1533,7 @@ export default function AddJam() {
 								type='text'
 								name='date'
 								id='dateManual'
-								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='date-description'
 								value={dateInput}
 								onChange={handleDateInputChange}
@@ -1589,7 +1589,7 @@ export default function AddJam() {
 								id='location'
 								defaultValue={location}
 								onChange={handleLocationChange}
-								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='location-description'
 							/>
 						</div>
@@ -1695,7 +1695,7 @@ export default function AddJam() {
 																	name={`sounds-${sound.text}`}
 																	disabled={jam?.sounds?.includes(sound.label)}
 																	type='checkbox'
-																	className='h-6 w-6 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500  border-2 mr-2'
+																	className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
 																	onChange={handleSoundsChange}
 																/>
 															</div>
@@ -1729,7 +1729,7 @@ export default function AddJam() {
 									type='text'
 									name='listen-link'
 									id='listen-link'
-									className='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'
+									className='shadow-sm focus:ring-cyan-500 focus:border-cyan-500 block w-full sm:text-sm border-gray-300 rounded-md'
 									value={listenLink}
 									onChange={handleLinkChange}
 								/>
@@ -1749,7 +1749,7 @@ export default function AddJam() {
 										Rating
 									</Listbox.Label>
 									<div className='relative mt-1'>
-										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm h-10'>
+										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
 											<span className='block truncate'>
 												{rating || 'No rating'}
 											</span>
@@ -1776,7 +1776,7 @@ export default function AddJam() {
 															className={({ active }) =>
 																classNames(
 																	active
-																		? 'text-white bg-indigo-600'
+																		? 'text-white bg-cyan-600'
 																		: 'text-gray-900',
 																	'relative cursor-default select-none py-2 pl-3 pr-9'
 																)
@@ -1801,7 +1801,7 @@ export default function AddJam() {
 																			className={classNames(
 																				active
 																					? 'text-white'
-																					: 'text-indigo-600',
+																					: 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
@@ -1838,7 +1838,7 @@ export default function AddJam() {
 									rows={5}
 									defaultValue={''}
 									onChange={handleCommentChange}
-									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 									aria-describedby='comment'
 								></textarea>
 							</div>
@@ -1863,7 +1863,7 @@ export default function AddJam() {
 							type='submit'
 							name='_action'
 							value='add-not-logged-in'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 							disabled={showAddSong}
 						>
 							Add this jam
@@ -1875,7 +1875,7 @@ export default function AddJam() {
 							type='submit'
 							name='_action'
 							value='update-not-logged-in'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 							disabled={showAddSong}
 						>
 							Add sounds to this jam
@@ -1894,7 +1894,7 @@ export default function AddJam() {
 								type='submit'
 								name='_action'
 								value='add-logged-in'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 								disabled={showAddSong}
 							>
 								Add this jam
@@ -1911,7 +1911,7 @@ export default function AddJam() {
 								type='submit'
 								name='_action'
 								value='update-logged-in'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 								disabled={showAddSong}
 							>
 								Update this jam
@@ -1923,7 +1923,7 @@ export default function AddJam() {
 							type='submit'
 							name='_action'
 							value='add-and-rating'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 							disabled={showAddSong}
 						>
 							Add jam and rating/comment
@@ -1939,7 +1939,7 @@ export default function AddJam() {
 								type='submit'
 								name='_action'
 								value='rating'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 								disabled={showAddSong}
 							>
 								Add rating/comment
@@ -1955,7 +1955,7 @@ export default function AddJam() {
 								type='submit'
 								name='_action'
 								value='rating-update'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
 								disabled={showAddSong}
 							>
 								Update jam and add rating/comment

@@ -57,7 +57,7 @@ function Filters({ sounds, artists, songs }) {
 		// 												id={`sound-${sound.text}`}
 		// 												name={`sound-${sound.text}`}
 		// 												type='checkbox'
-		// 												className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+		// 												className='h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 mr-2'
 		// 											/>
 		// 										</div>
 		// 									</div>
@@ -94,7 +94,7 @@ function Filters({ sounds, artists, songs }) {
 		// 											id={`band-${band.url}`}
 		// 											name={`band-${band.url}`}
 		// 											type='checkbox'
-		// 											className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2'
+		// 											className='h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 mr-2'
 		// 										/>
 		// 									</div>
 		// 								</div>
@@ -116,7 +116,7 @@ function Filters({ sounds, artists, songs }) {
 		// 				</Combobox.Label>
 		// 				<div className='relative mt-1 px-30'>
 		// 					<Combobox.Input
-		// 						className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'
+		// 						className='w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'
 		// 						onChange={(event) => setQuery(event.target.value)}
 		// 						displayValue={(song) => song}
 		// 					/>
@@ -136,7 +136,7 @@ function Filters({ sounds, artists, songs }) {
 		// 									className={({ active }) =>
 		// 										classNames(
 		// 											'relative cursor-default select-none py-2 pl-3 pr-9',
-		// 											active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+		// 											active ? 'bg-cyan-600 text-white' : 'text-gray-900'
 		// 										)
 		// 									}
 		// 								>
@@ -155,7 +155,7 @@ function Filters({ sounds, artists, songs }) {
 		// 												<span
 		// 													className={classNames(
 		// 														'absolute inset-y-0 right-0 flex items-center pr-4',
-		// 														active ? 'text-white' : 'text-indigo-600'
+		// 														active ? 'text-white' : 'text-cyan-600'
 		// 													)}
 		// 												>
 		// 													<CheckIcon
@@ -189,7 +189,7 @@ function Filters({ sounds, artists, songs }) {
 		// 							Before
 		// 						</Listbox.Label>
 		// 						<div className='relative mt-1'>
-		// 							<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
+		// 							<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
 		// 								<span className='block truncate'>
 		// 									{beforeYearDisplayValue}
 		// 								</span>
@@ -216,7 +216,7 @@ function Filters({ sounds, artists, songs }) {
 		// 												className={({ active }) =>
 		// 													classNames(
 		// 														active
-		// 															? 'text-white bg-indigo-600'
+		// 															? 'text-white bg-cyan-600'
 		// 															: 'text-gray-900',
 		// 														'relative cursor-default select-none py-2 pl-3 pr-9'
 		// 													)
@@ -239,7 +239,7 @@ function Filters({ sounds, artists, songs }) {
 		// 														{beforeYearSelected ? (
 		// 															<span
 		// 																className={classNames(
-		// 																	active ? 'text-white' : 'text-indigo-600',
+		// 																	active ? 'text-white' : 'text-cyan-600',
 		// 																	'absolute inset-y-0 right-0 flex items-center pr-4'
 		// 																)}
 		// 															>
@@ -274,7 +274,7 @@ function Filters({ sounds, artists, songs }) {
 		// 							After
 		// 						</Listbox.Label>
 		// 						<div className='relative mt-1'>
-		// 							<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
+		// 							<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
 		// 								<span className='block truncate'>
 		// 									{afterYearDisplayValue}
 		// 								</span>
@@ -301,7 +301,7 @@ function Filters({ sounds, artists, songs }) {
 		// 												className={({ active }) =>
 		// 													classNames(
 		// 														active
-		// 															? 'text-white bg-indigo-600'
+		// 															? 'text-white bg-cyan-600'
 		// 															: 'text-gray-900',
 		// 														'relative cursor-default select-none py-2 pl-3 pr-9'
 		// 													)
@@ -324,7 +324,7 @@ function Filters({ sounds, artists, songs }) {
 		// 														{afterYearSelected ? (
 		// 															<span
 		// 																className={classNames(
-		// 																	active ? 'text-white' : 'text-indigo-600',
+		// 																	active ? 'text-white' : 'text-cyan-600',
 		// 																	'absolute inset-y-0 right-0 flex items-center pr-4'
 		// 																)}
 		// 															>
@@ -358,7 +358,7 @@ function Filters({ sounds, artists, songs }) {
 		// 							How many
 		// 						</Listbox.Label>
 		// 						<div className='relative mt-1'>
-		// 							<Listbox.Button className='relative cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm'>
+		// 							<Listbox.Button className='relative cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
 		// 								<span className='block truncate'>{limitSelected}</span>
 		// 								<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
 		// 									<ChevronUpDownIcon
@@ -382,7 +382,7 @@ function Filters({ sounds, artists, songs }) {
 		// 											className={({ active }) =>
 		// 												classNames(
 		// 													active
-		// 														? 'text-white bg-indigo-600'
+		// 														? 'text-white bg-cyan-600'
 		// 														: 'text-gray-900',
 		// 													'relative cursor-default select-none py-2 pl-3 pr-9'
 		// 												)
@@ -405,7 +405,7 @@ function Filters({ sounds, artists, songs }) {
 		// 													{limitSelected ? (
 		// 														<span
 		// 															className={classNames(
-		// 																active ? 'text-white' : 'text-indigo-600',
+		// 																active ? 'text-white' : 'text-cyan-600',
 		// 																'absolute inset-y-0 right-0 flex items-center pr-4'
 		// 															)}
 		// 														>
@@ -437,7 +437,7 @@ function Filters({ sounds, artists, songs }) {
 		// 							aria-describedby='show-links-description'
 		// 							name='show-links'
 		// 							type='checkbox'
-		// 							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+		// 							className='h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500'
 		// 						/>
 		// 					</div>
 		// 					<div className='ml-3 text-sm'>
@@ -462,7 +462,7 @@ function Filters({ sounds, artists, songs }) {
 		// 							aria-describedby='show-ratings-description'
 		// 							name='show-ratings'
 		// 							type='checkbox'
-		// 							className='h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+		// 							className='h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500'
 		// 						/>
 		// 					</div>
 		// 					<div className='ml-3 text-sm'>
