@@ -7,7 +7,7 @@ const navigation = [
 	{ name: 'Home', href: '/', current: true },
 	{ name: 'Jams', href: '/jams', current: false },
 	{ name: 'Add', href: '/add/jam', current: false },
-	{ name: 'Roadmap', href: '/roadmap', current: false },
+	{ name: 'Coming Soon™️', href: '/roadmap', current: false },
 	{ name: 'Contact', href: '/contact', current: false },
 ];
 const userNavigation = [
