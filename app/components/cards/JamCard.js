@@ -1,6 +1,13 @@
 import { Link } from '@remix-run/react';
 
-export default function JamCard({ jam, sounds, user, profile, setShowIframe, setIframeUrl }) {
+export default function JamCard({
+	jam,
+	sounds,
+	user,
+	profile,
+	setShowIframe,
+	setIframeUrl,
+}) {
 	let soundsString = '';
 	//itereate through jam, if key in jam matches text in sounds, add sound label to sounds String
 	for (const [key, value] of Object.entries(jam)) {
@@ -25,18 +32,18 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 	soundsString = soundsString.slice(0, -2);
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
 
-  function handleListenClick() {
-    setIframeUrl(jam?.listen_link);
-    setShowIframe(true);
-  }
+	function handleListenClick() {
+		setIframeUrl(jam?.listen_link);
+		setShowIframe(true);
+	}
 
-  const link = `/add/jam?jamid=${jam?.id}`;
+	const link = `/add/jam?jamid=${jam?.id}`;
 	return (
 		<div className='p-6 bg-white border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>
-					<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
-						{jam.song_name}
-					</h5>
+				<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
+					{jam.song_name}
+				</h5>
 				<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
 					{jam.date}
 				</h5>
@@ -78,12 +85,19 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 				{!user && (
 					<Link
 						to='/login'
-						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-20000 hover:pl-2'
+						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-20000 hover:pl-2 color text-cyan-500 hover:text-cyan-600'
 					>
 						Login to rate
 					</Link>
 				)}
-				{user && <Link to={link} className='underline self-center align-middle'>{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}</Link>}
+				{user && (
+					<Link
+						to={link}
+						className='underline self-center align-middle text-cyan-500 hover:text-cyan-600 transition-all ease-in hover:scale-125 duration-20000 hover:pl-2'
+					>
+						{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}
+					</Link>
+				)}
 				<div className='transition-all ease-in hover:scale-125 duration-20000'>
 					{jam?.listen_link && (
 						<button
@@ -106,7 +120,6 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 							</svg>
 						</button>
 					)}
-
 				</div>
 			</div>
 		</div>

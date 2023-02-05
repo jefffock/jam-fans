@@ -49,6 +49,7 @@ export const loader = async ({ request, params }) => {
 		.select('*')
 		.order('avg_rating', { ascending: false })
 		.order('num_ratings', { ascending: false })
+    .order('song_name', { ascending: true })
 		.limit(100);
 	//get songs
 	const { data: songs } = await supabaseClient
