@@ -43,6 +43,10 @@ export default function JamList({
 		setFormattedIframeUrl(reformattedLink ?? iframeUrl);
 	}, [iframeUrl]);
 
+  function closeIframe() {
+    setShowIframe(false)
+  }
+
 	return (
 		<div className='pb-60'>
 			{jams?.length > 0 && (
@@ -83,7 +87,8 @@ export default function JamList({
 				)}
 			</div>
 			{showIframe && formattedIframeUrl && (
-				<div className='z-20 fixed bottom-0 right-0 pt-1 pl-1 pb-1 m-0  max-w-80 max-h-50 drop-shadow-2xl rounded-tl-lg rounded-bl-lg mb-14 md:mb-0 md:pb-0 md:rounded-bl-none bg-black'>
+				<div className='z-20 fixed bottom-0 right-0 pt-1 pl-1 pb-1 m-0  max-w-80 max-h-50 drop-shadow-2xl rounded-tl-lg rounded-bl-lg mb-14 md:mb-0 md:pb-0 md:rounded-bl-none bg-white flex flex-col'>
+          <button onClick={closeIframe} className='text-right mr-2'>Close &#215;</button>
 					<iframe
 						src={formattedIframeUrl}
 						// title={`Listen to ${jam.song_name} from ${jam.date}`}
