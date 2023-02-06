@@ -113,7 +113,7 @@ export default function JamCard({
 				{!user && (
 					<Link
 						to='/login'
-						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-20000 hover:pl-2 color text-cyan-500 hover:text-cyan-600'
+						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-500 hover:duration-20000 hover:pl-2 color text-cyan-500 hover:text-cyan-600'
 					>
 						Login to rate
 					</Link>
@@ -126,7 +126,7 @@ export default function JamCard({
 						{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}
 					</Link>
 				)}
-				<div className='transition-all ease-in hover:scale-125 duration-20000'>
+				<div className='transition-all ease-in hover:scale-125 duration-500 hover:duration-20000'>
 					{jam?.listen_link && (
 						<button
 							onClick={() => handleListenClick()}

@@ -72,9 +72,7 @@ export const loader = async ({ request, params }) => {
     .order('avg_rating', { ascending: false })
 		.order('num_ratings', { ascending: false })
 		.order('song_name', { ascending: true })
-		.limit(100);
-  console.log('jams', jams)
-  
+		.limit(100);  
 
 	artists = [
 		{
@@ -110,16 +108,6 @@ export default function Index({ supabase, session }) {
 		useLoaderData();
 	const navigate = useNavigate();
 	const [open, setOpen] = useState(false);
-	if (!artists) return <div>Loading...</div>;
-
-	// useEffect(() => {
-	// 	if (user && !profile && typeof document !== 'undefined') {
-	// 		navigate('/welcome')
-	// 	}
-	// }, [user, profile]);
-  if (jams) {
-    console.log('JAMs', jams[0])
-  }
 
 	return (
     <>

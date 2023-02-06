@@ -30,6 +30,10 @@ export const loader = async ({ request, params }) => {
 			.single();
 		profile = data;
 	}
+  const { data: sounds } = await supabaseClient
+  .from('sounds')
+  .select('label, text')
+  .order('label', { ascending: true });
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('nickname, emoji_code, url, artist')
@@ -87,6 +91,7 @@ export const loader = async ({ request, params }) => {
 		}
 	}
 
+
 	const list = await supabaseClient
 		.from('jams_lists')
 		.select('*')
@@ -117,13 +122,26 @@ export const loader = async ({ request, params }) => {
 		let before = beforeDate + '-12-31';
 		jams = jams.lte('date', before);
 	}
-	if (soundsInQuery) {
-		soundsInQuery.forEach((sound) => {
-			jams = jams.eq(sound, true);
-		});
-	}
+	// if (soundsInQuery) {
+	// 	soundsInQuery.forEach((sound) => {
+	// 		jams = jams.eq(sound, true);
+	// 	});
+	// }
+
 	if (showListenable) {
 		jams = jams.not('listen_link', 'is', null);
+	}
+  if (soundsInQuery) {
+    let arrayOfLabels = []
+    soundsInQuery.forEach((sound) => {
+      arrayOfLabels.push(sounds.find((s) => s.text === sound)?.label)
+    })
+    console.log('arrayOfLabels', arrayOfLabels)
+    jams = jams.contains('sounds', arrayOfLabels)
+    // console.log('soundsInQuery', soundsInQuery)
+		// jams = jams.filter((jam) => {
+		// 	return soundsInQuery.some(sound => jam.sounds.includes(sound));
+		// });
 	}
 	jams = jams.order(orderBy, { ascending: asc });
 	if (orderBy === 'avg_rating') {
@@ -150,10 +168,6 @@ export const loader = async ({ request, params }) => {
 	const { data: songs } = await supabaseClient
 		.from('songs')
 		.select('song, artist');
-	const { data: sounds } = await supabaseClient
-		.from('sounds')
-		.select('label, text')
-		.order('label', { ascending: true });
 	artists = [
 		{
 			nickname: 'All Bands',
