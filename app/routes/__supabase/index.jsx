@@ -73,7 +73,6 @@ export const loader = async ({ request, params }) => {
 		.order('num_ratings', { ascending: false })
 		.order('song_name', { ascending: true })
 		.limit(100);  
-    console.log('jams', jams)
 
 	artists = [
 		{
