@@ -90,7 +90,7 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 	//make title
-	let title = 'Jams by All Bands';
+	let title = '🔥 Jams by All Bands';
 	let count = await supabaseClient
 		.from('versions')
 		.select('*', { count: 'exact', head: true });

@@ -17,7 +17,7 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 
-  const {
+	const {
 		data: { user },
 	} = await supabaseClient.auth.getUser();
 
@@ -30,10 +30,10 @@ export const loader = async ({ request, params }) => {
 			.single();
 		profile = data;
 	}
-  const { data: sounds } = await supabaseClient
-  .from('sounds')
-  .select('label, text')
-  .order('label', { ascending: true });
+	const { data: sounds } = await supabaseClient
+		.from('sounds')
+		.select('label, text')
+		.order('label', { ascending: true });
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('nickname, emoji_code, url, artist')
@@ -55,7 +55,7 @@ export const loader = async ({ request, params }) => {
 	let orderBy = 'avg_rating';
 	let asc = false;
 	let limit = 100;
-	let showListenable;
+	let showListenable = false;
 	let urlToShow;
 	let queryObjToStore = {};
 	let soundsInQuery = [];
@@ -91,7 +91,6 @@ export const loader = async ({ request, params }) => {
 		}
 	}
 
-
 	const list = await supabaseClient
 		.from('jams_lists')
 		.select('*')
@@ -102,26 +101,30 @@ export const loader = async ({ request, params }) => {
 	}
 	let jams = supabaseClient.from('jams').select('*');
 	let artistsInQueryNames = [];
+	console.log('artistsInQuery', artistsInQuery);
 	if (artistsInQuery?.length > 0) {
 		//if first element is null, break
 		if (artistsInQuery[0] !== 'null') {
 			artistsInQuery.forEach((artist) => {
 				artistsInQueryNames.push(artists.find((a) => a.url === artist)?.artist);
 			});
+			console.log('artistsInQueryNames', artistsInQueryNames);
 			jams = jams.in('artist', artistsInQueryNames);
 		}
 	}
-	if (song) {
-		jams = jams.eq('song_name', song);
-	}
-	if (afterDate) {
-		let after = afterDate + '-01-01';
-		jams = jams.gte('date', after);
-	}
-	if (beforeDate) {
-		let before = beforeDate + '-12-31';
-		jams = jams.lte('date', before);
-	}
+	// if (song) {
+	// 	jams = jams.eq('song_name', song);
+	// }
+	// if (afterDate) {
+	// 	let after = afterDate + '-01-01';
+	// 	jams = jams.gte('date', after);
+	// }
+	// if (beforeDate) {
+	// 	let before = beforeDate + '-12-31';
+	// 	jams = jams.lte('date', before);
+	// }
+
+	//old sounds
 	// if (soundsInQuery) {
 	// 	soundsInQuery.forEach((sound) => {
 	// 		jams = jams.eq(sound, true);
@@ -129,16 +132,20 @@ export const loader = async ({ request, params }) => {
 	// }
 
 	if (showListenable) {
+		console.log('showListenable', showListenable);
 		jams = jams.not('listen_link', 'is', null);
 	}
-  if (soundsInQuery) {
-    let arrayOfLabels = []
-    soundsInQuery.forEach((sound) => {
-      arrayOfLabels.push(sounds.find((s) => s.text === sound)?.label)
-    })
-    console.log('arrayOfLabels', arrayOfLabels)
-    jams = jams.contains('sounds', arrayOfLabels)
-    // console.log('soundsInQuery', soundsInQuery)
+	if (soundsInQuery) {
+		//new sounds
+		let arrayOfLabels = [];
+		soundsInQuery.forEach((sound) => {
+			arrayOfLabels.push(sounds.find((s) => s.text === sound)?.label);
+		});
+		console.log('arrayOfLabels', arrayOfLabels);
+		if (arrayOfLabels.length > 0) {
+			jams = jams.contains('sounds', arrayOfLabels);
+		}
+		// console.log('soundsInQuery', soundsInQuery)
 		// jams = jams.filter((jam) => {
 		// 	return soundsInQuery.some(sound => jam.sounds.includes(sound));
 		// });
@@ -184,7 +191,7 @@ export const loader = async ({ request, params }) => {
 		},
 	].concat(artists);
 
-	let title = '';
+	let title = '🔥 ';
 	if (soundsInQuery?.length > 0) {
 		for (var i = 0; i < soundsInQuery.length; i++) {
 			title += sounds.find((s) => s.text === soundsInQuery[i])?.label;
@@ -209,9 +216,9 @@ export const loader = async ({ request, params }) => {
 			if (j === artistsInQueryNames.length - 2) title += ' and ';
 		}
 	}
-  if (artistsInQueryNames?.length === 0) {
-    title += ' by All Bands';
-  }
+	if (artistsInQueryNames?.length === 0) {
+		title += ' by All Bands';
+	}
 	if (beforeDate && afterDate) {
 		if (beforeDate === afterDate) {
 			title += ' from ' + beforeDate;
@@ -235,7 +242,18 @@ export const loader = async ({ request, params }) => {
 	const search = url.search;
 
 	return json(
-		{ artists, songs, jams: jamsFetched, sounds, fullTitle, title, count, search, user, profile },
+		{
+			artists,
+			songs,
+			jams: jamsFetched,
+			sounds,
+			fullTitle,
+			title,
+			count,
+			search,
+			user,
+			profile,
+		},
 		{
 			headers: response.headers,
 		}
@@ -243,8 +261,18 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, jams } =
-		useLoaderData();
+	const {
+		artists,
+		songs,
+		sounds,
+		fullTitle,
+		title,
+		count,
+		search,
+		user,
+		profile,
+		jams,
+	} = useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
 
@@ -262,8 +290,8 @@ export default function Jams({ supabase, session }) {
 			title={title}
 			count={count}
 			search={search}
-      user={user}
-      profile={profile}
+			user={user}
+			profile={profile}
 		/>
-    	);
+	);
 }
