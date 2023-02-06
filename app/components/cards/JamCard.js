@@ -37,7 +37,7 @@ export default function JamCard({
 		<div className='p-6 bg-gray-50 border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
 			<div>
 				<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
-					{jam.song_name}
+					{jam.song_name}{' '}{String.fromCodePoint(jam.song_emoji)}
 				</h5>
 				<div className='flex justify-between'>
 					<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
@@ -63,7 +63,7 @@ export default function JamCard({
 				</div>
 				<div className='flex justify-between'>
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
-						{jam.artist}
+						{jam.artist}{' '}{String.fromCodePoint(jam.artist_emoji)}
 					</h6>
 					<p>{jam.num_ratings} ratings</p>
 				</div>
