@@ -9,7 +9,7 @@ export default function JamsHome({
 	session,
 	artists,
 	songs,
-	versions,
+	jams,
 	sounds,
 	open,
 	setOpen,
@@ -40,7 +40,7 @@ export default function JamsHome({
 				search={search}
 			/>
 			<JamList
-				jams={versions}
+				jams={jams}
 				sounds={sounds}
 				title={title}
         user={user}

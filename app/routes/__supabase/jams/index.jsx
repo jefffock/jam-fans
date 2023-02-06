@@ -101,13 +101,11 @@ export const loader = async ({ request, params }) => {
 		//if first element is null, break
 		if (artistsInQuery[0] !== 'null') {
 			artistsInQuery.forEach((artist) => {
-        console.log('artist', artist)
 				artistsInQueryNames.push(artists.find((a) => a.url === artist)?.artist);
 			});
 			jams = jams.in('artist', artistsInQueryNames);
 		}
 	}
-  console.log('artistsInQueryNames', artistsInQueryNames)
 	if (song) {
 		jams = jams.eq('song_name', song);
 	}

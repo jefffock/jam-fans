@@ -1,4 +1,5 @@
 import { Link } from '@remix-run/react';
+import { useState } from 'react';
 
 export default function JamCard({
 	jam,
@@ -8,33 +9,27 @@ export default function JamCard({
 	setShowIframe,
 	setIframeUrl,
 }) {
-	let soundsString = '';
-	//itereate through jam, if key in jam matches text in sounds, add sound label to sounds String
-	for (const [key, value] of Object.entries(jam)) {
-		if (
-			key === 'id' ||
-			key === 'song_name' ||
-			key === 'artist' ||
-			key === 'date' ||
-			key === 'location' ||
-			key === 'avg_rating' ||
-			key === 'submitter_name'
-		)
-			continue;
-		if (value === true) {
-			sounds.forEach((sound) => {
-				if (sound.text === key) {
-					soundsString += sound.label + ', ';
-				}
-			});
-		}
-	}
-	soundsString = soundsString.slice(0, -2);
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
+	const [showComments, setShowComments] = useState(false);
 
 	function handleListenClick() {
 		setIframeUrl(jam?.listen_link);
 		setShowIframe(true);
+	}
+	const comments = jam?.ratings
+		?.filter((rating) => {
+			return rating.f3 && rating.f3.trim() !== '';
+		})
+		.map((rating) => {
+			return {
+				rating: rating.f1,
+				name: rating.f2,
+				comment: rating.f3,
+			};
+		});
+
+	function handleCommentClick() {
+		setShowComments(!showComments);
 	}
 
 	const link = `/add/jam?jamid=${jam?.id}`;
@@ -44,16 +39,10 @@ export default function JamCard({
 				<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
 					{jam.song_name}
 				</h5>
-				<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
-					{jam.date}
-				</h5>
-				<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
-					{jam.artist}
-				</h6>
 				<div className='flex justify-between'>
-					<p className='mb-3 font-normal text-gray-700 mr-auto'>
-						{jam.location}
-					</p>
+					<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
+						{jam.date}
+					</h5>
 					<div className='flex float-right'>
 						<p className='mb-3 font-normal text-gray-700 ml-auto'>
 							{ratingToShow}{' '}
@@ -72,13 +61,52 @@ export default function JamCard({
 						</svg>
 					</div>
 				</div>
-				{soundsString && (
-					<p className='mb-3 font-normal text-gray-700'>{soundsString}</p>
-				)}
-				{jam?.submitter_name && (
-					<p className='font-normal text-gray-700'>
-						{'Added by ' + jam.submitter_name}
+				<div className='flex justify-between'>
+					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
+						{jam.artist}
+					</h6>
+					<p>{jam.num_ratings} ratings</p>
+				</div>
+				<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
+				{jam?.sounds && (
+					<p className='mb-3 font-normal text-gray-700'>
+						{jam?.sounds.join(', ')}
 					</p>
+				)}
+				{jam?.name && (
+					<p className='font-normal text-gray-700'>
+						{`Added by ${jam.name} (${jam?.points})`}
+					</p>
+				)}
+				{comments && comments.length > 0 && (
+					<button
+						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-2'
+						onClick={() => handleCommentClick()}
+					>
+						{showComments ? 'Hide Comments' : 'Show Comments'}
+					</button>
+				)}
+				{showComments &&
+					comments.map((comment) => {
+						return (
+							<div className='flex flex-col bg-white rounded-lg shadow-md p-6 my-4'>
+								<p className='mb-3 font-medium text-gray-700'>
+									{comment.comment}
+								</p>
+								<p className='text-gray-600'>
+									{comment.name} - {comment.rating}
+								</p>
+							</div>
+						);
+					})}
+				{showComments && comments.length > 2 && (
+					//hide comments
+					<button
+						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-2'
+						onClick={() => handleCommentClick()}
+					>
+						Hide Comments
+					</button>
 				)}
 			</div>
 			<div className='flex justify-between mt-3'>
@@ -93,7 +121,7 @@ export default function JamCard({
 				{user && (
 					<Link
 						to={link}
-						className='underline self-center align-middle text-cyan-500 hover:text-cyan-600 transition-all ease-in hover:scale-125 duration-20000 hover:pl-2'
+						className='underline self-center align-middle text-cyan-500 hover:text-cyan-600'
 					>
 						{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}
 					</Link>

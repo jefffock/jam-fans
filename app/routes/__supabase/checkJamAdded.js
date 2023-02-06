@@ -23,7 +23,6 @@ export const loader = async ({ request, params }) => {
 		.eq('song_name', song)
 		.eq('date', date)
 		.single();
-    console.log('jam', jam)
 	return json(
 		{ jam },
 		{

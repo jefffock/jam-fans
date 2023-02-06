@@ -65,7 +65,7 @@ export default function TopNav({ title, supabase, session }) {
 										<div className='hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8'>
 											{navigation.map((item, itemIndex) => (
 												<NavLink
-													key={item.itemIndex}
+													key={itemIndex}
 													to={item.href}
 													className={({ isActive }) =>
 														isActive ? activeClassName : inactiveClassName
@@ -98,9 +98,9 @@ export default function TopNav({ title, supabase, session }) {
 									<div className='hidden sm:inline self-center'>
 										{user && (
 											<div className=''>
-												{userNavigation.map((item) => (
+												{userNavigation.map((item, itemIndex) => (
 													<Disclosure.Button
-														key={item.name}
+														key={item.Index}
 														className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
 														onClick={handleSignOut}
 													>

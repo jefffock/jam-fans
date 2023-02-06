@@ -19,8 +19,6 @@ export default function JamList({
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
   const isRelisten = iframeUrl.includes('relist');
 
-	console.log('showIframe', showIframe);
-	console.log('iframeUrl', iframeUrl);
 	useEffect(() => {
 		let reformattedLink;
 		if (!reformattedLink && iframeUrl) {
@@ -57,11 +55,11 @@ export default function JamList({
 			)}
 			<div className='flex flex-wrap max-w-100vw justify-center'>
 				{jams?.length > 0 &&
-					jams?.map((version, index) => {
+					jams?.map((jam, index) => {
 						return (
 							<JamCard
 								key={index}
-								jam={version}
+								jam={jam}
 								sounds={sounds}
 								user={user}
 								profile={profile}

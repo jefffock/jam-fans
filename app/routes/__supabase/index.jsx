@@ -31,12 +31,12 @@ export const loader = async ({ request, params }) => {
 			.single();
 		profile = data;
 	}
-  console.log('user', user)
-  console.log('profile', profile)
-  if (user && !profile) {
-    console.log('redirecting to /welcome')
-    return redirect('/welcome');
-  }
+	console.log('user', user);
+	console.log('profile', profile);
+	if (user && !profile) {
+		console.log('redirecting to /welcome');
+		return redirect('/welcome');
+	}
 
 	//get artists
 	let { data: artists } = await supabaseClient
@@ -44,13 +44,14 @@ export const loader = async ({ request, params }) => {
 		.select('nickname, emoji_code, url, artist')
 		.order('name_for_order', { ascending: true });
 	//get base versions
-	const { data: versions } = await supabaseClient
-		.from('versions')
-		.select('*')
-		.order('avg_rating', { ascending: false })
-		.order('num_ratings', { ascending: false })
-    .order('song_name', { ascending: true })
-		.limit(100);
+	// let { data: versions } = await supabaseClient
+	// 	.from('versions')
+  //   .select('*')
+  //   // .select('*,ratings(*), ')
+	// 	.order('avg_rating', { ascending: false })
+	// 	.order('num_ratings', { ascending: false })
+	// 	.order('song_name', { ascending: true })
+	// 	.limit(100);
 	//get songs
 	const { data: songs } = await supabaseClient
 		.from('songs')
@@ -60,6 +61,20 @@ export const loader = async ({ request, params }) => {
 		.from('sounds')
 		.select('label, text')
 		.order('label', { ascending: true });
+  const { data: profiles } = await supabaseClient
+    .from('profiles')
+    .select('name, points')
+    .order('points', { ascending: false })
+  const { data: jams } = await supabaseClient
+    .from('jams')
+    .select('*')
+    .order('avg_rating', { ascending: false })
+		.order('num_ratings', { ascending: false })
+		.order('song_name', { ascending: true })
+		.limit(100);
+  console.log('jams', jams)
+  
+
 	artists = [
 		{
 			nickname: 'All Bands',
@@ -82,7 +97,7 @@ export const loader = async ({ request, params }) => {
 		.select('*', { count: 'exact', head: true });
 	count = count.count;
 	return json(
-		{ artists, songs, versions, sounds, count, user, profile, title },
+		{ artists, songs, sounds, count, user, profile, title, profiles, jams },
 		{
 			headers: response.headers,
 		}
@@ -90,9 +105,9 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, versions, sounds, title, count, user, profile } =
+	const { artists, songs, sounds, title, count, user, profile, jams } =
 		useLoaderData();
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
 
@@ -101,6 +116,9 @@ export default function Index({ supabase, session }) {
 	// 		navigate('/welcome')
 	// 	}
 	// }, [user, profile]);
+  if (jams) {
+    console.log('JAMs', jams[0])
+  }
 
 	return (
 		<JamsHome
@@ -108,7 +126,7 @@ export default function Index({ supabase, session }) {
 			session={session}
 			artists={artists}
 			songs={songs}
-			versions={versions}
+			jams={jams}
 			sounds={sounds}
 			open={open}
 			setOpen={setOpen}
