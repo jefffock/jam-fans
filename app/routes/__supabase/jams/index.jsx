@@ -95,7 +95,7 @@ export const loader = async ({ request, params }) => {
 	if (list.data) {
 		urlToShow = '/jams/lists/' + list.data.id;
 	}
-	let jams = supabaseClient.from('versions').select('*');
+	let jams = supabaseClient.from('jams').select('*');
 	let artistsInQueryNames = [];
 	if (artistsInQuery?.length > 0) {
 		//if first element is null, break
@@ -139,7 +139,7 @@ export const loader = async ({ request, params }) => {
 	// 	jams = jams.order('avg_rating', { ascending: false });
 	// }
 	jams = jams.limit(limit);
-	const { data: versions } = await jams;
+	const { data: jamsFetched } = await jams;
 	//get base versions
 	// const { data: versions } = await supabaseClient
 	// 	.from('versions')
@@ -221,7 +221,7 @@ export const loader = async ({ request, params }) => {
 	const search = url.search;
 
 	return json(
-		{ artists, songs, versions, sounds, fullTitle, title, count, search, user, profile },
+		{ artists, songs, jams: jamsFetched, sounds, fullTitle, title, count, search, user, profile },
 		{
 			headers: response.headers,
 		}
@@ -229,7 +229,7 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Jams({ supabase, session }) {
-	const { artists, songs, versions, sounds, fullTitle, title, count, search, user, profile } =
+	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, jams } =
 		useLoaderData();
 	const [open, setOpen] = useState(false);
 	if (!artists) return <div>Loading...</div>;
@@ -240,7 +240,7 @@ export default function Jams({ supabase, session }) {
 			session={session}
 			artists={artists}
 			songs={songs}
-			versions={versions}
+			jams={jams}
 			sounds={sounds}
 			open={open}
 			setOpen={setOpen}
@@ -251,5 +251,5 @@ export default function Jams({ supabase, session }) {
       user={user}
       profile={profile}
 		/>
-	);
+    	);
 }

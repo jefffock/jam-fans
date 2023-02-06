@@ -9,6 +9,7 @@ import JamFiltersSlideout from '../../components/JamFilters';
 import { useState, useEffect } from 'react';
 import FiltersButton from '../../components/FiltersButton';
 import JamsHome from '../../components/JamsHome';
+import Hero from '../../components/Hero';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -121,6 +122,8 @@ export default function Index({ supabase, session }) {
   }
 
 	return (
+    <>
+    <Hero/>
 		<JamsHome
 			supabase={supabase}
 			session={session}
@@ -135,5 +138,6 @@ export default function Index({ supabase, session }) {
 			profile={profile}
 			title={title}
 		/>
+    </>
 	);
 }

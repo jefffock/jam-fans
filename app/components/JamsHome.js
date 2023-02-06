@@ -22,7 +22,7 @@ export default function JamsHome({
 	if (!artists) return <div>Loading...</div>;
 
 	return (
-		<div>
+		<div className='bg-gray-100'>
 			<div className='flex justify-start'>
 				<FiltersButton
 					open={open}
