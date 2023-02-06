@@ -112,17 +112,17 @@ export const loader = async ({ request, params }) => {
 			jams = jams.in('artist', artistsInQueryNames);
 		}
 	}
-	// if (song) {
-	// 	jams = jams.eq('song_name', song);
-	// }
-	// if (afterDate) {
-	// 	let after = afterDate + '-01-01';
-	// 	jams = jams.gte('date', after);
-	// }
-	// if (beforeDate) {
-	// 	let before = beforeDate + '-12-31';
-	// 	jams = jams.lte('date', before);
-	// }
+	if (song) {
+		jams = jams.eq('song_name', song);
+	}
+	if (afterDate) {
+		let after = afterDate + '-01-01';
+		jams = jams.gte('date', after);
+	}
+	if (beforeDate) {
+		let before = beforeDate + '-12-31';
+		jams = jams.lte('date', before);
+	}
 
 	//old sounds
 	// if (soundsInQuery) {
@@ -130,6 +130,7 @@ export const loader = async ({ request, params }) => {
 	// 		jams = jams.eq(sound, true);
 	// 	});
 	// }
+
 
 	if (showListenable) {
 		console.log('showListenable', showListenable);
@@ -157,12 +158,6 @@ export const loader = async ({ request, params }) => {
 	if (orderBy === 'num_ratings') {
 		jams = jams.order('avg_rating', { ascending: false });
 	}
-	// if (orderBy === 'avg_rating') {
-	// 	jams = jams.order('num_ratings', { ascending: false });
-	// }
-	// if (orderBy === 'num_ratings') {
-	// 	jams = jams.order('avg_rating', { ascending: false });
-	// }
 	jams = jams.limit(limit);
 	const { data: jamsFetched } = await jams;
 	//get base versions
