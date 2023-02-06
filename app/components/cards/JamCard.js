@@ -36,7 +36,7 @@ export default function JamCard({
 
 	const link = `/add/jam?jamid=${jam?.id}`;
 	return (
-		<div className='p-6 bg-gray-50 border border-gray-200 rounded-lg shadow m-6 w-80 flex flex-col justify-between'>
+		<div className='p-6 bg-gray-50 border border-gray-200 rounded-lg shadow m-6 w-96 flex flex-col justify-between'>
 			<div>
 				<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
 					{jam.song_name}{' '}{songEmojis && songEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}

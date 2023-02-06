@@ -7,7 +7,11 @@ export default function ArtistBar({ artists, search }) {
 			<div className='flex h-25 w-screen overflow-x-scroll items-start pl-1 pr-10 align-middle'>
 				{artists?.map((artist, index) => {
 					let url = '';
-					if (search) url = search?.replace(/artists-.+?(?=&|$)/g, '');
+					if (search) {
+						url = search?.replace(/artists-.+?(?=&|$)/g, '');
+						// url = url.replace(/song-.+?(?=&|$)/g, '');
+            url = url.replace(/song=[^&]+|&song=[^&]+/g, '')
+					}
 					if (!search) url = `/jams/?`;
 					url += `&artists-${artist.url}=${artist.url}`;
 					return (
