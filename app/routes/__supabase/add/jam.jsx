@@ -588,8 +588,6 @@ export default function AddJam() {
 		setUseApis(addMethod === 'auto');
 	}
 
-	console.log('useApis', useApis);
-
 	function classNames(...classes) {
 		return classes.filter(Boolean).join(' ');
 	}

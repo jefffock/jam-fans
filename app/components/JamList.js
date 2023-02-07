@@ -38,7 +38,6 @@ export default function JamList({
 				}
 			}
 		}
-		console.log('reformattedLink', reformattedLink);
 		setFormattedIframeUrl(reformattedLink ?? iframeUrl);
 	}, [iframeUrl]);
 

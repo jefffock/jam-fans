@@ -123,15 +123,6 @@ export const loader = async ({ request, params }) => {
 		let before = beforeDate + '-12-31';
 		jams = jams.lte('date', before);
 	}
-
-	//old sounds
-	// if (soundsInQuery) {
-	// 	soundsInQuery.forEach((sound) => {
-	// 		jams = jams.eq(sound, true);
-	// 	});
-	// }
-
-
 	if (showListenable) {
 		console.log('showListenable', showListenable);
 		jams = jams.not('listen_link', 'is', null);
@@ -146,10 +137,6 @@ export const loader = async ({ request, params }) => {
 		if (arrayOfLabels.length > 0) {
 			jams = jams.contains('sounds', arrayOfLabels);
 		}
-		// console.log('soundsInQuery', soundsInQuery)
-		// jams = jams.filter((jam) => {
-		// 	return soundsInQuery.some(sound => jam.sounds.includes(sound));
-		// });
 	}
 	jams = jams.order(orderBy, { ascending: asc });
 	if (orderBy === 'avg_rating') {
