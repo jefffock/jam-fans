@@ -83,8 +83,6 @@ export const loader = async ({ request, params }) => {
 		.order('song_name', { ascending: true })
 		.range(startRange, endRange);
 
-	console.log('jams', jams[0]);
-
 	artists = [
 		{
 			nickname: 'All Bands',
