@@ -1,7 +1,7 @@
 import JamCard from './cards/JamCard';
 import { Link } from '@remix-run/react';
 import InfoAlert from './alerts/InfoAlert';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function JamList({
 	jams,
@@ -10,6 +10,7 @@ export default function JamList({
 	user,
 	profile,
 	search,
+  setHeight
 }) {
 	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length;
 	const urlStartIndex = search?.indexOf('=', artistStartIndex);
@@ -17,6 +18,15 @@ export default function JamList({
 	const [showIframe, setShowIframe] = useState(false);
 	const [iframeUrl, setIframeUrl] = useState('');
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
+
+  const divHeight = useCallback(
+    (node) => {
+      if (node !== null) {
+        setHeight(node.getBoundingClientRect().height);
+      }
+    },
+    [jams.length]
+  );
   const isRelisten = iframeUrl.includes('relist');
 
 	useEffect(() => {
@@ -33,7 +43,7 @@ export default function JamList({
 					let match = iframeUrl.match(regExp);
 					if (match && match[2].length == 11) {
 						youTubeId = match[2];
-						reformattedLink = `//www.youtube.com/embed/${youTubeId}`;
+						reformattedLink = `https://www.youtube.com/embed/${youTubeId}?autoplay=1`;
 					}
 				}
 			}
@@ -46,7 +56,7 @@ export default function JamList({
   }
 
 	return (
-		<div className='pb-60'>
+		<div className='pb-60' ref={divHeight}>
 			{jams?.length > 0 && (
 				<h1 className='my-3 mx-auto px-2 text-3xl tracking-tight text-gray-900 text-center'>
 					{title}

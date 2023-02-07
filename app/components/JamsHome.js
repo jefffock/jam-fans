@@ -17,7 +17,9 @@ export default function JamsHome({
 	count,
 	search,
   user,
-  profile
+  profile,
+  setClientHeight,
+  setHeight
 }) {
 	if (!artists) return <div>Loading...</div>;
 
@@ -46,6 +48,8 @@ export default function JamsHome({
         user={user}
         profile={profile}
         search={search}
+        setClientHeight={setClientHeight}
+      setHeight={setHeight}
 			/>
 		</div>
 	);

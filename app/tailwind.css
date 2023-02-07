@@ -804,6 +804,11 @@ select {
   margin-bottom: 5rem;
 }
 
+.my-0 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -971,6 +976,10 @@ select {
 
 .h-60 {
   height: 15rem;
+}
+
+.h-20 {
+  height: 5rem;
 }
 
 .max-h-60 {
@@ -1580,6 +1589,18 @@ select {
   padding-top: 3rem;
 }
 
+.pb-6 {
+  padding-bottom: 1.5rem;
+}
+
+.pt-0 {
+  padding-top: 0px;
+}
+
+.pt-3 {
+  padding-top: 0.75rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -1836,6 +1857,10 @@ select {
 
 .duration-700 {
   transition-duration: 700ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
 }
 
 .ease-in {
