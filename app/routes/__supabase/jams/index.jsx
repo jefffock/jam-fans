@@ -305,7 +305,8 @@ export default function Jams({ supabase, session }) {
 		if (!shouldFetch || !height) return;
 		if (clientHeight + scrollPosition + 2500 < height) return;
     let newSearch = search.slice(1)
-		fetcher.load(`/jams?index&${newSearch}&page=${page}`);
+    let urlToFetch = `/jams?index&${newSearch}&page=${page}`
+		fetcher.load(urlToFetch);
 		setShouldFetch(false);
 	}, [clientHeight, scrollPosition]);
 
