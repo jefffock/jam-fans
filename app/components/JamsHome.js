@@ -23,7 +23,7 @@ export default function JamsHome({
 
 	return (
 		<div className='bg-gray-100'>
-			<div className='flex justify-start'>
+			<div className='flex justify-center'>
 				<FiltersButton
 					open={open}
 					setOpen={setOpen}
