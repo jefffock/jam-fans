@@ -7,14 +7,14 @@ export default function FiltersButton({ open, setOpen }) {
 
 	return (
 		<button
-			className='inline-flex items-center rounded-md border border-cyan-600 bg-white p-2 m-2 mr-6 text-sm font-medium leading-4 text-cyan-600 shadow-sm hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 hover:scale-110 transition-all duration-700 ease-in transform'
+			className='inline-flex items-center rounded-md border border-cyan-600 bg-white p-2 m-2 text-sm font-medium leading-4 text-cyan-600 shadow-sm hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 hover:scale-110 transition-all duration-700 ease-in transform'
 			onClick={handleClick}
 		>
 			<FunnelIcon
 				className='-ml-1 mr-2 h-5 w-5 text-cyan-500'
 				aria-hidden='true'
 			/>
-			Filters - Find specific sounds, songs and more
+			Filters - Filter by sounds, song, bands, years
 		</button>
 	);
 }

@@ -10,15 +10,15 @@ export default function Hero() {
 			<h1 className='text-3xl font-bold my-2 p-4'>
 				Help other fans discover your favorite jams 💃
 			</h1>
-			<div className='max-w-3xl flex flex-col align-middle items-start'>
+			<div className='max-w-4xl flex flex-col align-middle items-start'>
 				<h2 className='font-bold text-2xl m-4 mb-0'>Your time to shine</h2>
 				<p className='text-xl m-4 mt-0'>
-					Contribute to the collective jam knowledge: add and rate your favorite jams.
+					Contribute to the collective jam knowledge by adding and rating your favorite jams.
 				</p>
 				<h2 className='font-bold text-2xl m-4 mb-0'>Reward</h2>
 				<p className='text-xl m-4 mt-0'>
-					An easy way to check out new bands or dive deep with your favorites.
-					Enjoy the satisfaction of knowing you are helping beautiful sounds reach new
+					An easy way to check out bands or dive deep with your favorites.
+					Enjoy the satisfaction of knowing you're helping beautiful sounds reach new
 					ears and hearts.
 				</p>
 			</div>
