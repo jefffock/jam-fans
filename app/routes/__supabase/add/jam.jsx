@@ -334,7 +334,7 @@ export async function action({ request, params }) {
 				.from('versions')
 				.update({
 					sounds: sounds,
-					listen_link: values.listen - link,
+					listen_link: values['listen-link'],
 				})
 				.eq('id', jam?.id);
 			addTenPoints(profile?.name);
@@ -526,7 +526,7 @@ export default function AddJam() {
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
-        navigate('/welcome')
+			navigate('/welcome');
 		}
 		if (initialSong && !songObj) {
 			async function getSongObj() {
@@ -841,7 +841,10 @@ export default function AddJam() {
 								{ id: 'auto', title: 'Easiest way' },
 								{ id: 'manual', title: 'Slightly less easy way' },
 							].map((addingMethod) => (
-								<div key={addingMethod?.id} className='flex align-middle'>
+								<div
+									key={addingMethod?.id}
+									className='flex align-middle'
+								>
 									<input
 										key={addingMethod.id}
 										id={addingMethod.id}
@@ -1171,9 +1174,7 @@ export default function AddJam() {
 																	{selected ? (
 																		<span
 																			className={classNames(
-																				active
-																					? 'text-white'
-																					: 'text-cyan-600',
+																				active ? 'text-white' : 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
@@ -1388,9 +1389,7 @@ export default function AddJam() {
 																	{selected ? (
 																		<span
 																			className={classNames(
-																				active
-																					? 'text-white'
-																					: 'text-cyan-600',
+																				active ? 'text-white' : 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
@@ -1799,9 +1798,7 @@ export default function AddJam() {
 																	{selected ? (
 																		<span
 																			className={classNames(
-																				active
-																					? 'text-white'
-																					: 'text-cyan-600',
+																				active ? 'text-white' : 'text-cyan-600',
 																				'absolute inset-y-0 right-0 flex items-center pr-4'
 																			)}
 																		>
