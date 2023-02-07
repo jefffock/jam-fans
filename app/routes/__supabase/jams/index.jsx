@@ -143,11 +143,13 @@ export const loader = async ({ request, params }) => {
 	jams = jams.order(orderBy, { ascending: asc });
   jams = jams.order('num_ratings', { ascending: false });
   jams = jams.order('song_name', { ascending: true })
+  jams = jams.order('id', { ascending: false })
   const startRange = page ? (page - 1) * 15 : 0;
   const endRange = page ? page * 15 : 15;
   console.log('startRange', startRange)
   console.log('endRange', endRange)
   jams = jams.range(startRange, endRange);
+  // jams = jams.limit(10);
   const { data: jamsFetched } = await jams;
 	// if (orderBy === 'avg_rating') {
 	// }
@@ -302,7 +304,8 @@ export default function Jams({ supabase, session }) {
   useEffect(() => {
 		if (!shouldFetch || !height) return;
 		if (clientHeight + scrollPosition + 2500 < height) return;
-		fetcher.load(`/?index&page=${page}`);
+    let newSearch = search.slice(1)
+		fetcher.load(`/jams?index&${newSearch}&page=${page}`);
 		setShouldFetch(false);
 	}, [clientHeight, scrollPosition]);
 

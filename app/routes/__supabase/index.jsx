@@ -81,6 +81,7 @@ export const loader = async ({ request, params }) => {
 		.order('avg_rating', { ascending: false })
 		.order('num_ratings', { ascending: false })
 		.order('song_name', { ascending: true })
+    .order('id', { ascending: false })
 		.range(startRange, endRange);
 
 	artists = [
@@ -188,7 +189,6 @@ export default function Index({ supabase, session }) {
 				user={user}
 				profile={profile}
 				title={title}
-				setClientHeight={setClientHeight}
 				setHeight={setHeight}
 			/>
 		</>
