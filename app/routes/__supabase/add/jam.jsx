@@ -830,6 +830,7 @@ export default function AddJam() {
 				<p className='text-center mt-4 text-xl'>
 					Add {profile ? 'and/or Rate ' : ''}a Jam
 				</p>
+				{!profile && <p className='text-lg text-center'>No account needed</p>}
 				<div className='flex justify-around'>
 					<fieldset className='mt-0'>
 						<legend className='sr-only'>Jam Adding Method</legend>
@@ -837,7 +838,7 @@ export default function AddJam() {
 						<div className='space-y-0 space-x-4 flex items-center'>
 							{[
 								{ id: 'auto', title: 'Easiest way' },
-								{ id: 'manual', title: 'Slightly less easy way' },
+								{ id: 'manual', title: 'Still pretty easy way' },
 							].map((addingMethod) => (
 								<div
 									key={addingMethod?.id}
