@@ -1,6 +1,6 @@
 export default function Hero() {
 	return (
-		<div className='flex flex-col items-center justify-center p-4 py-6 bg-white text-cyan-700'>
+		<div className='flex flex-col items-center justify-center p-4 pb-6 bg-white text-cyan-600'>
 			{/* <h1 className='text-3xl font-bold'>Discover your next favorite jam 💃</h1> */}
 			{/* <ul className='text-xl font-normal mt-3'>
 				<li className='my-2'>&#8226; Crowdsourced by the community</li>
@@ -10,7 +10,7 @@ export default function Hero() {
 			<h1 className='text-3xl font-bold my-2 p-4'>
 				Help other fans discover your favorite jams 💃
 			</h1>
-			<div className='max-w-4xl flex flex-col align-middle items-start'>
+			<div className='max-w-4xl flex flex-col align-middle items-start text-cyan-700'>
 				<h2 className='font-bold text-2xl m-4 mb-0'>Your time to shine</h2>
 				<p className='text-xl m-4 mt-0'>
 					Contribute to the collective jam knowledge by adding and rating your favorite jams.
