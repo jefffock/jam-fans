@@ -46,12 +46,12 @@ export const loader = async ({ request, params }) => {
 
 	delete queryParams['show-ratings'];
 	delete queryParams['limit[label]'];
-  const page = queryParams.page || 1;
-  delete queryParams.page;
+	const page = queryParams.page || 1;
+	delete queryParams.page;
 
 	const stringParams = JSON.stringify(queryParams);
 
-  console.log('page', page)
+	console.log('page', page);
 	//iterate through queryParamsArray and build a supabase query
 	let song;
 	let beforeDate;
@@ -141,16 +141,16 @@ export const loader = async ({ request, params }) => {
 		}
 	}
 	jams = jams.order(orderBy, { ascending: asc });
-  jams = jams.order('num_ratings', { ascending: false });
-  jams = jams.order('song_name', { ascending: true })
-  jams = jams.order('id', { ascending: false })
-  const startRange = page ? (page - 1) * 15 : 0;
-  const endRange = page ? page * 15 : 15;
-  console.log('startRange', startRange)
-  console.log('endRange', endRange)
-  jams = jams.range(startRange, endRange);
-  // jams = jams.limit(10);
-  const { data: jamsFetched } = await jams;
+	jams = jams.order('num_ratings', { ascending: false });
+	jams = jams.order('song_name', { ascending: true });
+	jams = jams.order('id', { ascending: false });
+	const startRange = page ? (page - 1) * 15 : 0;
+	const endRange = page ? page * 15 : 15;
+	console.log('startRange', startRange);
+	console.log('endRange', endRange);
+	jams = jams.range(startRange, endRange);
+	// jams = jams.limit(10);
+	const { data: jamsFetched } = await jams;
 	// if (orderBy === 'avg_rating') {
 	// }
 	// if (orderBy === 'num_ratings') {
@@ -244,7 +244,7 @@ export const loader = async ({ request, params }) => {
 			search,
 			user,
 			profile,
-      initialPage: page,
+			initialPage: page,
 		},
 		{
 			headers: response.headers,
@@ -264,10 +264,10 @@ export default function Jams({ supabase, session }) {
 		user,
 		profile,
 		initialJams,
-    initialPage,
+		initialPage,
 	} = useLoaderData();
 	const [open, setOpen] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
+	const [scrollPosition, setScrollPosition] = useState(0);
 	const [clientHeight, setClientHeight] = useState(null);
 	const [shouldFetch, setShouldFetch] = useState(true);
 	const [height, setHeight] = useState(null);
@@ -276,7 +276,7 @@ export default function Jams({ supabase, session }) {
 	const [jams, setJams] = useState(initialJams);
 	if (!artists) return <div>Loading...</div>;
 
-  useEffect(() => {
+	useEffect(() => {
 		const scrollListener = () => {
 			setClientHeight(window.innerHeight);
 			setScrollPosition(window.scrollY);
@@ -293,19 +293,23 @@ export default function Jams({ supabase, session }) {
 		};
 	}, []);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (initialPage === 1) {
-        setJams(initialJams);
-      }
-    }
-  }, [initialJams])
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			if (initialPage === 1) {
+				setJams(initialJams);
+			}
+		}
+	}, [initialJams]);
 
-  useEffect(() => {
+	useEffect(() => {
 		if (!shouldFetch || !height) return;
-		if (clientHeight + scrollPosition + 2500 < height) return;
-    let newSearch = search.slice(1)
-    let urlToFetch = `/jams?index&${newSearch}&page=${page}`
+		if (
+			(page !== 2 && clientHeight + scrollPosition + 2000 < height) ||
+			(page === 2 && clientHeight + scrollPosition + 1500 < height)
+		)
+			return;
+		let newSearch = search.slice(1);
+		let urlToFetch = `/jams?index&${newSearch}&page=${page}`;
 		fetcher.load(urlToFetch);
 		setShouldFetch(false);
 	}, [clientHeight, scrollPosition]);
@@ -317,7 +321,7 @@ export default function Jams({ supabase, session }) {
 		}
 
 		if (fetcher.data && fetcher.data.initialJams.length > 0) {
-      setJams((jams) => [...jams, ...fetcher.data.initialJams]);
+			setJams((jams) => [...jams, ...fetcher.data.initialJams]);
 			setPage((page) => page + 1);
 			setShouldFetch(true);
 		}
@@ -339,7 +343,7 @@ export default function Jams({ supabase, session }) {
 			search={search}
 			user={user}
 			profile={profile}
-      setHeight={setHeight}
+			setHeight={setHeight}
 		/>
 	);
 }
