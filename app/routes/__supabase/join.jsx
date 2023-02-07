@@ -78,7 +78,7 @@ export default function SignUp() {
 	}
 
 	return (
-		<div className='flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8'>
+		<div className='flex min-h-full flex-col justify-center pt-12 pb-20 sm:px-6 lg:px-8'>
 			<div className='sm:mx-auto sm:w-full sm:max-w-md'>
 				<img
 					className='mx-auto h-12 w-auto'
@@ -123,18 +123,21 @@ export default function SignUp() {
 								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm'
 								onChange={handleEmailChange}
 							/>
+              <p className='text-sm'>We'll never share your email.</p>
 						</div>
+
 					</div>
 					<div>
 						<button
 							type='button'
-							className='flex w-full justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4'
+							className='flex w-full justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 mt-4'
 							name='_action'
 							value='magic-link'
 							onClick={signInWithOtp}
 						>
-							Sign up with a magic link (no password!)
+							Sign up with a magic link
 						</button>
+            <p className='text-sm mb-4'>We'll send you a link to sign in. No password needed!</p>
 					</div>
 					{magicLinkSuccessText && (
 						<SuccessAlert
@@ -144,6 +147,7 @@ export default function SignUp() {
 					)}
 
 					<div>
+          <p className='text-sm'>Or:</p>
 						<label
 							htmlFor='password'
 							className='block text-sm font-medium text-gray-700'
