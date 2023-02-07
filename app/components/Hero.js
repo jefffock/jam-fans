@@ -13,12 +13,11 @@ export default function Hero() {
 			<div className='max-w-3xl flex flex-col align-middle items-start'>
 				<h2 className='font-bold text-2xl m-4 mb-0'>Your time to shine</h2>
 				<p className='text-xl m-4 mt-0'>
-					Contribute to the collective jam knowledge by adding
-					and rating your favorites.
+					Contribute to the collective jam knowledge: add and rate your favorite jams.
 				</p>
 				<h2 className='font-bold text-2xl m-4 mb-0'>Reward</h2>
 				<p className='text-xl m-4 mt-0'>
-					An easy way to explore new bands or dive deep with your favorites.
+					An easy way to check out new bands or dive deep with your favorites.
 					Enjoy the satisfaction of knowing you are helping beautiful sounds reach new
 					ears and hearts.
 				</p>
