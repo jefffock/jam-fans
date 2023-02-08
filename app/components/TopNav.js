@@ -150,7 +150,7 @@ export default function TopNav({ title, supabase, session }) {
 							</div>
 
 							<Disclosure.Panel className=''>
-								<div className='space-y-1 pt-2 pb-3'>
+								<div className='space-y-1 pt-2 pb-3 text-right'>
 									{navigation.map((item) => (
 										<Disclosure.Button
 											key={item.name}
@@ -168,7 +168,7 @@ export default function TopNav({ title, supabase, session }) {
 										</Disclosure.Button>
 									))}
 								</div>
-								<div className='border-t border-gray-200 pt-4 pb-3'>
+								<div className='border-t border-gray-200 pt-4 pb-3 text-right'>
 									<div className=' space-y-1'>
 										{user &&
 											userNavigation.map((item) => (
