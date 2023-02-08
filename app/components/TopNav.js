@@ -98,7 +98,7 @@ export default function TopNav({ title, supabase, session }) {
 											))}
 										</div>
 									</div>
-									<div className='hidden sm:inline self-center'>
+									<div className='flex sm:flex-row self-center items-end'>
 										{/* {user && (
 											<div className=''>
 												{userNavigation.map((item, itemIndex) => (
@@ -113,32 +113,38 @@ export default function TopNav({ title, supabase, session }) {
 											</div>
 										)} */}
 										{!user && (
-											<div className='ml-auto space-y-1 self-center'>
+											<div className='hidden lg:-my-px lg:mx-4 lg:flex lg:space-x-8'>
 												<a
 													href='/login'
-													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
+													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex align-baseline px-1 border-b-2 text-sm font-medium mr-8 pb-2'
 												>
 													Login
 												</a>
+												<a
+													href='/join'
+													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 border-b-2 text-sm font-medium mr-8'
+												>
+													Create an account
+												</a>
 											</div>
 										)}
-									</div>
-									<div className='-mr-2 flex items-center'>
-										{/* Mobile menu button */}
-										<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'>
-											<span className='sr-only'>Open main menu</span>
-											{open ? (
-												<XMarkIcon
-													className='block h-6 w-6'
-													aria-hidden='true'
-												/>
-											) : (
-												<Bars3Icon
-													className='block h-6 w-6'
-													aria-hidden='true'
-												/>
-											)}
-										</Disclosure.Button>
+										<div className='-mr-2 flex items-center'>
+											{/* Mobile menu button */}
+											<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'>
+												<span className='sr-only'>Open main menu</span>
+												{open ? (
+													<XMarkIcon
+														className='block h-6 w-6'
+														aria-hidden='true'
+													/>
+												) : (
+													<Bars3Icon
+														className='block h-6 w-6'
+														aria-hidden='true'
+													/>
+												)}
+											</Disclosure.Button>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -165,7 +171,7 @@ export default function TopNav({ title, supabase, session }) {
 								<div className='border-t border-gray-200 pt-4 pb-3'>
 									<div className=' space-y-1'>
 										{user &&
-											userNavigation.map((item) => (
+											userNavigation.slice(0, 2).map((item) => (
 												<Disclosure.Button
 													key={item.name}
 													as='a'
@@ -207,15 +213,14 @@ export default function TopNav({ title, supabase, session }) {
 															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
 														)}
 													>
-														Sign up
+														Create an account
 													</a>
 												</Disclosure.Button>
-												user
 											</div>
 										)}
-										{/* {!user &&
+										{!user &&
 											userNavigation &&
-											userNavigation.map((item) => (
+											userNavigation.slice(0, 3).map((item) => (
 												<Disclosure.Button
 													key={item.name}
 													as='a'
@@ -234,7 +239,7 @@ export default function TopNav({ title, supabase, session }) {
 												>
 													{item.name}
 												</Disclosure.Button>
-											))} */}
+											))}
 									</div>
 								</div>
 							</Disclosure.Panel>
