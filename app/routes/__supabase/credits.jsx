@@ -45,7 +45,7 @@ export default function Credits() {
 					</a>
 					!
 				</p>
-				<h2 class='text-2xl font-bold mb-2'>Setlist.fm</h2>
+				<h2 class='text-2xl font-bold mb-2 mt-8'>Setlist.fm</h2>
 				<p class='text-lg  mb-6'>All other artists</p>
 				<p class='text-lg  mb-10 self-start'>
 					<a
@@ -57,7 +57,7 @@ export default function Credits() {
 					has setlists by every band you can think of. Thank you to the setlist.fm contributors!
 				</p>
 				<p class='text-xl  mb-4'>
-					Thank you to everyone involved at Phish.net, Songfish, and Setlist.fm!
+					Thanks to everyone involved at Phish.net, Songfish, and Setlist.fm!
 				</p>
 			</div>
 		</div>
