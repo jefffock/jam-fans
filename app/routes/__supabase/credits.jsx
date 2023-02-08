@@ -56,9 +56,15 @@ export default function Credits() {
 					</a>{' '}
 					has setlists by every band you can think of. Thank you to the setlist.fm contributors!
 				</p>
-				<p class='text-xl  mb-4'>
-					Thanks to everyone involved at Phish.net, Songfish, and Setlist.fm!
-				</p>
+        <div className="relative">
+      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <div className="w-full border-t border-gray-300" />
+      </div>
+      <div className="relative flex justify-center">
+        <span className="bg-white px-2 text-3xl">Thank You!</span>
+      </div>
+    </div>
+        <p className="text-lg py-4">Artists, crew, staff, tapers, fans, friends and family of fans, and everyone else - thank you for playing your part in creating and sharing this music. </p>
 			</div>
 		</div>
 	);
