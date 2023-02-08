@@ -171,7 +171,7 @@ export default function TopNav({ title, supabase, session }) {
 								<div className='border-t border-gray-200 pt-4 pb-3'>
 									<div className=' space-y-1'>
 										{user &&
-											userNavigation.slice(0, 2).map((item) => (
+											userNavigation.map((item) => (
 												<Disclosure.Button
 													key={item.name}
 													as='a'

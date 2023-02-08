@@ -1,7 +1,7 @@
 export default function Privacy() {
 	return (
-		<div class='min-h-screen max-w-screen overflow-hidden p-4'>
-			<div class='flex flex-col items-center mt-10 mx-auto border rounded-xl p-4 max-w-xl'>
+		<div class='min-h-screen max-w-screen overflow-hidden p-4 pb-20'>
+			<div class='flex flex-col items-center mt-10 mx-auto border rounded-xl p-4 max-w-xl text-gray-800'>
 				<h1 class='text-3xl pb-10'>Privacy Policy</h1>
 				<p class='text-lg font-medium mb-4'>
 					At Jam Fans, we are committed to protecting the privacy of our users.

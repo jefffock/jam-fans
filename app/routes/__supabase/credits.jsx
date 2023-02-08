@@ -1,7 +1,7 @@
 export default function Credits() {
 	return (
 		<div className='p-4 w-full h-full pb-20'>
-			<div class='flex flex-col items-center mt-10 p-4 mx-auto max-w-xl border rounded-xl text-cyan-800'>
+			<div class='flex flex-col items-center mt-10 p-4 mx-auto max-w-xl border rounded-xl text-gray-800'>
 				<h1 class='text-3xl self-center pb-6'>Credits</h1>
 				<p class='text-lg  mb-6'>
 					When adding jams, the show and setlist data comes from:

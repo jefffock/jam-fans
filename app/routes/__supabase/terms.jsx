@@ -1,7 +1,7 @@
 export default function Terms() {
   return(
-    <div class="min-h-screen max-w-screen overflow-hidden p-4">
-  <div class="flex flex-col items-center mt-10 border rounded-xl p-4 max-w-xl mx-auto">
+    <div class="min-h-screen max-w-screen overflow-hidden p-4 pb-20">
+  <div class="flex flex-col items-center mt-10 border rounded-xl p-4 max-w-xl mx-auto text-gray-800">
     <h1 class="text-3xl pb-10">Terms of Service</h1>
     <p class="text-lg font-medium mb-4">By using jam.fans, you agree to the following terms of service:</p>
     <p class="text-lg mb-4">1. Community Resource: This site is a community resource, and we are grateful for your contribution by adding ratings, jams, and ideas.</p>
