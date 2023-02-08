@@ -543,7 +543,7 @@ export default function JamFiltersSlideout({
 															</Listbox>
 														</div>
 														{/* Checkbox options (show ratings, only show links) */}
-														<div className='px-4 py-2'>
+														<div className='px-4 py-2 pb-16'>
 															<fieldset className='space-y-5'>
 																<legend className='sr-only'>Options</legend>
 																<div className='relative flex items-start'>

@@ -11,7 +11,9 @@ const navigation = [
 	{ name: 'Contact', href: '/contact', current: false },
 ];
 const userNavigation = [
-	// { name: 'Settings', href: '#' },
+	{ name: 'Credits', href: '/credits' },
+	{ name: 'Terms of Service', href: '/terms' },
+	{ name: 'Privacy Policy', href: '/privacy' },
 	{ name: 'Sign out', href: '#' },
 ];
 
@@ -19,7 +21,8 @@ function classNames(...classes) {
 	return classes.filter(Boolean).join(' ');
 }
 
-const activeClassName = 'border-cyan-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
+const activeClassName =
+	'border-cyan-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 const inactiveClassName =
 	'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 
@@ -95,53 +98,59 @@ export default function TopNav({ title, supabase, session }) {
 											))}
 										</div>
 									</div>
-									<div className='hidden sm:inline self-center'>
-										{user && (
+									<div className='flex sm:flex-row self-center items-end'>
+										{/* {user && (
 											<div className=''>
 												{userNavigation.map((item, itemIndex) => (
 													<Disclosure.Button
 														key={item.Index}
 														className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
-														onClick={handleSignOut}
+														onClick={item.name === 'Sign out' ? () => handleSignOut() : null}
 													>
 														{item.name}
 													</Disclosure.Button>
 												))}
 											</div>
-										)}
+										)} */}
 										{!user && (
-											<div className='ml-auto space-y-1 self-center'>
+											<div className='hidden lg:-my-px lg:mx-4 lg:flex lg:space-x-8'>
 												<a
 													href='/login'
-													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
+													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex align-baseline px-1 border-b-2 text-sm font-medium mr-8 pb-2'
 												>
 													Login
 												</a>
+												<a
+													href='/join'
+													className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 border-b-2 text-sm font-medium mr-8'
+												>
+													Create an account
+												</a>
 											</div>
 										)}
-									</div>
-									<div className='-mr-2 flex items-center sm:hidden'>
-										{/* Mobile menu button */}
-										<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'>
-											<span className='sr-only'>Open main menu</span>
-											{open ? (
-												<XMarkIcon
-													className='block h-6 w-6'
-													aria-hidden='true'
-												/>
-											) : (
-												<Bars3Icon
-													className='block h-6 w-6'
-													aria-hidden='true'
-												/>
-											)}
-										</Disclosure.Button>
+										<div className='-mr-2 flex items-center'>
+											{/* Mobile menu button */}
+											<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'>
+												<span className='sr-only'>Open main menu</span>
+												{open ? (
+													<XMarkIcon
+														className='block h-6 w-6'
+														aria-hidden='true'
+													/>
+												) : (
+													<Bars3Icon
+														className='block h-6 w-6'
+														aria-hidden='true'
+													/>
+												)}
+											</Disclosure.Button>
+										</div>
 									</div>
 								</div>
 							</div>
 
-							<Disclosure.Panel className='sm:hidden'>
-								<div className='space-y-1 pt-2 pb-3'>
+							<Disclosure.Panel className=''>
+								<div className='inline sm:hidden space-y-1 pt-2 pb-3 text-right'>
 									{navigation.map((item) => (
 										<Disclosure.Button
 											key={item.name}
@@ -159,7 +168,7 @@ export default function TopNav({ title, supabase, session }) {
 										</Disclosure.Button>
 									))}
 								</div>
-								<div className='border-t border-gray-200 pt-4 pb-3'>
+								<div className='border-t border-gray-200 pt-4 pb-3 text-right'>
 									<div className=' space-y-1'>
 										{user &&
 											userNavigation.map((item) => (
@@ -173,7 +182,11 @@ export default function TopNav({ title, supabase, session }) {
 															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
 														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
 													)}
-													onClick={handleSignOut}
+													onClick={
+														item.name === 'Sign out'
+															? () => handleSignOut()
+															: null
+													}
 												>
 													{item.name}
 												</Disclosure.Button>
@@ -200,11 +213,33 @@ export default function TopNav({ title, supabase, session }) {
 															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
 														)}
 													>
-														Sign up
+														Create an account
 													</a>
 												</Disclosure.Button>
 											</div>
 										)}
+										{!user &&
+											userNavigation &&
+											userNavigation.slice(0, 3).map((item) => (
+												<Disclosure.Button
+													key={item.name}
+													as='a'
+													href={item.href}
+													className={classNames(
+														item?.current
+															? 'bg-cyan-50 border-cyan-500 text-cyan-700'
+															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+													)}
+													onClick={
+														item.name === 'Sign out'
+															? () => handleSignOut()
+															: null
+													}
+												>
+													{item.name}
+												</Disclosure.Button>
+											))}
 									</div>
 								</div>
 							</Disclosure.Panel>

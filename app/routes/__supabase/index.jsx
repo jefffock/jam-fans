@@ -1,6 +1,6 @@
 import { Link, Outlet, useNavigate } from '@remix-run/react';
 import { createServerClient } from '@supabase/auth-helpers-remix';
-import { useLoaderData } from '@remix-run/react';
+import { useLoaderData, useFetcher } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import ArtistBar from '../../components/ArtistBar';
 import JamList from '../../components/JamList';
@@ -18,6 +18,12 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	//get url search param page
+	const url = new URL(request.url);
+	const searchParams = new URLSearchParams(url.search);
+	const queryParams = Object.fromEntries(searchParams);
+	const page = queryParams.page || 1;
+	console.log('page', page);
 
 	const {
 		data: { user },
@@ -47,8 +53,8 @@ export const loader = async ({ request, params }) => {
 	//get base versions
 	// let { data: versions } = await supabaseClient
 	// 	.from('versions')
-  //   .select('*')
-  //   // .select('*,ratings(*), ')
+	//   .select('*')
+	//   // .select('*,ratings(*), ')
 	// 	.order('avg_rating', { ascending: false })
 	// 	.order('num_ratings', { ascending: false })
 	// 	.order('song_name', { ascending: true })
@@ -62,17 +68,21 @@ export const loader = async ({ request, params }) => {
 		.from('sounds')
 		.select('label, text')
 		.order('label', { ascending: true });
-  const { data: profiles } = await supabaseClient
-    .from('profiles')
-    .select('name, points')
-    .order('points', { ascending: false })
-  const { data: jams } = await supabaseClient
-    .from('jams')
-    .select('*')
-    .order('avg_rating', { ascending: false })
+	const { data: profiles } = await supabaseClient
+		.from('profiles')
+		.select('name, points')
+		.order('points', { ascending: false });
+
+	const startRange = page ? (page - 1) * 15 : 0;
+	const endRange = page ? page * 15 : 15;
+	const { data: jams } = await supabaseClient
+		.from('jams')
+		.select('*')
+		.order('avg_rating', { ascending: false })
 		.order('num_ratings', { ascending: false })
 		.order('song_name', { ascending: true })
-		.limit(100);  
+    .order('id', { ascending: false })
+		.range(startRange, endRange);
 
 	artists = [
 		{
@@ -96,7 +106,17 @@ export const loader = async ({ request, params }) => {
 		.select('*', { count: 'exact', head: true });
 	count = count.count;
 	return json(
-		{ artists, songs, sounds, count, user, profile, title, profiles, jams },
+		{
+			artists,
+			songs,
+			sounds,
+			count,
+			user,
+			profile,
+			title,
+			profiles,
+			initialJams: jams,
+		},
 		{
 			headers: response.headers,
 		}
@@ -104,28 +124,73 @@ export const loader = async ({ request, params }) => {
 };
 
 export default function Index({ supabase, session }) {
-	const { artists, songs, sounds, title, count, user, profile, jams } =
+	const { artists, songs, sounds, title, count, user, profile, initialJams } =
 		useLoaderData();
 	const navigate = useNavigate();
 	const [open, setOpen] = useState(false);
+	const [scrollPosition, setScrollPosition] = useState(0);
+	const [clientHeight, setClientHeight] = useState(null);
+	const [shouldFetch, setShouldFetch] = useState(true);
+	const [height, setHeight] = useState(null);
+	const [page, setPage] = useState(2);
+	const fetcher = useFetcher();
+	const [jams, setJams] = useState(initialJams);
+
+	useEffect(() => {
+		const scrollListener = () => {
+			setClientHeight(window.innerHeight);
+			setScrollPosition(window.scrollY);
+		};
+
+		if (typeof window !== 'undefined') {
+			window.addEventListener('scroll', scrollListener);
+		}
+
+		return () => {
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('scroll', scrollListener);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!shouldFetch || !height) return;
+		if (clientHeight + scrollPosition + 2500 < height) return;
+		fetcher.load(`/?index&page=${page}`);
+		setShouldFetch(false);
+	}, [clientHeight, scrollPosition]);
+
+	useEffect(() => {
+		if (fetcher.data && fetcher.data.initialJams.length === 0) {
+			setShouldFetch(false);
+			return;
+		}
+
+		if (fetcher.data && fetcher.data.initialJams.length > 0) {
+      setJams((jams) => [...jams, ...fetcher.data.initialJams]);
+			setPage((page) => page + 1);
+			setShouldFetch(true);
+		}
+	}, [fetcher.data]);
 
 	return (
-    <>
-    <Hero/>
-		<JamsHome
-			supabase={supabase}
-			session={session}
-			artists={artists}
-			songs={songs}
-			jams={jams}
-			sounds={sounds}
-			open={open}
-			setOpen={setOpen}
-			count={count}
-			user={user}
-			profile={profile}
-			title={title}
-		/>
-    </>
+		<>
+			<Hero />
+			<JamsHome
+				supabase={supabase}
+				session={session}
+				artists={artists}
+				songs={songs}
+				jams={jams}
+				sounds={sounds}
+				open={open}
+				setOpen={setOpen}
+				count={count}
+				user={user}
+				profile={profile}
+				title={title}
+				setHeight={setHeight}
+			/>
+		</>
 	);
 }

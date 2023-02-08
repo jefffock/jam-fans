@@ -1,13 +1,14 @@
-import { Outlet, useLoaderData } from '@remix-run/react';
+import { Outlet, useLoaderData, useFetcher } from '@remix-run/react';
 import ArtistBar from '../../../components/ArtistBar';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { json } from '@remix-run/node';
 import JamList from '../../../components/JamList';
 import JamFilters from '../../../components/JamFilters';
 import JamFiltersSlideout from '../../../components/JamFilters';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FiltersButton from '../../../components/FiltersButton';
 import JamsHome from '../../../components/JamsHome';
+import { setTokenSourceMapRange } from 'typescript';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -45,9 +46,12 @@ export const loader = async ({ request, params }) => {
 
 	delete queryParams['show-ratings'];
 	delete queryParams['limit[label]'];
+	const page = queryParams.page || 1;
+	delete queryParams.page;
 
 	const stringParams = JSON.stringify(queryParams);
 
+	console.log('page', page);
 	//iterate through queryParamsArray and build a supabase query
 	let song;
 	let beforeDate;
@@ -128,25 +132,30 @@ export const loader = async ({ request, params }) => {
 		jams = jams.not('listen_link', 'is', null);
 	}
 	if (soundsInQuery) {
-		//new sounds
 		let arrayOfLabels = [];
 		soundsInQuery.forEach((sound) => {
 			arrayOfLabels.push(sounds.find((s) => s.text === sound)?.label);
 		});
-		console.log('arrayOfLabels', arrayOfLabels);
 		if (arrayOfLabels.length > 0) {
 			jams = jams.contains('sounds', arrayOfLabels);
 		}
 	}
 	jams = jams.order(orderBy, { ascending: asc });
-	if (orderBy === 'avg_rating') {
-		jams = jams.order('num_ratings', { ascending: false });
-	}
-	if (orderBy === 'num_ratings') {
-		jams = jams.order('avg_rating', { ascending: false });
-	}
-	jams = jams.limit(limit);
+	jams = jams.order('num_ratings', { ascending: false });
+	jams = jams.order('song_name', { ascending: true });
+	jams = jams.order('id', { ascending: false });
+	const startRange = page ? (page - 1) * 15 : 0;
+	const endRange = page ? page * 15 : 15;
+	console.log('startRange', startRange);
+	console.log('endRange', endRange);
+	jams = jams.range(startRange, endRange);
+	// jams = jams.limit(10);
 	const { data: jamsFetched } = await jams;
+	// if (orderBy === 'avg_rating') {
+	// }
+	// if (orderBy === 'num_ratings') {
+	// 	jams = jams.order('avg_rating', { ascending: false });
+	// }
 	//get base versions
 	// const { data: versions } = await supabaseClient
 	// 	.from('versions')
@@ -227,7 +236,7 @@ export const loader = async ({ request, params }) => {
 		{
 			artists,
 			songs,
-			jams: jamsFetched,
+			initialJams: jamsFetched,
 			sounds,
 			fullTitle,
 			title,
@@ -235,6 +244,7 @@ export const loader = async ({ request, params }) => {
 			search,
 			user,
 			profile,
+			initialPage: page,
 		},
 		{
 			headers: response.headers,
@@ -253,10 +263,69 @@ export default function Jams({ supabase, session }) {
 		search,
 		user,
 		profile,
-		jams,
+		initialJams,
+		initialPage,
 	} = useLoaderData();
 	const [open, setOpen] = useState(false);
+	const [scrollPosition, setScrollPosition] = useState(0);
+	const [clientHeight, setClientHeight] = useState(null);
+	const [shouldFetch, setShouldFetch] = useState(true);
+	const [height, setHeight] = useState(null);
+	const [page, setPage] = useState(2);
+	const fetcher = useFetcher();
+	const [jams, setJams] = useState(initialJams);
 	if (!artists) return <div>Loading...</div>;
+
+	useEffect(() => {
+		const scrollListener = () => {
+			setClientHeight(window.innerHeight);
+			setScrollPosition(window.scrollY);
+		};
+
+		if (typeof window !== 'undefined') {
+			window.addEventListener('scroll', scrollListener);
+		}
+
+		return () => {
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('scroll', scrollListener);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			if (initialPage === 1) {
+				setJams(initialJams);
+			}
+		}
+	}, [initialJams]);
+
+	useEffect(() => {
+		if (!shouldFetch || !height) return;
+		if (
+			(page !== 2 && clientHeight + scrollPosition + 2000 < height) ||
+			(page === 2 && clientHeight + scrollPosition + 1500 < height)
+		)
+			return;
+		let newSearch = search.slice(1);
+		let urlToFetch = `/jams?index&${newSearch}&page=${page}`;
+		fetcher.load(urlToFetch);
+		setShouldFetch(false);
+	}, [clientHeight, scrollPosition]);
+
+	useEffect(() => {
+		if (fetcher.data && fetcher.data.initialJams.length === 0) {
+			setShouldFetch(false);
+			return;
+		}
+
+		if (fetcher.data && fetcher.data.initialJams.length > 0) {
+			setJams((jams) => [...jams, ...fetcher.data.initialJams]);
+			setPage((page) => page + 1);
+			setShouldFetch(true);
+		}
+	}, [fetcher.data]);
 
 	return (
 		<JamsHome
@@ -274,6 +343,7 @@ export default function Jams({ supabase, session }) {
 			search={search}
 			user={user}
 			profile={profile}
+			setHeight={setHeight}
 		/>
 	);
 }

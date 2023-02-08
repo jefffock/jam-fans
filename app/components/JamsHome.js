@@ -17,13 +17,15 @@ export default function JamsHome({
 	count,
 	search,
   user,
-  profile
+  profile,
+  setClientHeight,
+  setHeight
 }) {
 	if (!artists) return <div>Loading...</div>;
 
 	return (
 		<div className='bg-gray-100'>
-			<div className='flex justify-center'>
+			<div className='flex justify-center pt-3 pb-0 mb-0'>
 				<FiltersButton
 					open={open}
 					setOpen={setOpen}
@@ -46,6 +48,8 @@ export default function JamsHome({
         user={user}
         profile={profile}
         search={search}
+        setClientHeight={setClientHeight}
+      setHeight={setHeight}
 			/>
 		</div>
 	);

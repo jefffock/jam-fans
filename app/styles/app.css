@@ -58,6 +58,7 @@ body {
   margin: 0;
   /* 1 */
   line-height: inherit;
+  /* overflow: overlay; */
   /* 2 */
 }
 
