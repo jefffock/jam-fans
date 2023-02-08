@@ -150,7 +150,7 @@ export default function TopNav({ title, supabase, session }) {
 							</div>
 
 							<Disclosure.Panel className=''>
-								<div className='space-y-1 pt-2 pb-3 text-right'>
+								<div className='inline sm:hidden space-y-1 pt-2 pb-3 text-right'>
 									{navigation.map((item) => (
 										<Disclosure.Button
 											key={item.name}
