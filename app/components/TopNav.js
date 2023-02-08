@@ -11,7 +11,9 @@ const navigation = [
 	{ name: 'Contact', href: '/contact', current: false },
 ];
 const userNavigation = [
-	// { name: 'Settings', href: '#' },
+	{ name: 'Credits', href: '/credits' },
+	{ name: 'Terms of Service', href: '/terms' },
+	{ name: 'Privacy Policy', href: '/privacy' },
 	{ name: 'Sign out', href: '#' },
 ];
 
@@ -19,7 +21,8 @@ function classNames(...classes) {
 	return classes.filter(Boolean).join(' ');
 }
 
-const activeClassName = 'border-cyan-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
+const activeClassName =
+	'border-cyan-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 const inactiveClassName =
 	'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 
@@ -96,19 +99,19 @@ export default function TopNav({ title, supabase, session }) {
 										</div>
 									</div>
 									<div className='hidden sm:inline self-center'>
-										{user && (
+										{/* {user && (
 											<div className=''>
 												{userNavigation.map((item, itemIndex) => (
 													<Disclosure.Button
 														key={item.Index}
 														className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
-														onClick={handleSignOut}
+														onClick={item.name === 'Sign out' ? () => handleSignOut() : null}
 													>
 														{item.name}
 													</Disclosure.Button>
 												))}
 											</div>
-										)}
+										)} */}
 										{!user && (
 											<div className='ml-auto space-y-1 self-center'>
 												<a
@@ -120,7 +123,7 @@ export default function TopNav({ title, supabase, session }) {
 											</div>
 										)}
 									</div>
-									<div className='-mr-2 flex items-center sm:hidden'>
+									<div className='-mr-2 flex items-center'>
 										{/* Mobile menu button */}
 										<Disclosure.Button className='inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'>
 											<span className='sr-only'>Open main menu</span>
@@ -140,7 +143,7 @@ export default function TopNav({ title, supabase, session }) {
 								</div>
 							</div>
 
-							<Disclosure.Panel className='sm:hidden'>
+							<Disclosure.Panel className=''>
 								<div className='space-y-1 pt-2 pb-3'>
 									{navigation.map((item) => (
 										<Disclosure.Button
@@ -173,7 +176,11 @@ export default function TopNav({ title, supabase, session }) {
 															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
 														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
 													)}
-													onClick={handleSignOut}
+													onClick={
+														item.name === 'Sign out'
+															? () => handleSignOut()
+															: null
+													}
 												>
 													{item.name}
 												</Disclosure.Button>
@@ -203,8 +210,31 @@ export default function TopNav({ title, supabase, session }) {
 														Sign up
 													</a>
 												</Disclosure.Button>
+												user
 											</div>
 										)}
+										{/* {!user &&
+											userNavigation &&
+											userNavigation.map((item) => (
+												<Disclosure.Button
+													key={item.name}
+													as='a'
+													href={item.href}
+													className={classNames(
+														item?.current
+															? 'bg-cyan-50 border-cyan-500 text-cyan-700'
+															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+													)}
+													onClick={
+														item.name === 'Sign out'
+															? () => handleSignOut()
+															: null
+													}
+												>
+													{item.name}
+												</Disclosure.Button>
+											))} */}
 									</div>
 								</div>
 							</Disclosure.Panel>

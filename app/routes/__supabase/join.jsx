@@ -12,7 +12,7 @@ export default function SignUp() {
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
-  const [passwordSignupSuccess, setPasswordSignupSuccess] = useState(false);
+	const [passwordSignupSuccess, setPasswordSignupSuccess] = useState(false);
 	const [magicLinkSuccessText, setMagicLinkSuccessText] = useState('');
 	const [passwordResetSuccessText, setPasswordResetSuccessText] = useState('');
 
@@ -20,17 +20,17 @@ export default function SignUp() {
 		setLoading(true);
 		setErrorMessage(null);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
+		const { data, error } = await supabase.auth.signUp({
+			email: email,
+			password: password,
+		});
 		if (error) {
 			setLoading(false);
 			setErrorMessage(error.message);
 		} else {
 			setLoading(false);
-      setPasswordSignupSuccess(true)
-    }
+			setPasswordSignupSuccess(true);
+		}
 	}
 
 	function handleEmailChange(e) {
@@ -66,7 +66,7 @@ export default function SignUp() {
 	}
 
 	async function handlePasswordReset() {
-    if (!email) return alert('Please enter your email address.')
+		if (!email) return alert('Please enter your email address.');
 		const { data, error } = await supabase.auth.resetPasswordForEmail(email);
 		if (error) {
 			console.error('error', error);
@@ -123,9 +123,8 @@ export default function SignUp() {
 								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm'
 								onChange={handleEmailChange}
 							/>
-              <p className='text-sm'>We'll never share your email.</p>
+							<p className='text-sm'>We'll never share your email.</p>
 						</div>
-
 					</div>
 					<div>
 						<button
@@ -137,7 +136,9 @@ export default function SignUp() {
 						>
 							Sign up with a magic link
 						</button>
-            <p className='text-sm mb-4'>We'll send you a link to sign in. No password needed!</p>
+						<p className='text-sm mb-4'>
+							We'll send you a link to sign in. No password needed!
+						</p>
 					</div>
 					{magicLinkSuccessText && (
 						<SuccessAlert
@@ -147,7 +148,7 @@ export default function SignUp() {
 					)}
 
 					<div>
-          <p className='text-sm'>Or:</p>
+						<p className='text-sm'>Or:</p>
 						<label
 							htmlFor='password'
 							className='block text-sm font-medium text-gray-700'
@@ -165,12 +166,14 @@ export default function SignUp() {
 							/>
 						</div>
 					</div>
-          {passwordSignupSuccess &&
-          <SuccessAlert
+					{passwordSignupSuccess && (
+						<SuccessAlert
 							title={'Confirmation email sent!'}
-							description={"Check your email to confirm you're you. If we didn't do this, some beautiful, passionate fans would make millions of fake accounts to manipulate the ratings. This only needs to be done once. Thanks!"}
+							description={
+								"Check your email to confirm you're you. If we didn't do this, some beautiful, passionate fans would make millions of fake accounts to manipulate the ratings. This only needs to be done once. Thanks!"
+							}
 						/>
-          }
+					)}
 
 					<div>
 						<button
@@ -193,12 +196,12 @@ export default function SignUp() {
 							</p>
 						</div>
 					</div>
-          {passwordResetSuccessText && (
-            <SuccessAlert
-              title={'Email sent!'}
-              description={'Check your email to reset your password'}
-            />
-          )}
+					{passwordResetSuccessText && (
+						<SuccessAlert
+							title={'Email sent!'}
+							description={'Check your email to reset your password'}
+						/>
+					)}
 
 					<div className='mt-6'>
 						<div className='relative'>
@@ -223,6 +226,23 @@ export default function SignUp() {
 								></img>
 								<p>&nbsp;&nbsp;Google</p>
 							</button>
+						</div>
+					</div>
+					<div className='flex justify-center text-sm text-gray-700'>
+						<div className='flex max-w-60 py-4 mx-auto'>
+							<Link
+								className='underline'
+								href='/privacy'
+							>
+								Privacy Policy
+							</Link>
+							<p>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</p>
+							<Link
+								className='underline'
+								href='/terms'
+							>
+								Terms of Service
+							</Link>
 						</div>
 					</div>
 				</div>

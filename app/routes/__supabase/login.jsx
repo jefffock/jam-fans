@@ -25,7 +25,7 @@ export default function SignIn() {
 			password: password,
 		});
 		if (error) {
-      console.log('error', error)
+			console.log('error', error);
 			setLoading(false);
 			setErrorMessage(error.message);
 		} else {
@@ -67,7 +67,7 @@ export default function SignIn() {
 	}
 
 	async function handlePasswordReset() {
-    if (!email) return alert('Please enter your email address.')
+		if (!email) return alert('Please enter your email address.');
 		const { data, error } = await supabase.auth.resetPasswordForEmail(email);
 		if (error) {
 			console.error('error', error);
@@ -90,16 +90,14 @@ export default function SignIn() {
 					Sign in to rate jams
 				</h2>
 				<div className='mt-2 flex justify-center text-sm text-gray-600'>
-					<p
-						className='font-medium text-cyan-600 hover:text-cyan-500 inline align-middle h-min'
-					>
+					<p className='font-medium text-cyan-600 hover:text-cyan-500 inline align-middle h-min'>
 						Or{' '}
 						<Link
 							to='/join'
 							className='underline'
 						>
 							make an account:
-          <p className='text-6xl text-center align-middle'>🛳️</p>
+							<p className='text-6xl text-center align-middle'>🛳️</p>
 						</Link>
 					</p>
 				</div>
@@ -124,7 +122,7 @@ export default function SignIn() {
 								className='block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm'
 								onChange={handleEmailChange}
 							/>
-              <p className='text-sm'>We'll never share your email.</p>
+							<p className='text-sm'>We'll never share your email.</p>
 						</div>
 					</div>
 					<div>
@@ -137,7 +135,9 @@ export default function SignIn() {
 						>
 							Sign up/in with a magic link
 						</button>
-            <p className='text-sm mb-4'>We'll send you a link to sign in. No password needed!</p>
+						<p className='text-sm mb-4'>
+							We'll send you a link to sign in. No password needed!
+						</p>
 					</div>
 					{magicLinkSuccessText && (
 						<SuccessAlert
@@ -147,7 +147,7 @@ export default function SignIn() {
 					)}
 
 					<div>
-            <p className='text-sm'>Or:</p>
+						<p className='text-sm'>Or:</p>
 						<label
 							htmlFor='password'
 							className='block text-sm font-medium text-gray-700'
@@ -187,12 +187,12 @@ export default function SignIn() {
 							</p>
 						</div>
 					</div>
-          {passwordResetSuccessText && (
-            <SuccessAlert
-              title={'Email sent!'}
-              description={'Check your email to reset your password'}
-            />
-          )}
+					{passwordResetSuccessText && (
+						<SuccessAlert
+							title={'Email sent!'}
+							description={'Check your email to reset your password'}
+						/>
+					)}
 
 					<div className='mt-6'>
 						<div className='relative'>
@@ -217,6 +217,23 @@ export default function SignIn() {
 								></img>
 								<p>&nbsp;&nbsp;Google</p>
 							</button>
+						</div>
+					</div>
+					<div className='flex justify-center text-sm text-gray-700'>
+						<div className='flex max-w-60 py-4 mx-auto'>
+							<Link
+								className='underline'
+								href='/privacy'
+							>
+								Privacy Policy
+							</Link>
+							<p>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</p>
+							<Link
+								className='underline'
+								href='/terms'
+							>
+								Terms of Service
+							</Link>
 						</div>
 					</div>
 				</div>
