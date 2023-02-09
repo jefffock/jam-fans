@@ -114,10 +114,10 @@ export default function JamCard({
 			<div className='flex justify-between mt-3'>
 				{!user && (
 					<Link
-						to='/login'
+						to={link}
 						className='underline self-center align-middle transition-all ease-in hover:scale-125 duration-500 hover:duration-20000 hover:pl-2 color text-cyan-500 hover:text-cyan-600'
 					>
-						Login to rate
+						Add Sounds
 					</Link>
 				)}
 				{user && (
