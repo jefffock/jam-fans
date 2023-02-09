@@ -576,7 +576,13 @@ export default function AddJam() {
 		setYear('');
 		setSoundsSelected('');
 		setShowLoadingInfo(false);
-		if (artist && year && !date && artist !== 'Squeaky Feet') {
+		if (
+			artist &&
+			year &&
+			!date &&
+			artist.artist !== 'Squeaky Feet' &&
+			artist.artist !== 'Houseplant'
+		) {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
 			fetcher.load(urlToFetch);
@@ -598,6 +604,7 @@ export default function AddJam() {
 		if (
 			artist &&
 			artist.artist !== 'Squeaky Feet' &&
+			artist !== 'Houseplant' &&
 			songSelected &&
 			useApis &&
 			(artist.artist === 'Goose' ||
@@ -632,7 +639,12 @@ export default function AddJam() {
 	function handleShowChange(show) {
 		if (show) {
 			setSetlist(null);
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			if (
+				useApis &&
+				artist &&
+				artist.artist !== 'Squeaky Feet' &&
+				artist.artist !== 'Houseplant'
+			) {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
 				fetcher.load(urlToFetch);
@@ -703,7 +715,12 @@ export default function AddJam() {
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			if (
+				useApis &&
+				artist &&
+				artist !== 'Squeaky Feet' &&
+				artist !== 'Houseplant'
+			) {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
 				fetcher.load(urlToFetch);
 			}
@@ -822,6 +839,12 @@ export default function AddJam() {
 		}
 	}, [songSelected, date, setlist]);
 
+	useEffect(() => {
+		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
+			setUseApis(false);
+		}
+	}, [artist]);
+
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
 	return (
@@ -849,7 +872,16 @@ export default function AddJam() {
 										id={addingMethod.id}
 										name='adding-method'
 										type='radio'
-										defaultChecked={addingMethod.id === 'auto'}
+										defaultChecked={
+											artist === 'Squeaky Feet' || artist === 'Houseplant'
+												? addingMethod.id === 'manual'
+												: addingMethod.id === 'auto'
+										}
+										disabled={
+											artist === 'Squeaky Feet' || artist === 'Houseplant'
+												? addingMethod.id === 'auto'
+												: false
+										}
 										className='h-4 w-4 border-gray-300 text-cyan-600 focus:ring-cyan-500'
 										onClick={() => handleAddMethodChange(addingMethod.id)}
 									/>
