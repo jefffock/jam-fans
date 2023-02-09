@@ -842,7 +842,9 @@ export default function AddJam() {
 	useEffect(() => {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
 			setUseApis(false);
-		}
+		} else {
+      setUseApis(true);
+    }
 	}, [artist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
