@@ -10,6 +10,7 @@ export const loader = async ({ request, params }) => {
 	);
 	let urlToFetch;
   let location
+  let dbName;
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
@@ -98,7 +99,6 @@ export const loader = async ({ request, params }) => {
 		artist === 'Neighbor' ||
 		artist === "Umphrey's McGee"
 	) {
-
 		//use songfish api
 			let baseUrl;
 			switch (artist) {
