@@ -14,27 +14,40 @@ export default function Credits() {
 						className='underline text-blue-700 hover:text-blue-800'
 						href='https://phish.net/credits'
 					>
-						phish.net
+						Phish.net
 					</a>{' '}
 					is an amazing resource for <em></em>all things Phish. Thanks to the{' '}
 					<a
 						className='underline text-blue-700 hover:text-blue-800'
 						href='https://phish.net/credits'
 					>
-						phish.net team
+						Phish.net team
 					</a>
 					!
 				</p>
-				<h2 class='text-2xl font-bold mt-8 mb-2'>Songfish</h2>
-				<p class='text-lg mb-6'>Eggy, Goose, Neighbor, Umphrey's McGee</p>
+				<h2 className='text-2xl font-bold mt-8 mb-2'>Fan sites using Songfish</h2>
+				<ul className='text-lg m-6 text-left self-start'>
+					<li className='my-2'>
+						Eggy - <a href='https://thecarton.net' className='underline text-blue-700 hover:text-blue-800'>thecarton.net</a>
+					</li>
+					<li className='my-2'>
+						Goose - <a href='https://elgoose.net' className='underline text-blue-700 hover:text-blue-800'>elgoose.net</a>
+					</li>
+					<li className='my-2'>
+						Neighbor - <a href='https://www.neighbortunes.net' className='underline text-blue-700 hover:text-blue-800'>neighbortunes.net</a>
+					</li>
+					<li className='my-2'>
+						Umphrey's McGee - <a href='https://allthings.umphreys.com' className='underline text-blue-700 hover:text-blue-800'>allthings.umphreys.com</a>
+					</li>
+				</ul>
 				<p class='text-lg  mb-6'>
-					<a
+					Thank you to the fans who created, maintain and update these sites. Check them out!<br/><br/>They all use <a
 						className='underline text-blue-700 hover:text-blue-800'
 						href='https://songfishapp.com/'
 					>
 						Songfish
-					</a>{' '}
-					is setlist software that "allows a band or fans to preserve concert
+					</a>
+				, which means that when adding a jam to Jam Fans, you can choose a song name to see all performances. Songfish is a setlist software that "allows a band or fans to preserve concert
 					setlists and data. The software allows users to search that data and
 					generate statistics." Thanks{' '}
 					<a
@@ -54,17 +67,25 @@ export default function Credits() {
 					>
 						Setlist.fm
 					</a>{' '}
-					has setlists by every band you can think of. Thank you to the setlist.fm contributors!
+					has setlists by every band you can think of. Thank you to the
+					setlist.fm contributors!
 				</p>
-        <div className="relative">
-      <div className="absolute inset-0 flex items-center" aria-hidden="true">
-        <div className="w-full border-t border-gray-300" />
-      </div>
-      <div className="relative flex justify-center">
-        <span className="bg-white px-2 text-3xl">Thank You!</span>
-      </div>
-    </div>
-        <p className="text-lg py-4">Artists, crew, staff, tapers, fans, friends and family of fans, and everyone else - thank you for playing your part in creating and sharing this music. </p>
+				<div className='relative'>
+					<div
+						className='absolute inset-0 flex items-center'
+						aria-hidden='true'
+					>
+						<div className='w-full border-t border-gray-300' />
+					</div>
+					<div className='relative flex justify-center'>
+						<span className='bg-white px-2 text-3xl'>Thank You!</span>
+					</div>
+				</div>
+				<p className='text-lg py-4'>
+					Artists, crew, staff, tapers, fans, friends and family of fans, and
+					everyone else - thank you for playing your part in creating and
+					sharing this music.{' '}
+				</p>
 			</div>
 		</div>
 	);
