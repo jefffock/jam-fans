@@ -119,17 +119,21 @@ export const loader = async ({ request, params }) => {
 					baseUrl = baseUrls.neighborBaseUrl;
 			}
       const url = `${baseUrl}/setlists/showdate/${date}`
+      console.log('url to fetch: ', url)
     const setlistData = await fetch(url)
     setlist = await setlistData.json()
+    console.log('setlist: ', setlist)
     if (setlist && setlist.data && setlist.data.length > 0) {
       const song = setlist.data[0]
       location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
       const titles = setlist.data
-        .filter((song) => song.artist_id === '1')
+        .filter((song) => song.artist_id === 1)
         .map(({ songname }) => {
           if (songname === 'Echo Of A Rose') return 'Echo of a Rose'
           return songname
         })
+        console.log('titles: ', titles)
+        console.log('location: ', location)
       setlist = titles
     }
 	} else {
