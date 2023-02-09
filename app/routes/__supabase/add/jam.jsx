@@ -855,8 +855,8 @@ export default function AddJam() {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
 			setUseApis(false);
 		} else {
-      setUseApis(true);
-    }
+			setUseApis(true);
+		}
 	}, [artist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
