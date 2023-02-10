@@ -521,7 +521,8 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-	const [shows, setShows] = useState(null);
+	const [showsBySong, setShowsBySong] = useState(null);
+  const [showsByYear, setShowsByYear] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
   const [showPickerLabel, setShowPickerLabel] = useState('Shows');
@@ -572,7 +573,8 @@ export default function AddJam() {
 	function handleArtistChange(artist) {
 		setSongSelected('');
 		setJam(null);
-		setShows(null);
+		setShowsByYear(null);
+    setShowsBySong(null)
 		setLocation('');
 		setDate('');
 		setYear('');
@@ -596,7 +598,7 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-		setShows(null);
+		setShowsBySong(null);
     setQuery('');
 		if (
 			artist &&
@@ -636,9 +638,10 @@ export default function AddJam() {
 	function handleShowChange(show) {
 		if (show) {
 			setSetlist(null);
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			if (useApis && artist && artist !== 'Squeaky Feet' && artist !== 'Houseplant') {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+          console.log('getting setlist', urlToFetch)
 				fetcher.load(urlToFetch);
 			}
 			setShow(show);
@@ -705,7 +708,7 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
-		if (shows) setShows(null);
+		if (showsByYear) setShowsByYear(null);
 		if (location) setLocation('');
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
@@ -798,15 +801,28 @@ export default function AddJam() {
 	if (
 		fetcher &&
 		fetcher.data &&
-		fetcher.data.shows &&
-		fetcher.data.shows[0] &&
-		(!shows ||
-			fetcher.data.shows[0].showdate.normalize() !==
-				shows[0]?.showdate.normalize())
+		fetcher.data.showsBySong &&
+		fetcher.data.showsBySong[0] &&
+		(!showsBySong ||
+			fetcher.data.showsBySong[0].showdate.normalize() !==
+				showsBySong[0]?.showdate.normalize())
 	) {
-		setShows(fetcher?.data?.shows);
+		setShowsBySong(fetcher?.data?.showsBySong);
 	}
+  if (
+		fetcher &&
+		fetcher.data &&
+		fetcher.data.showsByYear &&
+		fetcher.data.showsByYear[0] &&
+		(!showsByYear ||
+			fetcher.data.showsByYear[0].showdate.normalize() !==
+				showsByYear[0]?.showdate.normalize())
+	) {
+		setShowsByYear(fetcher?.data?.showsByYear);
+	}
+  console.log('fetcher.data', fetcher?.data)
 	if (fetcher?.data?.setlist && !setlist && fetcher?.data?.setlist.length > 0) {
+    console.log('setlist client side', fetcher?.data?.setlist)
 		setSetlist(fetcher?.data?.setlist);
 	}
 	if (fetcher?.data?.location && artist && !location) {
@@ -836,6 +852,10 @@ export default function AddJam() {
 	}, [songSelected, date, setlist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
+
+  console.log('showsBySong', showsBySong)
+  console.log('showsByYear', showsByYear)
+  console.log('setlist in /add/jam clientside', setlist)
 
 	return (
 		<Form method='post'>
@@ -1119,8 +1139,8 @@ export default function AddJam() {
 				{useApis &&
 					songSelected &&
 					artist &&
+          showsBySong &&
 					!date &&
-					!year &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
@@ -1136,7 +1156,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows
+											Shows with a {songSelected}
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1159,7 +1179,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
+													{showsBySong?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
@@ -1335,11 +1355,9 @@ export default function AddJam() {
 				)}
 				{/* Show Picker if not from songfish artist + year*/}
 				{useApis &&
-					shows &&
-					shows?.length > 1 &&
-					!show &&
+					showsByYear &&
+					showsByYear?.length > 1 &&
 					!date &&
-					!location &&
 					year &&
 					(!fetcher ||
 						(fetcher && fetcher.state && fetcher.state !== 'loading')) && (
@@ -1351,7 +1369,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows
+											Shows from {year}
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1374,7 +1392,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
+													{showsByYear?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
@@ -1445,7 +1463,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* song picker from setlist */}
-				{useApis && setlist && !songSelected && date && artist && (
+				{useApis && setlist && !songSelected && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
@@ -1454,7 +1472,7 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-md font-medium text-gray-700'>
-										Songs in Setlist
+										Setlist from {new Date(date + 'T18:00:00').toLocaleDateString()}
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>

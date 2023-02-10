@@ -324,11 +324,19 @@ export const loader = async ({ request, params }) => {
 	shows?.sort((a, b) => {
 		return new Date(b.showdate) - new Date(a.showdate);
 	});
-	console.log('shows', shows);
-	return json(
-		{ shows: shows || [] },
-		{
-			headers: response.headers,
-		}
-	);
+  if (song) {
+    return json(
+      {showsBySong: shows ||[]},
+      {
+        headers: response.headers,
+      }
+    )
+  } else if (year) {
+    return json(
+      {showsByYear: shows ||[]},
+      {
+        headers: response.headers,
+      }
+    )
+  }
 };
