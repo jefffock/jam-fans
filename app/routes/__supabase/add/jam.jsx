@@ -706,19 +706,19 @@ export default function AddJam() {
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			if (useApis && artist && artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant') {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
 				fetcher.load(urlToFetch);
 			}
 			setYear(e);
 			if (
-				artist !== 'Phish' &&
-				artist !== "Umphrey's McGee" &&
-				artist !== 'Trey Anastasio, TAB' &&
-				artist !== 'Goose' &&
-				artist !== 'Eggy' &&
-				artist !== 'Neighbor' &&
-        artist !== "Taper's Choice"
+				artist.artist !== 'Phish' &&
+				artist.artist !== "Umphrey's McGee" &&
+				artist.artist !== 'Trey Anastasio, TAB' &&
+				artist.artist !== 'Goose' &&
+				artist.artist !== 'Eggy' &&
+				artist.artist !== 'Neighbor' &&
+        artist.artist !== "Taper's Choice"
 			) {
 				setShowLoadingInfo(true);
 			}
@@ -1417,7 +1417,7 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Loading spinner*/}
-				{fetcher && fetcher.state && fetcher.state === 'loading' && (
+				{fetcher && fetcher.state && fetcher.state === 'loading' && !(artist && songSelected && date && location) && (
 					<div className='flex flex-col justify-center'>
 						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
 					</div>
@@ -1662,7 +1662,7 @@ export default function AddJam() {
 						)}
 					</p>
 				)}
-				{useApis && showLoadingInfo && (
+				{useApis && showLoadingInfo && (artist !== 'Phish' && artist !== 'Trey Anastasio, TAB') (
 					<InfoAlert
 						title={'Thanks for your patience!'}
 						description={
