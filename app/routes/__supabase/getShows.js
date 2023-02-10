@@ -179,7 +179,7 @@ export const loader = async ({ request, params }) => {
 						existingJam: alreadyAdded ?? null,
 					};
 				});
-				shows = shows.reverse();
+				// shows = shows.reverse();
 			}
 		}
 	} else if (artist && year) {
@@ -312,7 +312,7 @@ export const loader = async ({ request, params }) => {
 	}
   //sort by showdate
   shows?.sort((a, b) => {
-    return new Date(a.showdate) - new Date(b.showdate);
+    return new Date(b.showdate) - new Date(a.showdate);
   });
   console.log('shows', shows)
 	return json(

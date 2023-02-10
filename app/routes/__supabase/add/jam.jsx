@@ -675,6 +675,7 @@ export default function AddJam() {
 		setShow('');
 		setJam('');
 		setSongSelected('');
+    setSoundsSelected('')
 	}
 
 	function clearSong() {
