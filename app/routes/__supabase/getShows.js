@@ -253,7 +253,6 @@ export const loader = async ({ request, params }) => {
 			const showsData = await fetch(url);
 			const showsRes = await showsData.json();
 			if (showsRes && showsRes.data && showsRes.data.length > 0) {
-				console.log('shows by year', showsRes.data);
 				shows = showsRes.data
 					.filter((show) => show.artist_id === 1)
 					.map((show) => {

@@ -4,6 +4,7 @@ import {
 	useFetcher,
 	useOutletContext,
 	useActionData,
+  useNavigate,
 } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
@@ -526,6 +527,7 @@ export default function AddJam() {
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
   const [showPickerLabel, setShowPickerLabel] = useState('Shows');
+  const navigate = useNavigate()
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -637,6 +639,7 @@ export default function AddJam() {
 
 	function handleShowChange(show) {
 		if (show) {
+      console.log('show in handleshowchange', show)
 			setSetlist(null);
 			if (useApis && artist && artist !== 'Squeaky Feet' && artist !== 'Houseplant') {
 				let urlToFetch =
@@ -682,6 +685,8 @@ export default function AddJam() {
 		setSongSelected('');
     setSoundsSelected('')
     showSuccessAlert(false);
+    setShowsBySong(null)
+    setShowsByYear(null)
 	}
 
 	function clearSong() {
@@ -691,10 +696,12 @@ export default function AddJam() {
 	}
 
 	function clearDate() {
+    console.log('clearing date')
 		setDate('');
 		setShow('');
 		setLocation('');
     setJam('')
+    setSetlist('')
 	}
 
 	function showEditLocation() {
@@ -810,7 +817,7 @@ export default function AddJam() {
 		setShowsBySong(fetcher?.data?.showsBySong);
 	}
   if (
-		fetcher &&
+		fetcher && 
 		fetcher.data &&
 		fetcher.data.showsByYear &&
 		fetcher.data.showsByYear[0] &&
@@ -832,6 +839,9 @@ export default function AddJam() {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
+  if (fetcher?.data?.year && fetcher?.data?.year !== year) {
+    setYear(fetcher?.data?.year);
+  }
   if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
     setShowSuccessAlert(true);
   }
@@ -853,9 +863,10 @@ export default function AddJam() {
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
-  console.log('showsBySong', showsBySong)
-  console.log('showsByYear', showsByYear)
+  console.log('showsBySong client length', showsBySong?.length)
+  console.log('showsByYear client length', showsByYear?.length)
   console.log('setlist in /add/jam clientside', setlist)
+  console.log('location', location)
 
 	return (
 		<Form method='post'>
@@ -1463,7 +1474,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* song picker from setlist */}
-				{useApis && setlist && !songSelected && (
+				{useApis && setlist && setlist !== '' && date && !songSelected && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
