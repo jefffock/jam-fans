@@ -69,7 +69,8 @@ export const loader = async ({ request, params }) => {
 	let song = queryParams?.song;
 	const year = queryParams?.year;
 	let shows;
-	let songId;
+	let songId
+  let jfVersions = []
 	//get all versions of a song (for select artists)
 	if (artist && song && !year) {
 		const { data, error } = await supabaseClient
@@ -77,6 +78,7 @@ export const loader = async ({ request, params }) => {
 			.select('*')
 			.eq('artist', artist)
 			.eq('song_name', song);
+    jfVersions = data
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 			const artistId = artist === 'Phish' ? '1' : '2';
@@ -104,7 +106,7 @@ export const loader = async ({ request, params }) => {
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
 						const date = new Date(show.showdate + 'T18:00:00Z');
-						const alreadyAdded = data.find((d) => d.date === show.showdate);
+						const alreadyAdded = jfVersions.find((version) => version.date === show.showdate);
 						return {
 							showdate: show.showdate,
 							location: `${show.venue}, ${show.city}, ${
@@ -165,7 +167,7 @@ export const loader = async ({ request, params }) => {
 				shows = await shows.json();
 				shows = shows?.data.map((show) => {
 					const date = new Date(show.showdate + 'T18:00:00Z');
-					const alreadyAdded = data.find((d) => d.date === show.showdate);
+					const alreadyAdded = jfVersions.find((version) => version.date === show.showdate);
 					return {
 						showdate: show.showdate,
 						location: `${show.venuename}, ${show.city}, ${

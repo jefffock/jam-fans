@@ -1479,7 +1479,7 @@ export default function AddJam() {
 																'relative cursor-default select-none py-2 pl-3 pr-9'
 															)
 														}
-														value={songInSet}
+														value={songInSet.value}
 													>
 														{({ selected, active }) => (
 															<>
@@ -1489,7 +1489,7 @@ export default function AddJam() {
 																		'block truncate'
 																	)}
 																>
-																	{songInSet}
+																	{songInSet.label}
 																</span>
 
 																{selected ? (

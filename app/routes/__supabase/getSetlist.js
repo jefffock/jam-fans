@@ -9,14 +9,14 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 	let urlToFetch;
-  let location
+	let location;
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
 		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v1',
 		neighborBaseUrl: 'https://neighbortunes.net/api/v1',
 		phishBaseUrl: 'https://api.phish.net/v5',
-    tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
+		tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
 	};
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
@@ -45,13 +45,13 @@ export const loader = async ({ request, params }) => {
 		'My Morning Jacket': 'ea5883b7-68ce-48b3-b115-61746ea53b8c',
 		Osees: '194272cc-dcc8-4640-a4a6-66da7d250d5c',
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
-    'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
+		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
-    Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
+		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
 		'String Cheese Incident': 'cff95140-6d57-498a-8834-10eb72865b29',
 		'Tedeschi Trucks Band': 'e33e1ccf-a3b9-4449-a66a-0091e8f55a60',
-    Twiddle: '5cf454bc-3be0-47ba-9d0b-1e53da631a4e',
+		Twiddle: '5cf454bc-3be0-47ba-9d0b-1e53da631a4e',
 		'Widespread Panic': '3797a6d0-7700-44bf-96fb-f44386bc9ab2',
 	};
 	const url = new URL(request.url);
@@ -59,12 +59,18 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const artist = queryParams?.artist;
 	const date = queryParams?.date;
+	let jfVersions;
 	const { data, error } = await supabaseClient
 		.from('versions')
 		.select('*')
 		.eq('artist', artist)
 		.eq('date', date);
-	let setlist = []
+	if (error) {
+		return new Response(error.message, { status: 500 });
+	} else {
+		jfVersions = data;
+	}
+	let setlist = [];
 	if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 		let artistId;
 		switch (artist) {
@@ -81,15 +87,23 @@ export const loader = async ({ request, params }) => {
 		const setlistData = await fetch(urlToFetch);
 		setlist = await setlistData.json();
 		if (setlist && setlist.data && setlist.data.length > 0) {
-      const song = setlist.data[0]
-      location = `${song.venue}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
+			const song = setlist.data[0];
+			location = `${song.venue}, ${song.city}, ${
+				song?.country === 'USA' ? song.state : song.country
+			}`;
+			console.log('setlist.data', setlist.data);
 			const titles = setlist.data
 				.filter((song) => song.artistid === artistId)
 				.map(({ song }) => {
+					const alreadyAdded = jfVersions.find(
+						({ song_name }) => song_name === song
+					);
 					if (song === 'Also Sprach Zarathustra') {
-						return 'Also Sprach Zarathustra (2001)';
+						return alreadyAdded
+							? '(Added) Also Sprach Zarathustra (2001)'
+							: 'Also Sprach Zarathustra (2001) ';
 					}
-					return song;
+					return alreadyAdded ? '(Added) ' + song : song;
 				});
 			setlist = titles;
 		}
@@ -98,71 +112,89 @@ export const loader = async ({ request, params }) => {
 		artist === 'Eggy' ||
 		artist === 'Neighbor' ||
 		artist === "Umphrey's McGee" ||
-    artist === "Taper's Choice"
+		artist === "Taper's Choice"
 	) {
-    console.log('getting songfish setlist')
+		console.log('getting songfish setlist');
 		//use songfish api
-			let baseUrl;
-			switch (artist) {
-				case 'Eggy':
-					baseUrl = baseUrls.eggyBaseUrl;
-					break;
-				case 'Goose':
-					baseUrl = baseUrls.gooseBaseUrl;
-					break;
-				case "Umphrey's McGee":
-					baseUrl = baseUrls.umphreysBaseUrl;
-					break;
-				case 'Neighbor':
-					baseUrl = baseUrls.neighborBaseUrl;
-        case "Taper's Choice":
-          baseUrl = baseUrls.tapersChoiceBaseUrl;
-			}
-      const url = `${baseUrl}/setlists/showdate/${date}`
-      console.log('songfish url', url)
-    const setlistData = await fetch(url)
-    setlist = await setlistData.json()
-    console.log('setlist X', setlist)
-    if (setlist && setlist.data && setlist.data.length > 0) {
-      console.log('starting to format the setlist')
-      const song = setlist.data[0]
-      location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
-      const titles = setlist?.data
-        .filter((song) => song.artist_id === 1)
-        .map(({ songname }) => {
-          if (songname === 'Echo Of A Rose') return 'Echo of a Rose'
-          return songname
-        })
-      console.log('titles', titles)
-      setlist = titles || []
-    }
+		let baseUrl;
+		switch (artist) {
+			case 'Eggy':
+				baseUrl = baseUrls.eggyBaseUrl;
+				break;
+			case 'Goose':
+				baseUrl = baseUrls.gooseBaseUrl;
+				break;
+			case "Umphrey's McGee":
+				baseUrl = baseUrls.umphreysBaseUrl;
+				break;
+			case 'Neighbor':
+				baseUrl = baseUrls.neighborBaseUrl;
+			case "Taper's Choice":
+				baseUrl = baseUrls.tapersChoiceBaseUrl;
+		}
+		const url = `${baseUrl}/setlists/showdate/${date}`;
+		console.log('songfish url', url);
+		const setlistData = await fetch(url);
+		setlist = await setlistData.json();
+		console.log('setlist X', setlist);
+		if (setlist && setlist.data && setlist.data.length > 0) {
+			console.log('starting to format the setlist');
+			const song = setlist.data[0];
+			location = `${song.venuename}, ${song.city}, ${
+				song?.country === 'USA' ? song.state : song.country
+			}`;
+			const titles = setlist?.data
+				.filter((song) => song.artist_id === 1)
+				.map(({ songname }) => {
+					const alreadyAdded = jfVersions.find(
+						({ song_name }) => song_name === songname
+					);
+
+					if (songname === 'Echo Of A Rose') songname = 'Echo of a Rose';
+					return {
+						label: alreadyAdded ? '(Added) ' + songname : songname,
+						value: songname,
+					};
+				});
+			console.log('titles', titles);
+			setlist = titles || [];
+		}
 	} else {
-    		//setlistfm for all other artists
-    const [year, month, day] = date.split('-')
-  const transformedDate = [day, month, year].join('-')
-  const mbid = mbids[artist]
-  const setlistFMUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&date=${transformedDate}`
-  let apiKey = process.env.SETLISTFM_API_KEY
-      const setlistData = await fetch(setlistFMUrl, {
-        headers: {
-          'x-api-key': `${apiKey}`,
-          'Accept': 'application/json'
-        }
-      })
-      setlist = await setlistData.json()
-      if (setlist && setlist.setlist && setlist.setlist.length > 0) {
-        const song = setlist.setlist[0]
-        location = `${song.venue.name}, ${song.venue.city.name}, ${song.venue.city.country.code === 'US' ? song.venue.city.stateCode : song.venue.city.country.name}`
-        const titles = setlist.setlist[0].sets.set
-          .map(({ song }) => song.map(({ name }) => name))
-          .flat()
-        setlist = titles
-      } 
+		//setlistfm for all other artists
+		const [year, month, day] = date.split('-');
+		const transformedDate = [day, month, year].join('-');
+		const mbid = mbids[artist];
+		const setlistFMUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&date=${transformedDate}`;
+		let apiKey = process.env.SETLISTFM_API_KEY;
+		const setlistData = await fetch(setlistFMUrl, {
+			headers: {
+				'x-api-key': `${apiKey}`,
+				Accept: 'application/json',
+			},
+		});
+		setlist = await setlistData.json();
+		if (setlist && setlist.setlist && setlist.setlist.length > 0) {
+			const song = setlist.setlist[0];
+			location = `${song.venue.name}, ${song.venue.city.name}, ${
+				song.venue.city.country.code === 'US'
+					? song.venue.city.stateCode
+					: song.venue.city.country.name
+			}`;
+			const titles = setlist.setlist[0].sets.set
+				.map(({ song }) => song.map(({ name }) => {
+          const alreadyAdded = jfVersions.find(({song_name}) => song_name === name)
+          return {
+						label: alreadyAdded ? '(Added) ' + name : name,
+						value: name,
+					};
+        }))
+				.flat();
+			setlist = titles;
+		}
 	}
-  console.log('setlist in getSetlist', setlist)
+	console.log('setlist in getSetlist', setlist);
 	return json(
-		{ setlist: setlist || [],
-    location },
+		{ setlist: setlist || [], location },
 		{
 			headers: response.headers,
 		}
