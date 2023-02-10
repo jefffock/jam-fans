@@ -524,6 +524,7 @@ export default function AddJam() {
 	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
+  const [showPickerLabel, setShowPickerLabel] = useState('Shows');
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -1135,7 +1136,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows with a {songSelected}
+											Shows
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1350,7 +1351,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows from {year}
+											Shows
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
