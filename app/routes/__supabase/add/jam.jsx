@@ -497,6 +497,7 @@ export default function AddJam() {
 	const [artistErrorText, setArtistErrorText] = useState(null);
 	const [dateErrorText, setDateErrorText] = useState(null);
 	const [locationErrorText, setLocationErrorText] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 	const [successAlertText, setSuccessAlertText] = useState(null);
 	const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
@@ -676,17 +677,20 @@ export default function AddJam() {
 		setJam('');
 		setSongSelected('');
     setSoundsSelected('')
+    showSuccessAlert(false);
 	}
 
 	function clearSong() {
 		setSong('');
 		setSongSelected('');
+    setJam('')
 	}
 
 	function clearDate() {
 		setDate('');
 		setShow('');
 		setLocation('');
+    setJam('')
 	}
 
 	function showEditLocation() {
@@ -811,9 +815,13 @@ export default function AddJam() {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
+  if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
+    setShowSuccessAlert(true);
+  }
 
 	//check if song exists
 	useEffect(() => {
+    setJam('')
 		if (songSelected && artist && date) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
@@ -1670,7 +1678,7 @@ export default function AddJam() {
 						}
 					/>
 				)}
-        {jam &&
+        {jam && jam !== '' &&
         <SuccessAlert title={"It's on Jam Fans!"} description={`You can add sounds ${profile ? 'and your rating and comment' : ''} below. Thanks for contributing!`} />}
 				{artist && songSelected && date && location && (
 					<>
