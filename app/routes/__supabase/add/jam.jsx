@@ -396,7 +396,7 @@ export async function action({ request, params }) {
 		console.log('in rating');
 		const { data, error } = await supabaseClient
 			.from('ratings')
-			.insert({
+			.upsert({
 				user_id: profile?.id,
 				version_id: jam?.id,
 				rating: values.rating,
@@ -420,7 +420,7 @@ export async function action({ request, params }) {
 		console.log('in rating update');
 		const { data, error } = await supabaseClient
 			.from('ratings')
-			.insert({
+			.upsert({
 				user_id: profile?.id,
 				version_id: jam?.id,
 				rating: values.rating,
@@ -524,6 +524,7 @@ export default function AddJam() {
 	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
+	const [ratingId, setRatingId] = useState(null);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -679,6 +680,15 @@ export default function AddJam() {
 		}
 	}, [setlist]);
 
+	useEffect(() => {
+		console.log('jam chang, jam, profile', jam, profile);
+		if (profile && profile?.name && jam) {
+			let urlToFetch = `/getRating?jam=${jam.id}&name=${profile.name}`;
+			console.log('fetching rating, urlToFetch', urlToFetch);
+			fetcher.load(urlToFetch);
+		}
+	}, [jam, profile]);
+
 	function clearArtist() {
 		setArtist('');
 		setSong('');
@@ -832,8 +842,15 @@ export default function AddJam() {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
+<<<<<<< HEAD
 	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
 		setShowSuccessAlert(true);
+=======
+	if (fetcher?.data?.rating && !rating && !comment) {
+		console.log('rating', fetcher?.data?.rating);
+		setRating(fetcher?.data?.rating.rating);
+		setComment(fetcher?.data?.rating.comment);
+>>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 	}
 
 	//check if song exists
@@ -954,6 +971,11 @@ export default function AddJam() {
 					type='hidden'
 					name='profile'
 					value={JSON.stringify(profile)}
+				/>
+				<input
+					type='hidden'
+					name='ratingId'
+					value={ratingId || ''}
 				/>
 				{/* artist picker*/}
 				{!artist && (
@@ -1646,7 +1668,7 @@ export default function AddJam() {
 				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
-					<p className='text-sm text-gray-500'>
+					<div className='text-sm text-gray-500'>
 						Shows and setlists from{' '}
 						<a
 							href={
@@ -1683,14 +1705,19 @@ export default function AddJam() {
 								: 'setlist.fm'}
 						</a>
 						.{' '}
-						{artist.artist === 'Phish' ||
+            <div>
+						{(artist.artist === 'Phish' ||
 						artist.artist === 'Trey Anastasio, TAB' ||
 						artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
+<<<<<<< HEAD
 						artist.artist === "Taper's Choice" ||
 						artist.artist === "Umphrey's McGee" ? (
 							<p>
+=======
+						artist.artist === "Umphrey's McGee") ? 
+>>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 								Thanks{' '}
 								<a
 									className='underline'
@@ -1699,6 +1726,7 @@ export default function AddJam() {
 									Adam Scheinberg
 								</a>
 								!
+<<<<<<< HEAD
 							</p>
 						) : !(artist && songSelected && date && location) ? (
 							"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"
@@ -1724,7 +1752,31 @@ export default function AddJam() {
 							profile ? 'and your rating and comment' : ''
 						} below. Thanks for contributing!`}
 					/>
+=======
+                    : ''}
+
+						 {/* : !(artist && songSelected && date && location) ? (
+							<p>"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"</p>
+              ) : <p>''</p>
+             } */
+              </div>
+>>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 				)}
+				{useApis &&
+					showLoadingInfo &&
+					artist.artist !== 'Phish' &&
+					artist.artist !== 'Trey Anastasio, TAB' &&
+					artist.artist !== 'Eggy' &&
+					artist.artist !== 'Neighbor' &&
+					artist.artist !== 'Goose' &&
+					artist.artist !== "Umphrey's McGee" && (
+						<InfoAlert
+							title={'Thanks for your patience!'}
+							description={
+								"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, deep breaths 😂"
+							}
+						/>
+					)}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
@@ -1899,10 +1951,17 @@ export default function AddJam() {
 									cols={30}
 									rows={5}
 									defaultValue={''}
+									value={comment}
 									onChange={handleCommentChange}
 									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 									aria-describedby='comment'
 								></textarea>
+								<InfoAlert
+									title={'Rating and comment can be updated'}
+									description={
+										'You can add or change your comment and rating later'
+									}
+								></InfoAlert>
 							</div>
 						</div>
 					</div>

@@ -15,7 +15,7 @@ export const loader = async ({ request, params }) => {
 	const artist = queryParams?.artist;
 	let song = queryParams?.song;
   let date = queryParams?.date;
-  console.log('artist, song, date', artist, song, date)
+  console.log('artist, song, date in checkJamAdded', artist, song, date)
 	let { data: jam } = await supabaseClient
 		.from('versions')
 		.select('*')
