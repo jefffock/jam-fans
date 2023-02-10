@@ -105,22 +105,17 @@ export const loader = async ({ request, params }) => {
 			let baseUrl;
 			switch (artist) {
 				case 'Eggy':
-					dbName = 'eggy_songs';
 					baseUrl = baseUrls.eggyBaseUrl;
 					break;
 				case 'Goose':
-					dbName = 'goose_songs';
 					baseUrl = baseUrls.gooseBaseUrl;
 					break;
 				case "Umphrey's McGee":
-					dbName = 'um_songs';
 					baseUrl = baseUrls.umphreysBaseUrl;
 					break;
 				case 'Neighbor':
-					dbName = 'neighbor_songs';
 					baseUrl = baseUrls.neighborBaseUrl;
         case "Taper's Choice":
-          dbName = 'tapers_choice_songs';
           baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
       const url = `${baseUrl}/setlists/showdate/${date}`
