@@ -641,6 +641,7 @@ export default function AddJam() {
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
+    console.log('handleShowChange', show)
 		if (show) {
 			setSetlist(null);
 			if (
