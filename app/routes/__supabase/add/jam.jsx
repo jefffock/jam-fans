@@ -825,7 +825,7 @@ export default function AddJam() {
     console.log('setlist client side', fetcher?.data?.setlist)
 		setSetlist(fetcher?.data?.setlist);
 	}
-	if (fetcher?.data?.location && artist && !location) {
+	if (fetcher?.data?.location && artist && fetcher?.data?.location !== location) {
 		setLocation(fetcher?.data?.location);
 	}
 	if (fetcher?.data?.jam && fetcher?.data?.jam !== jam) {
