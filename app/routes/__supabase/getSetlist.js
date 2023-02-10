@@ -95,15 +95,14 @@ export const loader = async ({ request, params }) => {
 			const titles = setlist.data
 				.filter((song) => song.artistid === artistId)
 				.map(({ song }) => {
+          if (song === 'Also Sprach Zarathustra') song = 'Also Sprach Zarathustra (2001)'
 					const alreadyAdded = jfVersions.find(
 						({ song_name }) => song_name === song
 					);
-					if (song === 'Also Sprach Zarathustra') {
-						return alreadyAdded
-							? '(Added) Also Sprach Zarathustra (2001)'
-							: 'Also Sprach Zarathustra (2001) ';
-					}
-					return alreadyAdded ? '(Added) ' + song : song;
+					return {
+						label: alreadyAdded ? '(Added) ' + song : song,
+						value: song,
+					};
 				});
 			setlist = titles;
 		}

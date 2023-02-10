@@ -659,7 +659,7 @@ export default function AddJam() {
 	//if song not in setlist, remove it
 	useEffect(() => {
 		if (setlist && songSelected) {
-			let songInSetlist = setlist.find((song) => song === songSelected);
+			let songInSetlist = setlist.find(({value}) => value === songSelected);
 			if (!songInSetlist) {
 				setSongSelected('');
 			}
@@ -814,7 +814,7 @@ export default function AddJam() {
 
 	//check if song exists
 	useEffect(() => {
-		if (songSelected && artist && date && setlist && shows) {
+		if (songSelected && artist && date) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -1670,6 +1670,8 @@ export default function AddJam() {
 						}
 					/>
 				)}
+        {jam &&
+        <SuccessAlert title={"It's on Jam Fans!"} description={`You can add sounds ${profile ? 'and your rating and comment' : ''} below. Thanks for contributing!`} />}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
