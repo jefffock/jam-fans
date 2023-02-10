@@ -16,6 +16,7 @@ export const loader = async ({ request, params }) => {
 		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v1',
 		neighborBaseUrl: 'https://neighbortunes.net/api/v1',
 		phishBaseUrl: 'https://api.phish.net/v5',
+    tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
 	};
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
@@ -63,7 +64,7 @@ export const loader = async ({ request, params }) => {
 		.select('*')
 		.eq('artist', artist)
 		.eq('date', date);
-	let setlist;
+	let setlist = []
 	if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 		let artistId;
 		switch (artist) {
@@ -96,9 +97,10 @@ export const loader = async ({ request, params }) => {
 		artist === 'Goose' ||
 		artist === 'Eggy' ||
 		artist === 'Neighbor' ||
-		artist === "Umphrey's McGee"
+		artist === "Umphrey's McGee" ||
+    artist === "Taper's Choice"
 	) {
-
+    console.log('getting songfish setlist')
 		//use songfish api
 			let baseUrl;
 			switch (artist) {
@@ -117,20 +119,27 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					dbName = 'neighbor_songs';
 					baseUrl = baseUrls.neighborBaseUrl;
+        case "Taper's Choice":
+          dbName = 'tapers_choice_songs';
+          baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
       const url = `${baseUrl}/setlists/showdate/${date}`
+      console.log('songfish url', url)
     const setlistData = await fetch(url)
     setlist = await setlistData.json()
+    console.log('setlist X', setlist)
     if (setlist && setlist.data && setlist.data.length > 0) {
+      console.log('starting to format the setlist')
       const song = setlist.data[0]
       location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
-      const titles = setlist.data
-        .filter((song) => song.artist_id === '1')
+      const titles = setlist?.data
+        .filter((song) => song.artist_id === 1)
         .map(({ songname }) => {
           if (songname === 'Echo Of A Rose') return 'Echo of a Rose'
           return songname
         })
-      setlist = titles
+      console.log('titles', titles)
+      setlist = titles || []
     }
 	} else {
     		//setlistfm for all other artists
@@ -153,7 +162,7 @@ export const loader = async ({ request, params }) => {
           .map(({ song }) => song.map(({ name }) => name))
           .flat()
         setlist = titles
-      }
+      } 
 	}
   console.log('setlist in getSetlist', setlist)
 	return json(

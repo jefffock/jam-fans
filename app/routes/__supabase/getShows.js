@@ -23,6 +23,7 @@ export const loader = async ({ request, params }) => {
 		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v1',
 		neighborBaseUrl: 'https://neighbortunes.net/api/v1',
 		phishBaseUrl: 'https://api.phish.net/v5',
+    tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
 	};
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
@@ -125,6 +126,7 @@ export const loader = async ({ request, params }) => {
 			if (song === 'Echo of a Rose') song = 'Echo Of A Rose';
 			let dbName;
 			let baseUrl;
+      console.log('artist', artist)
 			switch (artist) {
 				case 'Eggy':
 					dbName = 'eggy_songs';
@@ -141,6 +143,9 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					dbName = 'neighbor_songs';
 					baseUrl = baseUrls.neighborBaseUrl;
+        case "Taper's Choice":
+          dbName = 'tapers_choice_songs';
+          baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
 			let songId;
 			//get song id from supabase
@@ -216,7 +221,8 @@ export const loader = async ({ request, params }) => {
 			artist === 'Goose' ||
 			artist === 'Eggy' ||
 			artist === 'Neighbor' ||
-			artist === "Umphrey's McGee"
+			artist === "Umphrey's McGee" ||
+      artist === "Taper's Choice"
 		) {
 			let baseUrl;
 			switch (artist) {
@@ -232,6 +238,8 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					baseUrl = baseUrls.neighborBaseUrl;
 					break;
+        case "Taper's Choice":
+          baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
 			// const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`
 			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`;
@@ -303,7 +311,7 @@ export const loader = async ({ request, params }) => {
 		}
 	}
   //sort by showdate
-  shows.sort((a, b) => {
+  shows?.sort((a, b) => {
     return new Date(a.showdate) - new Date(b.showdate);
   });
   console.log('shows', shows)

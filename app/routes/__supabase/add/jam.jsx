@@ -595,9 +595,10 @@ export default function AddJam() {
 	//get shows by song for select artists
 	useEffect(() => {
 		setShows(null);
+    setQuery('');
 		if (
 			artist &&
-			artist.artist !== 'Squeaky Feet' &&
+			artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant' &&
 			songSelected &&
 			useApis &&
 			(artist.artist === 'Goose' ||
@@ -605,6 +606,7 @@ export default function AddJam() {
 				artist.artist === 'Neighbor' ||
 				artist.artist === "Umphrey's McGee" ||
 				artist.artist === 'Phish' ||
+				artist.artist === "Taper's Choice" ||
 				artist.artist === 'Trey Anastasio, TAB')
 		) {
 			let urlToFetch =
@@ -714,7 +716,8 @@ export default function AddJam() {
 				artist !== 'Trey Anastasio, TAB' &&
 				artist !== 'Goose' &&
 				artist !== 'Eggy' &&
-				artist !== 'Neighbor'
+				artist !== 'Neighbor' &&
+        artist !== "Taper's Choice"
 			) {
 				setShowLoadingInfo(true);
 			}
@@ -797,7 +800,7 @@ export default function AddJam() {
 	) {
 		setShows(fetcher?.data?.shows);
 	}
-	if (fetcher?.data?.setlist && !setlist) {
+	if (fetcher?.data?.setlist && !setlist && fetcher?.data?.setlist.length > 0) {
 		setSetlist(fetcher?.data?.setlist);
 	}
 	if (fetcher?.data?.location && artist && !location) {
@@ -1010,6 +1013,7 @@ export default function AddJam() {
 						artist.artist === 'Neighbor' ||
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
+						artist.artist === "Taper's Choice" ||
 						artist.artist === 'Trey Anastasio, TAB' ||
 						!useApis) && (
 						<div className='max-w-sm py-4'>
@@ -1112,6 +1116,7 @@ export default function AddJam() {
 						artist.artist === 'Neighbor' ||
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
+						artist.artist === "Taper's Choice" ||
 						artist.artist === 'Trey Anastasio, TAB') && (
 						<div className='max-h-40'>
 							<Listbox
@@ -1610,6 +1615,8 @@ export default function AddJam() {
 									? 'https://neighbortunes.net'
 									: artist.artist === 'Eggy'
 									? 'https://thecarton.net'
+									: artist.artist === "Taper's Choice"
+									? 'https://taperschoice.net'
 									: 'https://www.setlist.fm'
 							}
 							className='underline'
@@ -1625,6 +1632,8 @@ export default function AddJam() {
 								? 'neighbortunes.net'
 								: artist.artist === 'Eggy'
 								? 'thecarton.net'
+								: artist.artist === "Taper's Choice"
+								? 'taperschoice.net'
 								: 'setlist.fm'}
 						</a>
 						.{' '}
@@ -1633,6 +1642,7 @@ export default function AddJam() {
 						artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
+            artist.artist === "Taper's Choice" ||
 						artist.artist === "Umphrey's McGee" ? (
 							<p>
 								Thanks{' '}
