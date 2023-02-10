@@ -497,6 +497,7 @@ export default function AddJam() {
 	const [artistErrorText, setArtistErrorText] = useState(null);
 	const [dateErrorText, setDateErrorText] = useState(null);
 	const [locationErrorText, setLocationErrorText] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 	const [successAlertText, setSuccessAlertText] = useState(null);
 	const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
@@ -595,9 +596,10 @@ export default function AddJam() {
 	//get shows by song for select artists
 	useEffect(() => {
 		setShows(null);
+    setQuery('');
 		if (
 			artist &&
-			artist.artist !== 'Squeaky Feet' &&
+			artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant' &&
 			songSelected &&
 			useApis &&
 			(artist.artist === 'Goose' ||
@@ -605,6 +607,7 @@ export default function AddJam() {
 				artist.artist === 'Neighbor' ||
 				artist.artist === "Umphrey's McGee" ||
 				artist.artist === 'Phish' ||
+				artist.artist === "Taper's Choice" ||
 				artist.artist === 'Trey Anastasio, TAB')
 		) {
 			let urlToFetch =
@@ -657,7 +660,7 @@ export default function AddJam() {
 	//if song not in setlist, remove it
 	useEffect(() => {
 		if (setlist && songSelected) {
-			let songInSetlist = setlist.find((song) => song === songSelected);
+			let songInSetlist = setlist.find(({value}) => value === songSelected);
 			if (!songInSetlist) {
 				setSongSelected('');
 			}
@@ -673,17 +676,21 @@ export default function AddJam() {
 		setShow('');
 		setJam('');
 		setSongSelected('');
+    setSoundsSelected('')
+    showSuccessAlert(false);
 	}
 
 	function clearSong() {
 		setSong('');
 		setSongSelected('');
+    setJam('')
 	}
 
 	function clearDate() {
 		setDate('');
 		setShow('');
 		setLocation('');
+    setJam('')
 	}
 
 	function showEditLocation() {
@@ -703,18 +710,19 @@ export default function AddJam() {
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			if (useApis && artist && artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant') {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
 				fetcher.load(urlToFetch);
 			}
 			setYear(e);
 			if (
-				artist !== 'Phish' &&
-				artist !== "Umphrey's McGee" &&
-				artist !== 'Trey Anastasio, TAB' &&
-				artist !== 'Goose' &&
-				artist !== 'Eggy' &&
-				artist !== 'Neighbor'
+				artist.artist !== 'Phish' &&
+				artist.artist !== "Umphrey's McGee" &&
+				artist.artist !== 'Trey Anastasio, TAB' &&
+				artist.artist !== 'Goose' &&
+				artist.artist !== 'Eggy' &&
+				artist.artist !== 'Neighbor' &&
+        artist.artist !== "Taper's Choice"
 			) {
 				setShowLoadingInfo(true);
 			}
@@ -797,7 +805,7 @@ export default function AddJam() {
 	) {
 		setShows(fetcher?.data?.shows);
 	}
-	if (fetcher?.data?.setlist && !setlist) {
+	if (fetcher?.data?.setlist && !setlist && fetcher?.data?.setlist.length > 0) {
 		setSetlist(fetcher?.data?.setlist);
 	}
 	if (fetcher?.data?.location && artist && !location) {
@@ -807,10 +815,14 @@ export default function AddJam() {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
+  if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
+    setShowSuccessAlert(true);
+  }
 
 	//check if song exists
 	useEffect(() => {
-		if (songSelected && artist && date && setlist && shows) {
+    setJam('')
+		if (songSelected && artist && date) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -1010,6 +1022,7 @@ export default function AddJam() {
 						artist.artist === 'Neighbor' ||
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
+						artist.artist === "Taper's Choice" ||
 						artist.artist === 'Trey Anastasio, TAB' ||
 						!useApis) && (
 						<div className='max-w-sm py-4'>
@@ -1112,6 +1125,7 @@ export default function AddJam() {
 						artist.artist === 'Neighbor' ||
 						artist.artist === "Umphrey's McGee" ||
 						artist.artist === 'Phish' ||
+						artist.artist === "Taper's Choice" ||
 						artist.artist === 'Trey Anastasio, TAB') && (
 						<div className='max-h-40'>
 							<Listbox
@@ -1411,7 +1425,7 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Loading spinner*/}
-				{fetcher && fetcher.state && fetcher.state === 'loading' && (
+				{fetcher && fetcher.state && fetcher.state === 'loading' && !(artist && songSelected && date && location) && (
 					<div className='flex flex-col justify-center'>
 						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
 					</div>
@@ -1473,7 +1487,7 @@ export default function AddJam() {
 																'relative cursor-default select-none py-2 pl-3 pr-9'
 															)
 														}
-														value={songInSet}
+														value={songInSet.value}
 													>
 														{({ selected, active }) => (
 															<>
@@ -1483,7 +1497,7 @@ export default function AddJam() {
 																		'block truncate'
 																	)}
 																>
-																	{songInSet}
+																	{songInSet.label}
 																</span>
 
 																{selected ? (
@@ -1610,6 +1624,8 @@ export default function AddJam() {
 									? 'https://neighbortunes.net'
 									: artist.artist === 'Eggy'
 									? 'https://thecarton.net'
+									: artist.artist === "Taper's Choice"
+									? 'https://taperschoice.net'
 									: 'https://www.setlist.fm'
 							}
 							className='underline'
@@ -1625,6 +1641,8 @@ export default function AddJam() {
 								? 'neighbortunes.net'
 								: artist.artist === 'Eggy'
 								? 'thecarton.net'
+								: artist.artist === "Taper's Choice"
+								? 'taperschoice.net'
 								: 'setlist.fm'}
 						</a>
 						.{' '}
@@ -1633,6 +1651,7 @@ export default function AddJam() {
 						artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
+            artist.artist === "Taper's Choice" ||
 						artist.artist === "Umphrey's McGee" ? (
 							<p>
 								Thanks{' '}
@@ -1651,7 +1670,7 @@ export default function AddJam() {
 						)}
 					</p>
 				)}
-				{useApis && showLoadingInfo && (
+				{useApis && showLoadingInfo && (artist !== 'Phish' && artist !== 'Trey Anastasio, TAB') (
 					<InfoAlert
 						title={'Thanks for your patience!'}
 						description={
@@ -1659,6 +1678,8 @@ export default function AddJam() {
 						}
 					/>
 				)}
+        {jam && jam !== '' &&
+        <SuccessAlert title={"It's on Jam Fans!"} description={`You can add sounds ${profile ? 'and your rating and comment' : ''} below. Thanks for contributing!`} />}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
