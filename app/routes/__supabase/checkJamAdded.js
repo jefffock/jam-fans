@@ -242,7 +242,7 @@ export const loader = async ({ request, params }) => {
 		}
 		if (songId) {
 			const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
-			shows = await fetch(url);
+			let shows = await fetch(url);
 			shows = await shows.json();
 			shows = shows?.data
 				.filter((show) => show.artistid === artistId)
@@ -306,7 +306,7 @@ export const loader = async ({ request, params }) => {
 		} else {
 			songId = data[0]?.id;
 			const url = `${baseUrl}/setlists/song_id/${songId}`;
-			shows = await fetch(url);
+			let shows = await fetch(url);
 			shows = await shows.json();
 			shows = shows?.data
 				.filter((show) => show.artist_id === 1)
@@ -394,7 +394,7 @@ export const loader = async ({ request, params }) => {
     const showsData = await fetch(url);
     const showsRes = await showsData.json();
     if (showsRes && showsRes.data && showsRes.data.length > 0) {
-      shows = showsRes.data
+      let shows = showsRes.data
         .filter((show) => show.artist_id === 1)
         .map((show) => {
           const location = `${show.venuename}, ${show.city}, ${
@@ -440,7 +440,7 @@ export const loader = async ({ request, params }) => {
     }
     if (mbid && year) {
       const data = await paginatedFetch(url);
-      shows = data.map((show) => {
+      let shows = data.map((show) => {
         const location = `${show?.venue?.name ? show.venue.name + ', ' : ''}${
           show.venue.city.name
         }, ${
