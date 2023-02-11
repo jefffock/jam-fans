@@ -691,6 +691,7 @@ export default function AddJam() {
 		setShowsByYear(null);
 		setJam('');
 		setShow('');
+    setShowLoadingInfo(false);
 		setShowLocationInput(false);
 		setSoundsSelected('');
 		setShowSuccessAlert(false);
