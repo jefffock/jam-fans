@@ -1932,7 +1932,7 @@ export default function AddJam() {
         Add jam and comment/rating (not added yet), with rating
         Add rating/comments jam (already added), with rating
         */}
-				<div className='flex justify-around bg-white w-full px-2'>
+				<div className='flex justify-around bg-white w-full px-2 pb-20'>
 					{/* not logged in, add new jam*/}
 					{!profile && !jam && artist && songSelected && date && location && (
 						<button
