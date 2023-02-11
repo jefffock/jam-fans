@@ -78,12 +78,13 @@ export const loader = async ({ request, params }) => {
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 			switch (artist) {
-				case 'Phish':
-					artistId = '1';
-					tableName = 'phishnet_songs';
 				case 'Trey Anastasio, TAB':
 					artistId = '2';
 					tableName = 'tab_songs';
+          break;
+        default:
+          artistId = '1';
+					tableName = 'phishnet_songs';
 			}
 			switch (song) {
 				case 'Also Sprach Zarathustra (2001)':
@@ -101,9 +102,11 @@ export const loader = async ({ request, params }) => {
 					songId = data[0]?.songid;
 			}
 			if (songId) {
+        console.log('songId in getshows', songId)
 				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
 				shows = await fetch(url);
 				shows = await shows.json();
+        console.log('shows in getshows', shows)
 				shows = shows?.data
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
@@ -125,6 +128,7 @@ export const loader = async ({ request, params }) => {
 							existingJam: alreadyAdded ?? null,
 						};
 					});
+          console.log('shows in getshows after filter', shows)
 				shows = shows.reverse();
 			}
 		} else {
