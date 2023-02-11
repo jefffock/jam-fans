@@ -577,7 +577,7 @@ export default function AddJam() {
 		setJam(null);
 		setShowsByYear(null);
 		setShowsBySong(null);
-    setShow(null)
+		setShow(null);
 		setLocation('');
 		setDate('');
 		setYear('');
@@ -682,15 +682,15 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
-    fetcher.data = null
+		fetcher.data = null;
 		setArtist('');
 		setSong('');
-    setQuery('')
+		setQuery('');
 		setSongSelected('');
 		setDate('');
-    setYear('')
+		setYear('');
 		setLocation('');
-    setShowsBySong(null);
+		setShowsBySong(null);
 		setShowsByYear(null);
 		setJam('');
 		setShow('');
@@ -700,14 +700,14 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
-    fetcher.data = null
+		fetcher.data = null;
 		setSong('');
 		setSongSelected('');
 		setJam('');
 	}
 
 	function clearDate() {
-    fetcher.data = null
+		fetcher.data = null;
 		setDate('');
 		setShow('');
 		setLocation('');
@@ -731,7 +731,7 @@ export default function AddJam() {
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
 			setYear('');
-      fetcher.data = null
+			fetcher.data = null;
 		} else {
 			if (
 				useApis &&
@@ -823,7 +823,7 @@ export default function AddJam() {
 	}
 
 	if (
-    artist &&
+		artist &&
 		fetcher &&
 		fetcher.data &&
 		fetcher.data.showsBySong &&
@@ -835,7 +835,7 @@ export default function AddJam() {
 		setShowsBySong(fetcher?.data?.showsBySong);
 	}
 	if (
-    artist &&
+		artist &&
 		fetcher &&
 		fetcher.data &&
 		fetcher.data.showsByYear &&
@@ -1477,15 +1477,6 @@ export default function AddJam() {
 							</Listbox>
 						</div>
 					)}
-				{/* Loading spinner*/}
-				{fetcher &&
-					fetcher.state &&
-					fetcher.state === 'loading' &&
-					!(artist && songSelected && date && location) && (
-						<div className='flex flex-col justify-center'>
-							<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
-						</div>
-					)}
 				{/* Date input */}
 				{useApis && !date && artist && (
 					<div>
@@ -1662,6 +1653,12 @@ export default function AddJam() {
 								aria-describedby='location-description'
 							/>
 						</div>
+					</div>
+				)}
+				{/* Loading spinner*/}
+				{fetcher && fetcher.state && fetcher.state === 'loading' && (
+					<div className='flex flex-col justify-center'>
+						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
 					</div>
 				)}
 				{/* api attribution */}
