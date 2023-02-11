@@ -161,7 +161,7 @@ export default function JamFiltersSlideout({
 								leaveTo='translate-x-full'
 							>
 								<Dialog.Panel className='pointer-events-auto w-screen max-w-md'>
-									<div className='flex h-full flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl pb-40 sm:pb-0'>
+									<div className={`flex h-full flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl ${showIframe ? 'pb-40' : 'pb-0'} sm:pb-0`}>
 										<div className='flex min-h-0 flex-1 flex-col overflow-y-scroll py-6'>
 											<div className='px-4 sm:px-6'>
 												<div className='flex items-start justify-between'>
