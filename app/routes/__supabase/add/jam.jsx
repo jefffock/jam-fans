@@ -1655,7 +1655,7 @@ export default function AddJam() {
 				{/* Loading spinner*/}
 				{fetcher && fetcher.state && fetcher.state === 'loading' && (
 					<div className='flex flex-col justify-center'>
-						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
+						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700'></div>
 					</div>
 				)}
 				{/* api attribution */}
@@ -1731,12 +1731,12 @@ export default function AddJam() {
 							}
 						/>
 					)}
-				{jam && jam !== '' && (
+				{artist && songSelected && date && location && jam && jam !== '' && (
 					<SuccessAlert
 						title={"It's on Jam Fans!"}
 						description={`You can add sounds ${
 							profile ? 'and your rating and comment' : ''
-						} below. Thanks for contributing!`}
+						} below. Thanks for helping other fans!`}
 					/>
 				)}
 				{artist && songSelected && date && location && (
@@ -1787,7 +1787,7 @@ export default function AddJam() {
 						</div>
 					</>
 				)}
-				{soundsSelected && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{artist && songSelected && date && location && soundsSelected && soundsSelected !== '' && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&
