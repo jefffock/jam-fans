@@ -3,6 +3,8 @@ import JamFiltersSlideout from './JamFilters';
 import ArtistBar from './ArtistBar';
 import FiltersButton from './FiltersButton';
 import JamList from './JamList';
+import { useState, useEffect } from 'react';
+import { useFetcher } from '@remix-run/react';
 
 export default function JamsHome({
 	supabase,
@@ -21,6 +23,7 @@ export default function JamsHome({
   setClientHeight,
   setHeight
 }) {
+
 	if (!artists) return <div>Loading...</div>;
 
 	return (
