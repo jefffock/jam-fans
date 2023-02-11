@@ -13,6 +13,7 @@ export const loader = async ({ request, params }) => {
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const artist = queryParams?.artist;
+  console.log('artist in checkJamAdded', artist)
 	let song = queryParams?.song;
 	let date = queryParams?.date;
 	//get year from date
@@ -415,7 +416,7 @@ export const loader = async ({ request, params }) => {
     let apiKey = process.env.SETLISTFM_API_KEY;
     async function paginatedFetch(url, page = 1, previousResponse = []) {
       console.log('in paginated fetch', url, page, previousResponse);
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       return fetch(`${url}&p=${page}`, {
         headers: {
           'x-api-key': `${apiKey}`,
@@ -459,7 +460,7 @@ export const loader = async ({ request, params }) => {
       }); showsByYear = shows
     }
   }
-  
+
 	return json(
 		{ jam, setlist, location, showsByYear, showsBySong, year },
 		{

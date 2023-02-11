@@ -573,6 +573,8 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
+    console.log('changing artist')
+    fetcher.load('/clearFetcher')
 		setSongSelected('');
 		setJam(null);
 		setShowsByYear(null);
@@ -583,11 +585,6 @@ export default function AddJam() {
 		setYear('');
 		setSoundsSelected('');
 		setShowLoadingInfo(false);
-		if (artist && year && !date && artist !== 'Squeaky Feet') {
-			//fetch shows
-			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
-			fetcher.load(urlToFetch);
-		}
 		setArtist(artist);
 	}
 
@@ -682,7 +679,7 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
-		fetcher.data = null;
+		fetcher.load('/clearFetcher')
 		setArtist('');
 		setSong('');
 		setQuery('');
@@ -700,15 +697,15 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
-		fetcher.data = null;
-		setSong('');
+    fetcher.load('/clearFetcher')
+    setSong('');
 		setSongSelected('');
 		setJam('');
 	}
 
 	function clearDate() {
-		fetcher.data = null;
-		setDate('');
+    fetcher.load('/clearFetcher')
+    setDate('');
 		setShow('');
 		setLocation('');
 		setJam('');
@@ -731,7 +728,6 @@ export default function AddJam() {
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
 			setYear('');
-			fetcher.data = null;
 		} else {
 			if (
 				useApis &&
@@ -1726,11 +1722,11 @@ export default function AddJam() {
 				)}
 				{useApis &&
 					showLoadingInfo &&
-					(artist !== 'Phish' && artist !== 'Trey Anastasio, TAB')(
+					artist.artist !== 'Phish' && artist.artist !== 'Trey Anastasio, TAB' && artist.artist !== 'Eggy' && artist.artist !== 'Goose' && artist.artist !== 'Neighbor' && artist.artist !== "Umphrey's Mcgee" && artist.artist !== "Taper's Choice" && (
 						<InfoAlert
 							title={'Thanks for your patience!'}
 							description={
-								"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, deep breaths 😂"
+								"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, thanks for your patience! We're also limited in how many times we can get data per day so if it's not working, please try the 'Still pretty easy way.' Thanks!"
 							}
 						/>
 					)}
