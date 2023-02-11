@@ -213,7 +213,8 @@ export const loader = async ({ request, params }) => {
 			setlist = titles;
 		}
 	}
-	//get shows by song if songfish
+	//get shows by song if songfish/phish
+  let songId
 	const { data: versions, error2 } = await supabaseClient
 		.from('versions')
 		.select('*')
@@ -292,7 +293,6 @@ export const loader = async ({ request, params }) => {
 				dbName = 'tapers_choice_songs';
 				baseUrl = baseUrls.tapersChoiceBaseUrl;
 		}
-		let songId;
 		//get song id from supabase
 		console.log('dbName', dbName);
 		console.log('song', song);

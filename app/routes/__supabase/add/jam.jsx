@@ -641,7 +641,6 @@ export default function AddJam() {
 
 	function handleShowChange(show) {
 		if (show) {
-			console.log('show in handleshowchange', show);
 			setSetlist(null);
 			//dont get setlist song bc checkJamAdded takes care of it
 			if (
@@ -653,7 +652,6 @@ export default function AddJam() {
 			) {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
-				console.log('getting setlist', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 			setShow(show);
@@ -684,7 +682,6 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
-    console.log('clearing artist')
     fetcher.data = null
 		setArtist('');
 		setSong('');
@@ -710,7 +707,6 @@ export default function AddJam() {
 	}
 
 	function clearDate() {
-		console.log('clearing date');
     fetcher.data = null
 		setDate('');
 		setShow('');
@@ -826,7 +822,6 @@ export default function AddJam() {
 		setListenLink(e.target.value);
 	}
 
-  console.log('artist', artist)
 	if (
     artist &&
 		fetcher &&
@@ -849,10 +844,8 @@ export default function AddJam() {
 			fetcher.data.showsByYear[0].showdate.normalize() !==
 				showsByYear[0]?.showdate.normalize())
 	) {
-    console.log('setting shows by year')
 		setShowsByYear(fetcher?.data?.showsByYear);
 	}
-	console.log('fetcher.data', fetcher?.data);
 	if (
 		fetcher?.data?.setlist &&
 		fetcher?.data?.setlist.length > 0 &&
@@ -861,7 +854,6 @@ export default function AddJam() {
 				setlist[1].value !== fetcher?.data?.setlist[1].value &&
 				setlist[2].value !== fetcher?.data?.setlist[2].value))
 	) {
-		console.log('setlist client side', fetcher?.data?.setlist);
 		setSetlist(fetcher?.data?.setlist);
 	}
 	if (
@@ -898,11 +890,6 @@ export default function AddJam() {
 	}, [songSelected, date]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
-
-	console.log('showsBySong client length', showsBySong?.length);
-	console.log('showsByYear client length', showsByYear?.length);
-	console.log('setlist in /add/jam clientside', setlist);
-	console.log('location', location);
 
 	return (
 		<Form method='post'>

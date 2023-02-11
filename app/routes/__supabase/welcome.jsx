@@ -47,7 +47,6 @@ export default function Welcome() {
           name: username,
         },
       ]);
-      console.log('data', data, 'error', error)
     if (error) {
       console.error(error)
     } else {

@@ -1854,16 +1854,12 @@ select {
   transition-duration: 150ms;
 }
 
-.duration-300 {
-  transition-duration: 300ms;
+.duration-500 {
+  transition-duration: 500ms;
 }
 
 .duration-100 {
   transition-duration: 100ms;
-}
-
-.duration-500 {
-  transition-duration: 500ms;
 }
 
 .ease-in {
