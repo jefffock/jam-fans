@@ -1787,7 +1787,7 @@ export default function AddJam() {
 						</div>
 					</>
 				)}
-				{artist && songSelected && date && location && soundsSelected && soundsSelected !== '' && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{artist && songSelected && date && location && soundsSelected && soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&
