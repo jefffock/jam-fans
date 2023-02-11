@@ -4,14 +4,13 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useOutletContext, Link, NavLink } from '@remix-run/react';
 
 const navigation = [
-	{ name: 'Home', href: '/', current: true },
 	{ name: 'Jams', href: '/jams', current: false },
-	{ name: 'Add', href: '/add/jam', current: false },
+	{ name: 'Contribute', href: '/add/jam', current: false },
 	{ name: 'Coming Soon™️', href: '/roadmap', current: false },
-	{ name: 'Contact', href: '/contact', current: false },
 ];
 const userNavigation = [
 	{ name: 'Credits', href: '/credits' },
+  { name: 'Contact', href: '/contact', current: false },
 	{ name: 'Terms of Service', href: '/terms' },
 	{ name: 'Privacy Policy', href: '/privacy' },
 	{ name: 'Sign out', href: '#' },
@@ -28,6 +27,11 @@ const inactiveClassName =
 
 export default function TopNav({ title, supabase, session }) {
 	const user = session?.user;
+  //if user add login and signup to userNavigation and remove sign out
+  if (!user && userNavigation.length === 5) {
+    userNavigation.unshift({ name: 'Login', href: '/login' }, { name: 'Create an account', href: '/join' });
+    userNavigation.pop();
+  }
 
 	async function handleSignOut() {
 		const { error } = await supabase.auth.signOut();
@@ -168,10 +172,9 @@ export default function TopNav({ title, supabase, session }) {
 										</Disclosure.Button>
 									))}
 								</div>
-								<div className='border-t border-gray-200 pt-4 pb-3 text-right'>
-									<div className=' space-y-1'>
-										{user &&
-											userNavigation.map((item) => (
+								<div className='border-t border-gray-200 pt-4 pb-3 text-right flex flex-row-reverse'>
+									<div className=' space-y-1 max-w-fit self-end'>
+										{userNavigation.map((item) => (
 												<Disclosure.Button
 													key={item.name}
 													as='a'
@@ -180,7 +183,7 @@ export default function TopNav({ title, supabase, session }) {
 														item?.current
 															? 'bg-cyan-50 border-cyan-500 text-cyan-700'
 															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
+														'ml-auto space-y-1 self-center block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
 													)}
 													onClick={
 														item.name === 'Sign out'
@@ -191,7 +194,7 @@ export default function TopNav({ title, supabase, session }) {
 													{item.name}
 												</Disclosure.Button>
 											))}
-										{!user && (
+										{/* {!user && (
 											<div className=''>
 												<Disclosure.Button className='ml-auto space-y-1 self-center'>
 													<a
@@ -217,10 +220,10 @@ export default function TopNav({ title, supabase, session }) {
 													</a>
 												</Disclosure.Button>
 											</div>
-										)}
-										{!user &&
+										)} */}
+										{/* {!user &&
 											userNavigation &&
-											userNavigation.slice(0, 3).map((item) => (
+											userNavigation.map((item) => (
 												<Disclosure.Button
 													key={item.name}
 													as='a'
@@ -239,7 +242,7 @@ export default function TopNav({ title, supabase, session }) {
 												>
 													{item.name}
 												</Disclosure.Button>
-											))}
+											))} */}
 									</div>
 								</div>
 							</Disclosure.Panel>

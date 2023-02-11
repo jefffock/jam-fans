@@ -37,7 +37,7 @@ export default function Credits() {
 						Neighbor - <a href='https://www.neighbortunes.net' className='underline text-blue-700 hover:text-blue-800'>neighbortunes.net</a>
 					</li>
           <li className='my-2'>
-						Taper's Choice - <a href='https://taperschoice.net' className='underline text-blue-700 hover:text-blue-800'>taperschoice.net/</a>
+						Taper's Choice - <a href='https://taperschoice.net' className='underline text-blue-700 hover:text-blue-800'>taperschoice.net</a>
 					</li>
 					<li className='my-2'>
 						Umphrey's McGee - <a href='https://allthings.umphreys.com' className='underline text-blue-700 hover:text-blue-800'>allthings.umphreys.com</a>
