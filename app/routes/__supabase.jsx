@@ -74,12 +74,13 @@ export default function Supabase() {
   }, [serverAccessToken, supabase, fetcher]);
 
   return (
-    <>
-      {/* <Login supabase={supabase} session={session} />
+    <div className='w-full max-w-full overflow-x-hidden'>
+    {/* <Login supabase={supabase} session={session} />
       <Nav /> */}
+
       <TopNav supabase={supabase} session={session}/>
       <Outlet context={{ supabase, session }} />
       <BottomNav supabase={supabase} session={session}/>
-    </>
+      </div>
   );
 }
