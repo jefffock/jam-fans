@@ -459,10 +459,7 @@ export const loader = async ({ request, params }) => {
       }); showsByYear = shows
     }
   }
-	console.log('setlist in getSetlist', setlist);
-	console.log('location in getSetlist', location);
-  console.log('showsByYear length in getSetlist', showsByYear.length);
-  console.log('showsBySong length in getSetlist', showsBySong.length);
+  
 	return json(
 		{ jam, setlist, location, showsByYear, showsBySong, year },
 		{
