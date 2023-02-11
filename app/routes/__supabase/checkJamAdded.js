@@ -177,7 +177,7 @@ export const loader = async ({ request, params }) => {
 			setlist = titles || [];
 		}
 	} else {
-		//setlistfm for all other artists
+		//setlistfm for shows by year for all other artists
 		const [year, month, day] = date.split('-');
 		const transformedDate = [day, month, year].join('-');
 		const mbid = mbids[artist];

@@ -320,10 +320,10 @@ export const loader = async ({ request, params }) => {
 		}
 	}
 	//sort by showdate
-	shows?.sort((a, b) => {
-		return new Date(b.showdate) - new Date(a.showdate);
-	});
   if (song) {
+    shows?.sort((a, b) => {
+      return new Date(b.showdate) - new Date(a.showdate);
+    });
     return json(
       {showsBySong: shows ||[]},
       {
