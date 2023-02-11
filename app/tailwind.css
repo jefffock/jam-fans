@@ -1388,9 +1388,9 @@ select {
   border-color: rgb(6 182 212 / var(--tw-border-opacity));
 }
 
-.border-blue-900 {
+.border-cyan-700 {
   --tw-border-opacity: 1;
-  border-color: rgb(30 58 138 / var(--tw-border-opacity));
+  border-color: rgb(14 116 144 / var(--tw-border-opacity));
 }
 
 .bg-white {
@@ -1854,16 +1854,12 @@ select {
   transition-duration: 150ms;
 }
 
-.duration-300 {
-  transition-duration: 300ms;
+.duration-500 {
+  transition-duration: 500ms;
 }
 
 .duration-100 {
   transition-duration: 100ms;
-}
-
-.duration-500 {
-  transition-duration: 500ms;
 }
 
 .ease-in {

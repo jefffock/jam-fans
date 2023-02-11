@@ -4,6 +4,7 @@ import {
 	useFetcher,
 	useOutletContext,
 	useActionData,
+	useNavigate,
 } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
@@ -497,7 +498,7 @@ export default function AddJam() {
 	const [artistErrorText, setArtistErrorText] = useState(null);
 	const [dateErrorText, setDateErrorText] = useState(null);
 	const [locationErrorText, setLocationErrorText] = useState(null);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 	const [successAlertText, setSuccessAlertText] = useState(null);
 	const [setlist, setSetlist] = useState(null);
 	const [tags, setTags] = useState([]);
@@ -521,10 +522,12 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-	const [shows, setShows] = useState(null);
+	const [showsBySong, setShowsBySong] = useState(null);
+	const [showsByYear, setShowsByYear] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
-  const [showPickerLabel, setShowPickerLabel] = useState('Shows');
+	const [showPickerLabel, setShowPickerLabel] = useState('Shows');
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -570,19 +573,18 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
+    console.log('changing artist')
+    fetcher.load('/clearFetcher')
 		setSongSelected('');
 		setJam(null);
-		setShows(null);
+		setShowsByYear(null);
+		setShowsBySong(null);
+		setShow(null);
 		setLocation('');
 		setDate('');
 		setYear('');
 		setSoundsSelected('');
 		setShowLoadingInfo(false);
-		if (artist && year && !date && artist !== 'Squeaky Feet') {
-			//fetch shows
-			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
-			fetcher.load(urlToFetch);
-		}
 		setArtist(artist);
 	}
 
@@ -596,11 +598,12 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-		setShows(null);
-    setQuery('');
+		setShowsBySong(null);
+		setQuery('');
 		if (
 			artist &&
-			artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant' &&
+			artist.artist !== 'Squeaky Feet' &&
+			artist.artist !== 'Houseplant' &&
 			songSelected &&
 			useApis &&
 			(artist.artist === 'Goose' ||
@@ -636,7 +639,14 @@ export default function AddJam() {
 	function handleShowChange(show) {
 		if (show) {
 			setSetlist(null);
-			if (useApis && artist && artist !== 'Squeaky Feet') {
+			//dont get setlist song bc checkJamAdded takes care of it
+			if (
+				useApis &&
+				artist &&
+				artist !== 'Squeaky Feet' &&
+				artist !== 'Houseplant' &&
+				!songSelected
+			) {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
 				fetcher.load(urlToFetch);
@@ -661,7 +671,7 @@ export default function AddJam() {
 	//if song not in setlist, remove it
 	useEffect(() => {
 		if (setlist && songSelected) {
-			let songInSetlist = setlist.find(({value}) => value === songSelected);
+			let songInSetlist = setlist.find(({ value }) => value === songSelected);
 			if (!songInSetlist) {
 				setSongSelected('');
 			}
@@ -669,29 +679,38 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
+		fetcher.load('/clearFetcher')
 		setArtist('');
 		setSong('');
-		setDate('');
-		setLocation('');
-		setShowLocationInput(false);
-		setShow('');
-		setJam('');
+		setQuery('');
 		setSongSelected('');
-    setSoundsSelected('')
-    showSuccessAlert(false);
+		setDate('');
+		setYear('');
+		setLocation('');
+		setShowsBySong(null);
+		setShowsByYear(null);
+		setJam('');
+		setShow('');
+    setShowLoadingInfo(false);
+		setShowLocationInput(false);
+		setSoundsSelected('');
+		setShowSuccessAlert(false);
 	}
 
 	function clearSong() {
-		setSong('');
+    fetcher.load('/clearFetcher')
+    setSong('');
 		setSongSelected('');
-    setJam('')
+		setJam('');
 	}
 
 	function clearDate() {
-		setDate('');
+    fetcher.load('/clearFetcher')
+    setDate('');
 		setShow('');
 		setLocation('');
-    setJam('')
+		setJam('');
+		setSetlist('');
 	}
 
 	function showEditLocation() {
@@ -705,13 +724,18 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
-		if (shows) setShows(null);
+		if (showsByYear) setShowsByYear(null);
 		if (location) setLocation('');
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
-			if (useApis && artist && artist.artist !== 'Squeaky Feet' && artist.artist !== 'Houseplant') {
+			if (
+				useApis &&
+				artist &&
+				artist.artist !== 'Squeaky Feet' &&
+				artist.artist !== 'Houseplant'
+			) {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
 				fetcher.load(urlToFetch);
 			}
@@ -723,7 +747,7 @@ export default function AddJam() {
 				artist.artist !== 'Goose' &&
 				artist.artist !== 'Eggy' &&
 				artist.artist !== 'Neighbor' &&
-        artist.artist !== "Taper's Choice"
+				artist.artist !== "Taper's Choice"
 			) {
 				setShowLoadingInfo(true);
 			}
@@ -796,33 +820,60 @@ export default function AddJam() {
 	}
 
 	if (
+		artist &&
 		fetcher &&
 		fetcher.data &&
-		fetcher.data.shows &&
-		fetcher.data.shows[0] &&
-		(!shows ||
-			fetcher.data.shows[0].showdate.normalize() !==
-				shows[0]?.showdate.normalize())
+		fetcher.data.showsBySong &&
+		fetcher.data.showsBySong[0] &&
+		(!showsBySong ||
+			fetcher.data.showsBySong[0].showdate.normalize() !==
+				showsBySong[0]?.showdate.normalize())
 	) {
-		setShows(fetcher?.data?.shows);
+		setShowsBySong(fetcher?.data?.showsBySong);
 	}
-	if (fetcher?.data?.setlist && !setlist && fetcher?.data?.setlist.length > 0) {
+	if (
+		artist &&
+		fetcher &&
+		fetcher.data &&
+		fetcher.data.showsByYear &&
+		fetcher.data.showsByYear[0] &&
+		(!showsByYear ||
+			fetcher.data.showsByYear[0].showdate.normalize() !==
+				showsByYear[0]?.showdate.normalize())
+	) {
+		setShowsByYear(fetcher?.data?.showsByYear);
+	}
+	if (
+		fetcher?.data?.setlist &&
+		fetcher?.data?.setlist.length > 0 &&
+		(!setlist ||
+			(setlist[0].value !== fetcher?.data?.setlist[0].value &&
+				setlist[1].value !== fetcher?.data?.setlist[1].value &&
+				setlist[2].value !== fetcher?.data?.setlist[2].value))
+	) {
 		setSetlist(fetcher?.data?.setlist);
 	}
-	if (fetcher?.data?.location && artist && !location) {
+	if (
+		fetcher?.data?.location &&
+		artist &&
+		fetcher?.data?.location !== location
+	) {
 		setLocation(fetcher?.data?.location);
 	}
 	if (fetcher?.data?.jam && fetcher?.data?.jam !== jam) {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
-  if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
-    setShowSuccessAlert(true);
-  }
+	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
+		setYear(fetcher?.data?.year);
+	}
+	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
+		setShowSuccessAlert(true);
+	}
 
 	//check if song exists
 	useEffect(() => {
-    setJam('')
+		setJam('');
 		if (songSelected && artist && date) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
@@ -833,7 +884,7 @@ export default function AddJam() {
 				date;
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date, setlist]);
+	}, [songSelected, date]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
@@ -1119,8 +1170,8 @@ export default function AddJam() {
 				{useApis &&
 					songSelected &&
 					artist &&
+					showsBySong &&
 					!date &&
-					!year &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
@@ -1136,7 +1187,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows
+											Shows with a {songSelected}
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1159,7 +1210,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
+													{showsBySong?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
@@ -1335,11 +1386,9 @@ export default function AddJam() {
 				)}
 				{/* Show Picker if not from songfish artist + year*/}
 				{useApis &&
-					shows &&
-					shows?.length > 1 &&
-					!show &&
+					showsByYear &&
+					showsByYear?.length > 1 &&
 					!date &&
-					!location &&
 					year &&
 					(!fetcher ||
 						(fetcher && fetcher.state && fetcher.state !== 'loading')) && (
@@ -1351,7 +1400,7 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows
+											Shows from {year}
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1374,7 +1423,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
+													{showsByYear?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
@@ -1425,12 +1474,6 @@ export default function AddJam() {
 							</Listbox>
 						</div>
 					)}
-				{/* Loading spinner*/}
-				{fetcher && fetcher.state && fetcher.state === 'loading' && !(artist && songSelected && date && location) && (
-					<div className='flex flex-col justify-center'>
-						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
-					</div>
-				)}
 				{/* Date input */}
 				{useApis && !date && artist && (
 					<div>
@@ -1445,7 +1488,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* song picker from setlist */}
-				{useApis && setlist && !songSelected && date && artist && (
+				{useApis && setlist && setlist !== '' && date && !songSelected && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
@@ -1454,7 +1497,8 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-md font-medium text-gray-700'>
-										Songs in Setlist
+										Setlist from{' '}
+										{new Date(date + 'T18:00:00').toLocaleDateString()}
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1608,6 +1652,12 @@ export default function AddJam() {
 						</div>
 					</div>
 				)}
+				{/* Loading spinner*/}
+				{fetcher && fetcher.state && fetcher.state === 'loading' && (
+					<div className='flex flex-col justify-center'>
+						<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700'></div>
+					</div>
+				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
 					<p className='text-sm text-gray-500'>
@@ -1652,7 +1702,7 @@ export default function AddJam() {
 						artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
-            artist.artist === "Taper's Choice" ||
+						artist.artist === "Taper's Choice" ||
 						artist.artist === "Umphrey's McGee" ? (
 							<p>
 								Thanks{' '}
@@ -1671,16 +1721,24 @@ export default function AddJam() {
 						)}
 					</p>
 				)}
-				{useApis && showLoadingInfo && (artist !== 'Phish' && artist !== 'Trey Anastasio, TAB') (
-					<InfoAlert
-						title={'Thanks for your patience!'}
-						description={
-							"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, deep breaths 😂"
-						}
+				{useApis &&
+					showLoadingInfo &&
+					artist.artist !== 'Phish' && artist.artist !== 'Trey Anastasio, TAB' && artist.artist !== 'Eggy' && artist.artist !== 'Goose' && artist.artist !== 'Neighbor' && artist.artist !== "Umphrey's Mcgee" && artist.artist !== "Taper's Choice" && (
+						<InfoAlert
+							title={'Thanks for your patience!'}
+							description={
+								"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, thanks for your patience! We're also limited in how many times we can get data per day so if it's not working, please try the 'Still pretty easy way.' Thanks!"
+							}
+						/>
+					)}
+				{artist && songSelected && date && location && jam && jam !== '' && (
+					<SuccessAlert
+						title={"It's on Jam Fans!"}
+						description={`You can add sounds ${
+							profile ? 'and your rating and comment' : ''
+						} below. Thanks for helping other fans!`}
 					/>
 				)}
-        {jam && jam !== '' &&
-        <SuccessAlert title={"It's on Jam Fans!"} description={`You can add sounds ${profile ? 'and your rating and comment' : ''} below. Thanks for contributing!`} />}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
@@ -1729,7 +1787,7 @@ export default function AddJam() {
 						</div>
 					</>
 				)}
-				{soundsSelected && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{artist && songSelected && date && location && soundsSelected && soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&

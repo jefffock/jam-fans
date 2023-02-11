@@ -9,14 +9,6 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 
-	async function wait500() {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve('resolved');
-			}, 500);
-		});
-	}
-
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
@@ -66,13 +58,17 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 
 	const artist = queryParams?.artist;
-	let song = queryParams?.song;
-	const year = queryParams?.year;
+	let song = queryParams?.song || null;
+	const year = queryParams?.year || null;
 	let shows;
 	let songId;
 	let jfVersions = [];
 	//get all versions of a song (for select artists)
+	let artistId;
+	let tableName;
+  console.log('song in getshows', song)
 	if (artist && song && !year) {
+    console.log('artist and song', artist, song)
 		const { data, error } = await supabaseClient
 			.from('versions')
 			.select('*')
@@ -81,8 +77,15 @@ export const loader = async ({ request, params }) => {
 		jfVersions = data;
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
-			const artistId = artist === 'Phish' ? '1' : '2';
-			const tableName = artist === 'Phish' ? 'phishnet_songs' : 'tab_songs';
+			switch (artist) {
+				case 'Trey Anastasio, TAB':
+					artistId = '2';
+					tableName = 'tab_songs';
+          break;
+        default:
+          artistId = '1';
+					tableName = 'phishnet_songs';
+			}
 			switch (song) {
 				case 'Also Sprach Zarathustra (2001)':
 					songId = 21;
@@ -99,9 +102,11 @@ export const loader = async ({ request, params }) => {
 					songId = data[0]?.songid;
 			}
 			if (songId) {
+        console.log('songId in getshows', songId)
 				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
 				shows = await fetch(url);
 				shows = await shows.json();
+        console.log('shows in getshows', shows)
 				shows = shows?.data
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
@@ -123,6 +128,7 @@ export const loader = async ({ request, params }) => {
 							existingJam: alreadyAdded ?? null,
 						};
 					});
+          console.log('shows in getshows after filter', shows)
 				shows = shows.reverse();
 			}
 		} else {
@@ -167,32 +173,33 @@ export const loader = async ({ request, params }) => {
 				const url = `${baseUrl}/setlists/song_id/${songId}`;
 				shows = await fetch(url);
 				shows = await shows.json();
-        shows = shows?.data.filter((show) => show.artist_id === 1)
-				.map((show) => {
-					const date = new Date(show.showdate + 'T18:00:00Z');
-					const alreadyAdded = jfVersions.find(
-						(version) => version.date === show.showdate
-					);
-					return {
-						showdate: show.showdate,
-						location: `${show.venuename}, ${show.city}, ${
-							show.country === 'USA' ? show.state : show.country
-						}`,
-						label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
-							show.venuename
-						}, ${show.city}, ${
-							show.country === 'USA' ? show.state : show.country
-						}`,
-						existingJam: alreadyAdded ?? null,
-					};
-				});
+				shows = shows?.data
+					.filter((show) => show.artist_id === 1)
+					.map((show) => {
+						const date = new Date(show.showdate + 'T18:00:00Z');
+						const alreadyAdded = jfVersions.find(
+							(version) => version.date === show.showdate
+						);
+						return {
+							showdate: show.showdate,
+							location: `${show.venuename}, ${show.city}, ${
+								show.country === 'USA' ? show.state : show.country
+							}`,
+							label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
+								show.venuename
+							}, ${show.city}, ${
+								show.country === 'USA' ? show.state : show.country
+							}`,
+							existingJam: alreadyAdded ?? null,
+						};
+					});
 				// shows = shows.reverse();
 			}
 		}
 	} else if (artist && year) {
 		//get shows by year
+		let artistId;
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
-			let artistId;
 			switch (artist) {
 				case 'Phish':
 					artistId = '1';
@@ -253,7 +260,6 @@ export const loader = async ({ request, params }) => {
 			const showsData = await fetch(url);
 			const showsRes = await showsData.json();
 			if (showsRes && showsRes.data && showsRes.data.length > 0) {
-				console.log('shows by year', showsRes.data);
 				shows = showsRes.data
 					.filter((show) => show.artist_id === 1)
 					.map((show) => {
@@ -274,8 +280,7 @@ export const loader = async ({ request, params }) => {
 			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
 			let apiKey = process.env.SETLISTFM_API_KEY;
 			async function paginatedFetch(url, page = 1, previousResponse = []) {
-				console.log('in paginated fetch', url, page, previousResponse);
-				await new Promise((resolve) => setTimeout(resolve, 600));
+				await new Promise((resolve) => setTimeout(resolve, 1000));
 				return fetch(`${url}&p=${page}`, {
 					headers: {
 						'x-api-key': `${apiKey}`,
@@ -284,7 +289,6 @@ export const loader = async ({ request, params }) => {
 				}) // Append the page number to the base URL
 					.then((response) => response.json())
 					.then((newResponse) => {
-						console.log('newResponse', newResponse);
 						const setlist = newResponse?.setlist || [];
 
 						const response = [...setlist, ...previousResponse]; // Combine the two arrays
@@ -321,14 +325,25 @@ export const loader = async ({ request, params }) => {
 		}
 	}
 	//sort by showdate
-	shows?.sort((a, b) => {
-		return new Date(b.showdate) - new Date(a.showdate);
-	});
-	console.log('shows', shows);
-	return json(
-		{ shows: shows || [] },
-		{
-			headers: response.headers,
-		}
-	);
+	if (song) {
+		shows?.sort((a, b) => {
+			return new Date(b.showdate) - new Date(a.showdate);
+		});
+		return json(
+			{ showsBySong: shows || [] },
+			{
+				headers: response.headers,
+			}
+		);
+	} else if (year) {
+    shows?.sort((a, b) => {
+      return new Date(a.showdate) - new Date(b.showdate);
+    });
+		return json(
+			{ showsByYear: shows || [] },
+			{
+				headers: response.headers,
+			}
+		);
+	}
 };
