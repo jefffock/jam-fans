@@ -10,12 +10,13 @@ export default function JamList({
 	user,
 	profile,
 	search,
-  setHeight
+  setHeight,
+  showIframe,
+  setShowIframe,
 }) {
 	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length;
 	const urlStartIndex = search?.indexOf('=', artistStartIndex);
 	const artistUrl = search?.substring(artistStartIndex, urlStartIndex);
-	const [showIframe, setShowIframe] = useState(false);
 	const [iframeUrl, setIframeUrl] = useState('');
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
 
@@ -95,7 +96,7 @@ export default function JamList({
 				)}
 			</div>
 			{showIframe && formattedIframeUrl &&  (
-				<div className={`z-20 fixed bottom-0 right-0 pt-1 pl-1 pb-1 m-0 ${isRelisten ? 'w-full h-1/3' : 'max-w-80  max-h-50 md:mb-0'} drop-shadow-sm rounded-tl-lg rounded-bl-lg mb-14 md:pb-0 md:rounded-bl-none bg-white flex flex-col`}>
+				<div className={`z-20 fixed bottom-0 left-0 pt-1 pl-1 pb-1 m-0 ${isRelisten ? 'w-full h-1/3' : 'max-w-80  max-h-50 md:mb-0'} drop-shadow-sm rounded-tl-lg rounded-bl-lg mb-14 md:pb-0 md:rounded-bl-none bg-white flex flex-col`}>
           <button onClick={closeIframe} className='text-right mr-2'>Close &#215;</button>
 					<iframe
 						src={formattedIframeUrl}

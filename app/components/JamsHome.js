@@ -3,7 +3,7 @@ import JamFiltersSlideout from './JamFilters';
 import ArtistBar from './ArtistBar';
 import FiltersButton from './FiltersButton';
 import JamList from './JamList';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 
 export default function JamsHome({
@@ -23,7 +23,8 @@ export default function JamsHome({
   setClientHeight,
   setHeight
 }) {
-
+  const fetcher = useFetcher();
+  const [showIframe, setShowIframe] = useState(false);
 	if (!artists) return <div>Loading...</div>;
 
 	return (
@@ -43,6 +44,8 @@ export default function JamsHome({
 				setOpen={setOpen}
 				totalCount={count}
 				search={search}
+        showIframe={showIframe}
+        
 			/>
 			<JamList
 				jams={jams}
@@ -53,6 +56,8 @@ export default function JamsHome({
         search={search}
         setClientHeight={setClientHeight}
       setHeight={setHeight}
+      showIframe={showIframe}
+      setShowIframe={setShowIframe}
 			/>
 		</div>
 	);
