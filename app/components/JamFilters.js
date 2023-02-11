@@ -608,7 +608,7 @@ export default function JamFiltersSlideout({
 												<div className='absolute flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
 													{count === 0 && (
 														<Link
-															to='/add'
+															to='/add/jam'
 															className='underline mr-2 bottom-0 self-center'
 														>
 															Add a Jam?
