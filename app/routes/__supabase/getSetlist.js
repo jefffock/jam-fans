@@ -47,6 +47,7 @@ export const loader = async ({ request, params }) => {
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
 		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
+    'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
 		'String Cheese Incident': 'cff95140-6d57-498a-8834-10eb72865b29',
