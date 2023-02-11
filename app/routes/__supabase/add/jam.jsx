@@ -889,8 +889,8 @@ export default function AddJam() {
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
 	return (
-		<Form method='post'>
-			<div className='flex flex-col space-y-4 p-4 pb-20 max-w-xl mx-auto'>
+		<Form method='post' className='h-screen pb-40'>
+			<div className='flex flex-col space-y-4 p-4 pb-40 max-w-xl mx-auto h-full'>
 				<p className='text-center mt-4 text-xl'>
 					Add {profile ? 'and/or Rate ' : ''}a Jam
 				</p>
@@ -1660,7 +1660,7 @@ export default function AddJam() {
 				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
-					<p className='text-sm text-gray-500'>
+					<p className={`text-sm text-gray-500 ${!(artist && songSelected && date) ? 'pb-40' : ''}`}>
 						Shows and setlists from{' '}
 						<a
 							href={

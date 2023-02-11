@@ -74,7 +74,7 @@ export default function Supabase() {
   }, [serverAccessToken, supabase, fetcher]);
 
   return (
-    <div className='w-full max-w-full overflow-x-hidden'>
+    <div className='w-full h-full overflow-x-hidden'>
     {/* <Login supabase={supabase} session={session} />
       <Nav /> */}
 
