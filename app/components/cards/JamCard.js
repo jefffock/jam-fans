@@ -33,6 +33,7 @@ export default function JamCard({
 	}
 
   let songEmojis = jam.song_emoji?.split(',')
+  let artistEmojis = jam.artist_emoji?.split(',')
 
 	const link = `/add/jam?jamid=${jam?.id}`;
 	return (
@@ -65,7 +66,7 @@ export default function JamCard({
 				</div>
 				<div className='flex justify-between'>
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
-						{jam.artist}{' '}{String.fromCodePoint(jam.artist_emoji)}
+						{jam.artist}{' '}{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</h6>
 					<p>{jam.num_ratings} ratings</p>
 				</div>
