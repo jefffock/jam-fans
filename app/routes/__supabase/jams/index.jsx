@@ -54,6 +54,7 @@ export const loader = async ({ request, params }) => {
 	console.log('page', page);
 	//iterate through queryParamsArray and build a supabase query
 	let song;
+  let date;
 	let beforeDate;
 	let afterDate;
 	let orderBy = 'avg_rating';
@@ -93,8 +94,19 @@ export const loader = async ({ request, params }) => {
 		if (key.includes('show-links')) {
 			showListenable = true;
 		}
+    if (key.includes('date')) {
+      date = value;
+    }
 	}
-
+  console
+  //cnovert date from mmddyyyy with no hyphens to yyyy-mm-dd
+  if (date) {
+    let year = date.slice(4, 8);
+    let month = date.slice(0, 2);
+    let day = date.slice(2, 4);
+    date = year + '-' + month + '-' + day;
+  }
+  console.log('date in index loader', date);
 	const list = await supabaseClient
 		.from('jams_lists')
 		.select('*')
@@ -119,11 +131,11 @@ export const loader = async ({ request, params }) => {
 	if (song) {
 		jams = jams.eq('song_name', song);
 	}
-	if (afterDate) {
+	if (afterDate && !date) {
 		let after = afterDate + '-01-01';
 		jams = jams.gte('date', after);
 	}
-	if (beforeDate) {
+	if (beforeDate && !date) {
 		let before = beforeDate + '-12-31';
 		jams = jams.lte('date', before);
 	}
@@ -140,6 +152,10 @@ export const loader = async ({ request, params }) => {
 			jams = jams.contains('sounds', arrayOfLabels);
 		}
 	}
+  if (date) {
+    console.log('date in index', date)
+    jams = jams.eq('date', date);
+  }
 	jams = jams.order(orderBy, { ascending: asc });
 	jams = jams.order('num_ratings', { ascending: false });
 	jams = jams.order('song_name', { ascending: true });
@@ -197,7 +213,7 @@ export const loader = async ({ request, params }) => {
 		title += ' ' + song;
 	}
 	title += ' Jams';
-	if (artistsInQueryNames?.length > 0) {
+	if (artistsInQueryNames?.length > 0 && !date) {
 		title += ' by ';
 		title += ' ';
 		for (var j = 0; j < artistsInQueryNames.length; j++) {
@@ -207,20 +223,23 @@ export const loader = async ({ request, params }) => {
 			if (j === artistsInQueryNames.length - 2) title += ' and ';
 		}
 	}
-	if (artistsInQueryNames?.length === 0) {
+	if (artistsInQueryNames?.length === 0 && !date) {
 		title += ' by All Bands';
 	}
-	if (beforeDate && afterDate) {
+  if (date) {
+    title += ' from ' + (new Date(date + 'T16:00:00')).toLocaleDateString();
+  }
+	if (beforeDate && afterDate && !date) {
 		if (beforeDate === afterDate) {
 			title += ' from ' + beforeDate;
 		} else {
 			title += ' from ' + afterDate + ' to ' + beforeDate;
 		}
 	}
-	if (beforeDate && !afterDate) {
+	if (beforeDate && !afterDate && !date) {
 		title += ' from ' + beforeDate + ' and before ';
 	}
-	if (afterDate && !beforeDate) {
+	if (afterDate && !beforeDate && !date) {
 		title += ' from ' + afterDate + ' and after ';
 	}
 	title.trim();

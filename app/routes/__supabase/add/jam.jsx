@@ -1498,7 +1498,7 @@ export default function AddJam() {
 								<>
 									<Listbox.Label className='block text-md font-medium text-gray-700'>
 										Setlist from{' '}
-										{new Date(date + 'T18:00:00').toLocaleDateString()}
+										{new Date(date + 'T18:00:00').toDateString()}
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
