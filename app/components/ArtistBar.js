@@ -28,6 +28,7 @@ export default function ArtistBar({ artists, search }) {
 }
 
 function ArtistInBar({ artist, url }) {
+  let emojis = artist?.emoji_code?.split(',')
 	return (
 		<>
 			{artist.url === 'allman-brothers' && (
@@ -39,7 +40,7 @@ function ArtistInBar({ artist, url }) {
 			>
 				<Link to={url}>
 					<p className='text-center text-2xl'>
-						{String.fromCodePoint(artist.emoji_code)}
+          {emojis && emojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</p>
 					<p className='text-center text-sm whitespace-nowrap'>
 						{artist.nickname}

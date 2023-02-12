@@ -24,6 +24,7 @@ export const loader = async ({ request, params }) => {
 
 	//iterate through queryParamsArray and build a supabase query
 	let song;
+  let date;
 	let beforeDate;
 	let afterDate;
 	let orderBy = 'avg_rating';
@@ -62,7 +63,9 @@ export const loader = async ({ request, params }) => {
 		}
 		if (key.includes('show-links')) {
 			showListenable = true;
-		}
+		} if (key.includes('date')) {
+      date = value;
+    }
 	}
 
 	let jams = supabaseClient
@@ -98,6 +101,14 @@ export const loader = async ({ request, params }) => {
 	if (showListenable) {
 		jams = jams.not('listen_link', 'is', null);
 	}
+  if (date) {
+    let year = date.slice(4, 8);
+    let month = date.slice(0, 2);
+    let day = date.slice(2, 4);
+    date = year + '-' + month + '-' + day;
+    console.log('date in jamscount', date)
+    jams = jams.eq('date', date)
+  }
 	const { count } = await jams;
 	return json(
 		{ count },
