@@ -1932,7 +1932,7 @@ export default function AddJam() {
         Add jam and comment/rating (not added yet), with rating
         Add rating/comments jam (already added), with rating
         */}
-				<div className='flex justify-around bg-white w-full px-2 pb-20'>
+				<div className={`flex justify-around bg-white w-full px-2 ${actionData && actionData?.status === 200 ? '' : 'pb-20'}`}>
 					{/* not logged in, add new jam*/}
 					{!profile && !jam && artist && songSelected && date && location && (
 						<button
@@ -2038,16 +2038,18 @@ export default function AddJam() {
 							</button>
 						)}
 				</div>
-				{actionData && actionData?.status === 200 && (
-					<SuccessAlert
-						title={'Success!'}
-						description={
-							"Thanks for contributing! You're a great person making a positive impact in the world."
-						}
-					/>
+        {actionData && actionData?.status === 200 && (
+          <div className='pb-20'>
+            <SuccessAlert
+              title={'Success!'}
+              description={
+                "Thanks for contributing! You're a great person making a positive impact in the world."
+              }
+            />
+          </div>
 				)}
 				{actionData && actionData?.status !== 200 && (
-					<>
+					<div className='pb-20'>
 						<ErrorAlert
 							title={'Error :('}
 							description={
@@ -2055,7 +2057,7 @@ export default function AddJam() {
 							}
 						/>
 						<a href='https://twitter.com/jeffphox'>@jeffphox on twitter</a>
-					</>
+					</div>
 				)}
 			</div>
 		</Form>
