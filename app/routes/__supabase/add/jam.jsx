@@ -1684,7 +1684,7 @@ export default function AddJam() {
 				{useApis && artist.artist && (
 					<div
 						className={`text-sm text-gray-500 ${
-							!(artist && songSelected && date) ? 'pb-40' : ''
+							(!(artist && songSelected && date) &&!showLoadingInfo) ? 'pb-40' : ''
 						}`}
 					>
 						Shows and setlists from{' '}
@@ -1749,6 +1749,7 @@ export default function AddJam() {
 				)}
 				{useApis &&
 					showLoadingInfo &&
+          !(artist && songSelected && date && location) &&
 					artist.artist !== 'Phish' &&
 					artist.artist !== 'Trey Anastasio, TAB' &&
 					artist.artist !== 'Eggy' &&
@@ -1759,7 +1760,7 @@ export default function AddJam() {
 						<InfoAlert
 							title={'Thanks for your patience!'}
 							description={
-								"I've asked setlist.fm for an increase in how fast I can get data. Until that's approved, thanks for your patience! We're also limited in how many times we can get data per day so if it's not working, please try the 'Still pretty easy way.' Thanks!"
+								"Setlist.fm limits how fast we can get data and how much data we can get, so if it's not working, please try the 'Still pretty easy way.' Thanks for contributing!"
 							}
 						/>
 					)}
