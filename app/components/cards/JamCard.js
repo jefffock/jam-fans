@@ -69,7 +69,7 @@ export default function JamCard({
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.artist}{' '}{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</h6>
-					<p className={`${showRatings ? 'flex float-right' : 'hidden'}`}>{jam.num_ratings} ratings</p>
+					<p className={`${(!showRatings || jam.num_ratings === 0) ? 'hidden' : 'flex float-right'}`}>{jam.num_ratings} ratings</p>
 				</div>
 				<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
 				{jam?.sounds && (
