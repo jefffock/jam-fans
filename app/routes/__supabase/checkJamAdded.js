@@ -81,10 +81,9 @@ export const loader = async ({ request, params }) => {
 		.eq('date', date)
 		.single();
 	//get setlist when checking if jam exists
+  let jfVersionsOnDate;
+  let jfVersionsOfSong;
   if (shouldGetSetlist) {
-
-    let jfVersionsOnDate;
-    let jfVersionsOfSong;
     const { data, error } = await supabaseClient
       .from('versions')
       .select('*')
