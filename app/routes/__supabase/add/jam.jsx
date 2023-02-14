@@ -884,20 +884,24 @@ export default function AddJam() {
 	) {
 		setShowSuccessAlert(true);
 	}
-	console.log('fetcher?.data', fetcher?.data);
-	console.log('actionData', actionData);
 
 	//check if song exists
 	useEffect(() => {
 		setJam('');
 		if (songSelected && artist && date) {
+      const getShowsByYear = (!showsByYear || showsByYear[0].showdate.slice(0, 4) !== date.slice(0, 4)) ? 'true' : 'false';
+      const getSetlist = !setlist ? 'true' : 'false';
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
 				'&song=' +
 				songSelected +
 				'&date=' +
-				date;
+				date +
+        '&fetchShowsByYear=' +
+        getShowsByYear +
+        '&fetchSetlist=' +
+        getSetlist;
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date]);
@@ -1678,7 +1682,7 @@ export default function AddJam() {
 				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
-					<p
+					<div
 						className={`text-sm text-gray-500 ${
 							!(artist && songSelected && date) ? 'pb-40' : ''
 						}`}
@@ -1741,7 +1745,7 @@ export default function AddJam() {
 						) : (
 							''
 						)}
-					</p>
+					</div>
 				)}
 				{useApis &&
 					showLoadingInfo &&
