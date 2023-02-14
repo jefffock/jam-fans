@@ -92,7 +92,6 @@ export const loader = async ({ request, params }) => {
 			location = `${song.venue}, ${song.city}, ${
 				song?.country === 'USA' ? song.state : song.country
 			}`;
-			console.log('setlist.data', setlist.data);
 			const titles = setlist.data
 				.filter((song) => song.artistid === artistId)
 				.map(({ song }) => {
@@ -136,7 +135,6 @@ export const loader = async ({ request, params }) => {
 		console.log('songfish url', url);
 		const setlistData = await fetch(url);
 		setlist = await setlistData.json();
-		console.log('setlist X', setlist);
 		if (setlist && setlist.data && setlist.data.length > 0) {
 			console.log('starting to format the setlist');
 			const song = setlist.data[0];
@@ -192,8 +190,6 @@ export const loader = async ({ request, params }) => {
 			setlist = titles;
 		}
 	}
-	console.log('setlist in getSetlist', setlist);
-  console.log('location in getSetlist', location);
 	return json(
 		{ setlist: setlist || [], location },
 		{

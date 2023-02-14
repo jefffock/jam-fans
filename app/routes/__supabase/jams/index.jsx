@@ -347,8 +347,6 @@ export default function Jams({ supabase, session }) {
 		}
 	}, [fetcher.data]);
 
-	console.log('search', search);
-
 	return (
 		<>
 			{!search && <Hero />}
