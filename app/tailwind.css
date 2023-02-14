@@ -1008,6 +1008,10 @@ select {
   max-height: 10rem;
 }
 
+.max-h-64 {
+  max-height: 16rem;
+}
+
 .min-h-0 {
   min-height: 0px;
 }

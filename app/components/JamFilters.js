@@ -237,7 +237,7 @@ export default function JamFiltersSlideout({
 																		<legend className='text-2xl text-gray-900'>
 																			Sounds
 																		</legend>
-																		<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll sm:col-span-6'>
+																		<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll sm:col-span-6'>
 																			{sounds &&
 																				sounds?.map((sound, soundIdx) => (
 																					<div
@@ -279,7 +279,7 @@ export default function JamFiltersSlideout({
 																	<legend className='text-2xl text-gray-900 pt-4'>
 																		Bands
 																	</legend>
-																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll'>
+																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll'>
 																		{artists &&
 																			artists?.map((artist, artistIdx) => (
 																				<div
