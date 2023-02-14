@@ -175,7 +175,6 @@ export const loader = async ({ request, params }) => {
 						value: songname,
 					};
 				});
-			console.log('titles', titles);
 			setlist = titles || [];
 		}
 	} else {

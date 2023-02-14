@@ -107,7 +107,6 @@ export const loader = async ({ request, params }) => {
 				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
 				shows = await fetch(url);
 				shows = await shows.json();
-        console.log('shows in getshows', shows)
 				shows = shows?.data
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
@@ -129,7 +128,6 @@ export const loader = async ({ request, params }) => {
 							existingJam: alreadyAdded ?? null,
 						};
 					});
-          console.log('shows in getshows after filter', shows)
 				shows = shows.reverse();
 			}
 		} else {

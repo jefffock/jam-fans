@@ -234,7 +234,7 @@ export default function JamFiltersSlideout({
 															<div className='sm:col-span-6 mx-4'>
 																<div className='mt-1 flex rounded-md shadow-sm'>
 																	<fieldset>
-																		<legend className='text-lg font-medium text-gray-900'>
+																		<legend className='text-2xl text-gray-900'>
 																			Sounds
 																		</legend>
 																		<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll sm:col-span-6'>
@@ -276,7 +276,7 @@ export default function JamFiltersSlideout({
 														<div className='sm:col-span-4 mx-4 mt-6'>
 															<div className='mt-1 flex rounded-md shadow-sm'>
 																<fieldset>
-																	<legend className='text-lg font-medium text-gray-900 pt-4'>
+																	<legend className='text-2xl text-gray-900 pt-4'>
 																		Bands
 																	</legend>
 																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll'>
@@ -324,7 +324,7 @@ export default function JamFiltersSlideout({
 																}}
 																name='song'
 															>
-																<Combobox.Label className='block text-lg font-medium text-gray-900'>
+																<Combobox.Label className='block text-2xl  text-gray-900'>
 																	Song
 																</Combobox.Label>
 																<div className='relative mt-1 px-30'>
@@ -396,7 +396,7 @@ export default function JamFiltersSlideout({
 															</Combobox>
 														</div>
 														{/* Year Pickers */}
-														{/* <h3 className='block text-lg font-medium text-gray-900 px-4 pt-4'>
+														{/* <h3 className='block text-2xl font-medium text-gray-900 px-4 pt-4'>
 															When
 														</h3> */}
 														{/* On Date picker */}
@@ -404,7 +404,7 @@ export default function JamFiltersSlideout({
 															<label
 																htmlFor='date'
 																// className='block text-md font-medium text-gray-700'
-																className='block text-lg font-medium text-gray-900'
+																className='block text-2xl text-gray-900'
 															>
 																Date
 															</label>
@@ -417,7 +417,7 @@ export default function JamFiltersSlideout({
 																className='border border-gray-300 rounded-md p-2'
 															/>
 															<p className='text-sm'>mmddyyyy</p>
-															<p className='text-lg'>
+															<p className='text-2xl'>
 																{date
 																	? new Date(
 																			date + 'T16:00:00'
@@ -438,7 +438,7 @@ export default function JamFiltersSlideout({
 															>
 																{({ open }) => (
 																	<div>
-																		<Listbox.Label className='block text-lg font-medium text-gray-900'>
+																		<Listbox.Label className='block text-2xl text-gray-900'>
 																			Before
 																		</Listbox.Label>
 																		<div className='relative mt-1'>
@@ -531,7 +531,7 @@ export default function JamFiltersSlideout({
 															>
 																{({ open }) => (
 																	<div>
-																		<Listbox.Label className='block text-lg font-medium text-gray-900'>
+																		<Listbox.Label className='block text-2xl text-gray-900'>
 																			After
 																		</Listbox.Label>
 																		<div className='relative mt-1'>

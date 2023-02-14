@@ -5,6 +5,7 @@ import {
 	useOutletContext,
 	useActionData,
 	useNavigate,
+  useSubmit
 } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
@@ -164,6 +165,7 @@ export async function action({ request, params }) {
 	const response = new Response();
 	let formData = await request.formData();
 	let { _action, ...values } = Object.fromEntries(formData);
+  console.log('_action', _action)
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
 		process.env.SUPABASE_ANON_KEY,
@@ -268,6 +270,12 @@ export async function action({ request, params }) {
 	console.log('songObj', songObj);
 	console.log('song_id', songObj?.id);
 	console.log('profile', profile);
+	if (_action === 'clear') {
+		return {
+			status: 200,
+			body: 'clear',
+		};
+	}
 	if (_action === 'new-song') {
 		const { data, error } = await supabaseClient
 			.from('songs')
@@ -462,7 +470,7 @@ export async function action({ request, params }) {
 			calcAverageForVersion(jam?.id);
 		}
 	}
-	return { status: 200, body: 'ok' };
+	return { status: 200, body: 'action complete' };
 }
 
 export default function AddJam() {
@@ -528,6 +536,7 @@ export default function AddJam() {
 	const [useApis, setUseApis] = useState(true);
 	const [showPickerLabel, setShowPickerLabel] = useState('Shows');
 	const navigate = useNavigate();
+  const submit = useSubmit();
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -573,8 +582,8 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
-    console.log('changing artist')
-    fetcher.load('/clearFetcher')
+		console.log('changing artist');
+		submit({ _action: 'clear' });
 		setSongSelected('');
 		setJam(null);
 		setShowsByYear(null);
@@ -679,7 +688,7 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
-		fetcher.load('/clearFetcher')
+		submit({ _action: 'clear' });
 		setArtist('');
 		setSong('');
 		setQuery('');
@@ -691,22 +700,22 @@ export default function AddJam() {
 		setShowsByYear(null);
 		setJam('');
 		setShow('');
-    setShowLoadingInfo(false);
+		setShowLoadingInfo(false);
 		setShowLocationInput(false);
 		setSoundsSelected('');
 		setShowSuccessAlert(false);
 	}
 
 	function clearSong() {
-    fetcher.load('/clearFetcher')
-    setSong('');
+		submit({ _action: 'clear' });
+		setSong('');
 		setSongSelected('');
 		setJam('');
 	}
 
 	function clearDate() {
-    fetcher.load('/clearFetcher')
-    setDate('');
+		submit({ _action: 'clear' });
+		setDate('');
 		setShow('');
 		setLocation('');
 		setJam('');
@@ -867,9 +876,16 @@ export default function AddJam() {
 	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
 		setYear(fetcher?.data?.year);
 	}
-	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
+	if (
+		actionData &&
+		actionData?.status === 200 &&
+		actionData?.body === 'action complete' &&
+		!showSuccessAlert
+	) {
 		setShowSuccessAlert(true);
 	}
+	console.log('fetcher?.data', fetcher?.data);
+	console.log('actionData', actionData);
 
 	//check if song exists
 	useEffect(() => {
@@ -889,7 +905,10 @@ export default function AddJam() {
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
 
 	return (
-		<Form method='post' className='h-screen pb-40'>
+		<Form
+			method='post'
+			className='h-screen pb-40'
+		>
 			<div className='flex flex-col space-y-4 p-4 pb-40 max-w-xl mx-auto h-full'>
 				<p className='text-center mt-4 text-xl'>
 					Add {profile ? 'and/or Rate ' : ''}a Jam
@@ -1497,8 +1516,7 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-md font-medium text-gray-700'>
-										Setlist from{' '}
-										{new Date(date + 'T18:00:00').toDateString()}
+										Setlist from {new Date(date + 'T18:00:00').toDateString()}
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1660,7 +1678,11 @@ export default function AddJam() {
 				)}
 				{/* api attribution */}
 				{useApis && artist.artist && (
-					<p className={`text-sm text-gray-500 ${!(artist && songSelected && date) ? 'pb-40' : ''}`}>
+					<p
+						className={`text-sm text-gray-500 ${
+							!(artist && songSelected && date) ? 'pb-40' : ''
+						}`}
+					>
 						Shows and setlists from{' '}
 						<a
 							href={
@@ -1723,7 +1745,13 @@ export default function AddJam() {
 				)}
 				{useApis &&
 					showLoadingInfo &&
-					artist.artist !== 'Phish' && artist.artist !== 'Trey Anastasio, TAB' && artist.artist !== 'Eggy' && artist.artist !== 'Goose' && artist.artist !== 'Neighbor' && artist.artist !== "Umphrey's Mcgee" && artist.artist !== "Taper's Choice" && (
+					artist.artist !== 'Phish' &&
+					artist.artist !== 'Trey Anastasio, TAB' &&
+					artist.artist !== 'Eggy' &&
+					artist.artist !== 'Goose' &&
+					artist.artist !== 'Neighbor' &&
+					artist.artist !== "Umphrey's Mcgee" &&
+					artist.artist !== "Taper's Choice" && (
 						<InfoAlert
 							title={'Thanks for your patience!'}
 							description={
@@ -1787,7 +1815,12 @@ export default function AddJam() {
 						</div>
 					</>
 				)}
-				{artist && songSelected && date && location && soundsSelected && soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
+				{artist &&
+					songSelected &&
+					date &&
+					location &&
+					soundsSelected &&
+					soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&
@@ -1932,7 +1965,11 @@ export default function AddJam() {
         Add jam and comment/rating (not added yet), with rating
         Add rating/comments jam (already added), with rating
         */}
-				<div className={`flex justify-around bg-white w-full px-2 ${actionData && actionData?.status === 200 ? '' : 'pb-20'}`}>
+				<div
+					className={`flex justify-around bg-white w-full px-2 ${
+						actionData && actionData?.body === 'action complete' ? '' : 'pb-20'
+					}`}
+				>
 					{/* not logged in, add new jam*/}
 					{!profile && !jam && artist && songSelected && date && location && (
 						<button
@@ -2038,15 +2075,15 @@ export default function AddJam() {
 							</button>
 						)}
 				</div>
-        {actionData && actionData?.status === 200 && (
-          <div className='pb-20'>
-            <SuccessAlert
-              title={'Success!'}
-              description={
-                "Thanks for contributing! You're a great person making a positive impact in the world."
-              }
-            />
-          </div>
+				{actionData && actionData?.body === 'action complete' && (
+					<div className='pb-20'>
+						<SuccessAlert
+							title={'Success!'}
+							description={
+								"Thanks for contributing! You're a great person making a positive impact in the world."
+							}
+						/>
+					</div>
 				)}
 				{actionData && actionData?.status !== 200 && (
 					<div className='pb-20'>
