@@ -8,6 +8,7 @@ export default function JamCard({
 	profile,
 	setShowIframe,
 	setIframeUrl,
+  showRatings
 }) {
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
 	const [showComments, setShowComments] = useState(false);
@@ -46,9 +47,9 @@ export default function JamCard({
 					<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.date}
 					</h5>
-					<div className='flex float-right'>
+					<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>
 						<p className='mb-3 font-normal text-gray-700 ml-auto'>
-							{ratingToShow}{' '}
+							{showRatings ? ratingToShow : ''}{' '}
 						</p>
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
@@ -68,7 +69,7 @@ export default function JamCard({
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.artist}{' '}{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</h6>
-					<p>{jam.num_ratings} ratings</p>
+					<p className={`${showRatings ? 'flex float-right' : 'hidden'}`}>{jam.num_ratings} ratings</p>
 				</div>
 				<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
 				{jam?.sounds && (
