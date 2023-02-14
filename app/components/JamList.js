@@ -3,6 +3,7 @@ import { Link } from '@remix-run/react';
 import InfoAlert from './alerts/InfoAlert';
 import { useState, useEffect, useCallback } from 'react';
 import { Switch } from '@headlessui/react';
+import Sorter from './Sorter';
 
 export default function JamList({
 	jams,
@@ -103,6 +104,7 @@ export default function JamList({
 							/>
 						</Switch>
             <p className='ml-2'>Show Ratings</p>
+            {/* <Sorter /> */}
 					</div>
 				</>
 			)}
