@@ -83,14 +83,14 @@ export default function JamList({
 						<InfoAlert
 							title={`No ${title} (yet)`}
 							description={
-								"If you could go ahead and add one, yeah, that'd be great (no account needed!)"
+								"Please add one if you know one (no account needed!)"
 							}
 						/>
 						<Link
 							to={artistUrl ? `/add/jam?artistUrl=${artistUrl}` : '/add/jam'}
 							className='text-center text-xl underline'
 						>
-							Add a jam
+							Add a Jam
 						</Link>
 					</div>
 				)}
