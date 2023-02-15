@@ -21,7 +21,8 @@ export default function JamsHome({
   user,
   profile,
   setClientHeight,
-  setHeight
+  setHeight,
+  setUrlToLoad
 }) {
   const fetcher = useFetcher();
   const [showIframe, setShowIframe] = useState(false);
@@ -58,6 +59,7 @@ export default function JamsHome({
       setHeight={setHeight}
       showIframe={showIframe}
       setShowIframe={setShowIframe}
+      setUrlToLoad={setUrlToLoad}
 			/>
 		</div>
 	);

@@ -12,6 +12,7 @@ import { setTokenSourceMapRange } from 'typescript';
 import Hero from '../../../components/Hero';
 
 export const loader = async ({ request, params }) => {
+  console.log('in /jams loader')
 	const response = new Response();
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
@@ -98,6 +99,9 @@ export const loader = async ({ request, params }) => {
 		if (key.includes('date')) {
 			date = value;
 		}
+		if (key.includes('order')) {
+			orderBy = value;
+		}
 	}
 	console;
 	//cnovert date from mmddyyyy with no hyphens to yyyy-mm-dd
@@ -157,8 +161,14 @@ export const loader = async ({ request, params }) => {
 		console.log('date in index', date);
 		jams = jams.eq('date', date);
 	}
-	jams = jams.order(orderBy, { ascending: asc });
-	jams = jams.order('num_ratings', { ascending: false });
+	console.log('orderBy in jams loader', orderBy);
+	jams = jams.order(orderBy, { ascending: false });
+	if (orderBy === 'avg_rating') {
+		jams = jams.order('num_ratings', { ascending: false });
+	}
+	if (orderBy === 'num_ratings') {
+		jams = jams.order('avg_rating', { ascending: false });
+	}
 	jams = jams.order('song_name', { ascending: true });
 	jams = jams.order('id', { ascending: false });
 	const startRange = page ? (page - 1) * 15 : 0;
@@ -294,6 +304,8 @@ export default function Jams({ supabase, session }) {
 	const [page, setPage] = useState(2);
 	const fetcher = useFetcher();
 	const [jams, setJams] = useState(initialJams);
+	const [urlToLoad, setUrlToLoad] = useState(null);
+
 	if (!artists) return <div>Loading...</div>;
 
 	useEffect(() => {
@@ -312,6 +324,14 @@ export default function Jams({ supabase, session }) {
 			}
 		};
 	}, []);
+
+	useEffect(() => {
+    if (typeof document !== 'undefined' && urlToLoad) {
+		console.log('loading', urlToLoad);
+		fetcher.load(urlToLoad);
+		setUrlToLoad(null);
+    }
+	}, [urlToLoad]);
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
@@ -366,6 +386,7 @@ export default function Jams({ supabase, session }) {
 				user={user}
 				profile={profile}
 				setHeight={setHeight}
+				setUrlToLoad={setUrlToLoad}
 			/>
 		</>
 	);

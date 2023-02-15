@@ -1,5 +1,5 @@
 import JamCard from './cards/JamCard';
-import { Link } from '@remix-run/react';
+import { Link, useFetcher } from '@remix-run/react';
 import InfoAlert from './alerts/InfoAlert';
 import { useState, useEffect, useCallback } from 'react';
 import { Switch } from '@headlessui/react';
@@ -15,6 +15,7 @@ export default function JamList({
 	setHeight,
 	showIframe,
 	setShowIframe,
+  setUrlToLoad
 }) {
 	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length;
 	const urlStartIndex = search?.indexOf('=', artistStartIndex);
@@ -22,6 +23,8 @@ export default function JamList({
 	const [iframeUrl, setIframeUrl] = useState('');
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('');
 	const [showRatings, setShowRatings] = useState(true);
+	const [orderBy, setOrderBy] = useState('avg_rating');
+	const fetcher = useFetcher();
 
 	const divHeight = useCallback(
 		(node) => {
@@ -59,21 +62,21 @@ export default function JamList({
 		setShowIframe(false);
 	}
 
-  function handleShowRatingsClick() {
-    //use localstorage to save the state of the switch
-    localStorage.setItem('jf-show-ratings', !showRatings);
-    setShowRatings(!showRatings);
-  }
+	function handleShowRatingsClick() {
+		//use localstorage to save the state of the switch
+		localStorage.setItem('jf-show-ratings', !showRatings);
+		setShowRatings(!showRatings);
+	}
 
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ');
-  }
+	function classNames(...classes) {
+		return classes.filter(Boolean).join(' ');
+	}
 
-  useEffect(() => {
-    if (localStorage.getItem('jf-show-ratings') === 'false') {
-      setShowRatings(false);
-    }
-  }, []);
+	useEffect(() => {
+		if (localStorage.getItem('jf-show-ratings') === 'false') {
+			setShowRatings(false);
+		}
+	}, []);
 
 	return (
 		<div
@@ -85,13 +88,13 @@ export default function JamList({
 					<h1 className='my-3 mx-auto px-2 text-3xl tracking-tight text-gray-900 text-center'>
 						{title}
 					</h1>
-					<div className='flex justify-center'>
+					<div className='flex justify-center align-middle'>
 						<Switch
 							checked={showRatings}
 							onChange={handleShowRatingsClick}
 							className={classNames(
 								showRatings ? 'bg-cyan-600' : 'bg-gray-200',
-								'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
+								'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 self-center'
 							)}
 						>
 							<span className='sr-only'>Show Ratings</span>
@@ -103,8 +106,12 @@ export default function JamList({
 								)}
 							/>
 						</Switch>
-            <p className='ml-2'>Show Ratings</p>
-            {/* <Sorter /> */}
+						<p className=' text-md ml-2 self-center mr-10'>Show Ratings</p>
+						<Sorter
+							orderBy={orderBy}
+							setOrderBy={setOrderBy}
+              search={search}
+						/>
 					</div>
 				</>
 			)}
@@ -120,7 +127,7 @@ export default function JamList({
 								profile={profile}
 								setShowIframe={setShowIframe}
 								setIframeUrl={setIframeUrl}
-                showRatings={showRatings}
+								showRatings={showRatings}
 							/>
 						);
 					})}
