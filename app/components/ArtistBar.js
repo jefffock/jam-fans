@@ -10,7 +10,7 @@ export default function ArtistBar({ artists, search }) {
 					if (search) {
 						url = search?.replace(/artists-.+?(?=&|$)/g, '');
 						// url = url.replace(/song-.+?(?=&|$)/g, '');
-            url = url.replace(/song=[^&]+|&song=[^&]+/g, '')
+						url = url.replace(/song=[^&]+|&song=[^&]+/g, '');
 					}
 					if (!search) url = `/jams/?`;
 					url += `&artists-${artist.url}=${artist.url}`;
@@ -28,11 +28,11 @@ export default function ArtistBar({ artists, search }) {
 }
 
 function ArtistInBar({ artist, url }) {
-  let emojis = artist?.emoji_code?.split(',')
+	let emojis = artist?.emoji_code?.split(',');
 	return (
 		<>
 			{artist.url === 'allman-brothers' && (
-				<div className='border-l-2 border-gray-200 h-14 self-center rounded-full'></div>
+				<div className='border-l-2 border-gray-400 h-14 self-center rounded-full'></div>
 			)}
 
 			<div
@@ -40,7 +40,8 @@ function ArtistInBar({ artist, url }) {
 			>
 				<Link to={url}>
 					<p className='text-center text-2xl'>
-          {emojis && emojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
+						{emojis &&
+							emojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</p>
 					<p className='text-center text-sm whitespace-nowrap'>
 						{artist.nickname}

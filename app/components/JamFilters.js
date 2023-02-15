@@ -165,6 +165,17 @@ export default function JamFiltersSlideout({
 		}
 	}, [date]);
 
+  function getOrder(search) {
+    let order = 'avg_rating';
+    let searchParams = new URLSearchParams(search);
+    if (searchParams.has('order')) {
+      order = searchParams.get('order');
+    }
+    return order;
+  }
+
+  const order = getOrder(search);
+
 	return (
 		<Transition.Root
 			show={open}
@@ -222,11 +233,11 @@ export default function JamFiltersSlideout({
 												className='space-y-8 divide-y divide-gray-200'
 												id='jam-filter-form'
 											>
-												{/* <input
+												<input
 													type='hidden'
-													name='date'
-													value={date}
-												/> */}
+													name='order'
+													value={order}
+												/>
 												<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 													<div className='space-y-8 divide-y divide-gray-200'>
 														{/* sound picker*/}
