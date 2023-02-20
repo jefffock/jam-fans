@@ -8,6 +8,7 @@ export default function JamCard({
 	profile,
 	setShowIframe,
 	setIframeUrl,
+  showRatings
 }) {
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '');
 	const [showComments, setShowComments] = useState(false);
@@ -46,10 +47,8 @@ export default function JamCard({
 					<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.date}
 					</h5>
-					<div className='flex float-right'>
-						<p className='mb-3 font-normal text-gray-700 ml-auto'>
-							{ratingToShow}{' '}
-						</p>
+					<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>
+						
 						<svg
 							xmlns='http://www.w3.org/2000/svg'
 							viewBox='0 0 20 20'
@@ -62,13 +61,16 @@ export default function JamCard({
 								clipRule='evenodd'
 							/>
 						</svg>
+            <p className='mb-3 font-normal text-gray-700 ml-auto'>
+							{showRatings ? ratingToShow : ''}
+						</p>
 					</div>
 				</div>
 				<div className='flex justify-between'>
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.artist}{' '}{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</h6>
-					<p>{jam.num_ratings} ratings</p>
+					<p className={`${(!showRatings || jam.num_ratings === 0) ? 'hidden' : 'flex float-right'}`}>{jam.num_ratings} ratings</p>
 				</div>
 				<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
 				{jam?.sounds && (
@@ -83,7 +85,7 @@ export default function JamCard({
 				)}
 				{comments && comments.length > 0 && (
 					<button
-						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-2'
+						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-2'
 						onClick={() => handleCommentClick()}
 					>
 						{showComments ? 'Hide Comments' : 'Show Comments'}
@@ -105,7 +107,7 @@ export default function JamCard({
 				{showComments && comments.length > 2 && (
 					//hide comments
 					<button
-						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 my-2'
+						className='inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-2'
 						onClick={() => handleCommentClick()}
 					>
 						Hide Comments

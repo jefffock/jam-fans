@@ -21,7 +21,8 @@ export default function JamsHome({
   user,
   profile,
   setClientHeight,
-  setHeight
+  setHeight,
+  setUrlToLoad
 }) {
   const fetcher = useFetcher();
   const [showIframe, setShowIframe] = useState(false);
@@ -29,13 +30,13 @@ export default function JamsHome({
 
 	return (
 		<div className='bg-gray-100'>
+			<ArtistBar artists={artists} search={search}/>
 			<div className='flex justify-center pt-3 pb-0 mb-0'>
 				<FiltersButton
 					open={open}
 					setOpen={setOpen}
 				/>
 			</div>
-			<ArtistBar artists={artists} search={search}/>
 			<JamFiltersSlideout
 				sounds={sounds}
 				artists={artists}
@@ -58,6 +59,7 @@ export default function JamsHome({
       setHeight={setHeight}
       showIframe={showIframe}
       setShowIframe={setShowIframe}
+      setUrlToLoad={setUrlToLoad}
 			/>
 		</div>
 	);
