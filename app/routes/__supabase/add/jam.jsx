@@ -1803,7 +1803,7 @@ export default function AddJam() {
 					date &&
 					location &&
 					fetcher?.data?.jam &&
-					jam !== 'not on jf' && (
+					fetcher?.data?.jam !== 'not on jf' && (
 						<SuccessAlert
 							title={"It's on Jam Fans!"}
 							description={`You can add sounds ${
