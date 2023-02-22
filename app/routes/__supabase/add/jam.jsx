@@ -603,7 +603,7 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-    if (!actionData.body.includes('action complete')) {
+    if (!actionData?.body?.includes('action complete') && artist) {
       setShowsBySong(null);
       setJam(null);
       setQuery('');
