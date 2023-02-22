@@ -890,6 +890,9 @@ export default function AddJam() {
 		fetcher?.data?.jam?.sounds &&
 		(!soundsSelected || soundsSelected.length === 0 || JSON.stringify(fetcher?.data?.jam?.sounds) !== JSON.stringify(soundsSelected))
 	) {
+    console.log('going to set sounds')
+    console.log('fetcher?.data?.jam?.sounds', fetcher?.data?.jam?.sounds)
+    console.log('soundsSelected', soundsSelected)
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
