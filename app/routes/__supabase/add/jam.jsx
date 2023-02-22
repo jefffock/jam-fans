@@ -888,9 +888,8 @@ export default function AddJam() {
 	// }
 	if (
 		fetcher?.data?.jam?.sounds &&
-		(!soundsSelected || soundsSelected.length === 0)
+		(!soundsSelected || soundsSelected.length === 0 || JSON.stringify(fetcher?.data?.jam?.sounds) !== JSON.stringify(soundsSelected))
 	) {
-    console.log('setting sounds selected')
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
