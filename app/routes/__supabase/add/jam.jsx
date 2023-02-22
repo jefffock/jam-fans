@@ -888,6 +888,7 @@ export default function AddJam() {
 	// }
 	if (
 		fetcher?.data?.jam?.sounds &&
+    fetcher?.data?.jam?.sounds.length > 0 &&
 		(!soundsSelected || soundsSelected.length === 0 || JSON.stringify(fetcher?.data?.jam?.sounds) !== JSON.stringify(soundsSelected))
 	) {
     console.log('going to set sounds')
