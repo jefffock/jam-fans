@@ -872,18 +872,20 @@ export default function AddJam() {
 		setLocation(fetcher?.data?.location);
 	}
 	//setjam (if added to jamfans already)
-	if (fetcher?.data?.jam === 'not on jf' && jam) {
-		console.log('jam is null');
-		setJam(null);
-	}
-	if (
-		fetcher?.data?.jam &&
-		fetcher?.data?.jam !== 'not on jf' &&
-		(!jam || fetcher?.data?.jam?.id !== jam?.id)
-	) {
-		console.log('jam is not null');
-		setJam(fetcher?.data?.jam);
-	}
+	// console.log('fetcher?.data?.jam', fetcher?.data?.jam)
+	// console.log('jam', jam)
+	// if (fetcher?.data?.jam === 'not on jf' && jam) {
+	// 	console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
+	// 	setJam(null);
+	// }
+	// if (
+	// 	fetcher?.data?.jam &&
+	// 	fetcher?.data?.jam !== 'not on jf' &&
+	// 	(!jam || fetcher?.data?.jam?.id !== jam?.id)
+	// ) {
+	// 	console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
+	// 	setJam(fetcher?.data?.jam);
+	// }
 	if (
 		fetcher?.data?.jam?.sounds &&
 		(!soundsSelected || soundsSelected.length === 0)
@@ -1004,7 +1006,7 @@ export default function AddJam() {
 				<input
 					type='hidden'
 					name='jam'
-					value={JSON.stringify(jam)}
+					value={JSON.stringify(fetcher?.data?.jam)}
 				/>
 				<input
 					type='hidden'
@@ -1796,14 +1798,19 @@ export default function AddJam() {
 							}
 						/>
 					)}
-				{artist && songSelected && date && location && jam && jam !== '' && (
-					<SuccessAlert
-						title={"It's on Jam Fans!"}
-						description={`You can add sounds ${
-							profile ? 'and your rating and comment' : ''
-						} below. Thanks for helping other fans!`}
-					/>
-				)}
+				{artist &&
+					songSelected &&
+					date &&
+					location &&
+					fetcher?.data?.jam &&
+					jam !== 'not on jf' && (
+						<SuccessAlert
+							title={"It's on Jam Fans!"}
+							description={`You can add sounds ${
+								profile ? 'and your rating and comment' : ''
+							} below. Thanks for helping other fans!`}
+						/>
+					)}
 				{artist && songSelected && date && location && (
 					<>
 						<p className='text-sm'>Optional fields:</p>
@@ -1817,7 +1824,9 @@ export default function AddJam() {
 									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll max-w-fit'>
 										{sounds &&
 											sounds?.map((sound, soundIdx) => {
-												if (!jam?.sounds?.includes(sound.label)) {
+												if (
+													!fetcher?.data?.jam?.sounds?.includes(sound.label)
+												) {
 													return (
 														<div
 															key={soundIdx}
@@ -1836,7 +1845,9 @@ export default function AddJam() {
 																	value={`${sound.label}`}
 																	id={`${sound.text}`}
 																	name={`sounds-${sound.text}`}
-																	disabled={jam?.sounds?.includes(sound.label)}
+																	disabled={fetcher?.data?.jam?.sounds?.includes(
+																		sound.label
+																	)}
 																	type='checkbox'
 																	className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
 																	onChange={handleSoundsChange}
@@ -1864,7 +1875,8 @@ export default function AddJam() {
 					date &&
 					location &&
 					profile &&
-					(!jam || (jam && !jam?.listen_link)) && (
+					(!fetcher?.data?.jam ||
+						(fetcher?.data?.jam && !fetcher?.data?.jam?.listen_link)) && (
 						<div className='mt-6'>
 							<label
 								htmlFor='listen-link'
@@ -2008,36 +2020,44 @@ export default function AddJam() {
 					}`}
 				>
 					{/* not logged in, add new jam*/}
-					{!profile && !jam && artist && songSelected && date && location && (
-						<button
-							type='submit'
-							name='_action'
-							value='add-not-logged-in'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
-							disabled={showAddSong}
-						>
-							Add this jam
-						</button>
-					)}
+					{!profile &&
+						fetcher?.data?.jam === 'not on jf' &&
+						artist &&
+						songSelected &&
+						date &&
+						location && (
+							<button
+								type='submit'
+								name='_action'
+								value='add-not-logged-in'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
+								disabled={showAddSong}
+							>
+								Add this jam
+							</button>
+						)}
 					{/* not logged in, jam exists, update sounds*/}
-					{!profile && jam && jam?.sounds?.length !== soundsSelected?.length && (
-						<button
-							type='submit'
-							name='_action'
-							value='update-not-logged-in'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
-							disabled={showAddSong}
-						>
-							Add sounds to this jam
-						</button>
-					)}
+					{!profile &&
+						fetcher?.data?.jam &&
+						fetcher?.data?.jam !== 'not on jf' &&
+						fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length && (
+							<button
+								type='submit'
+								name='_action'
+								value='update-not-logged-in'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
+								disabled={showAddSong}
+							>
+								Add sounds to this jam
+							</button>
+						)}
 					{/*logged in, add new jam, no rating*/}
 					{profile &&
 						artist &&
 						songSelected &&
 						date &&
 						location &&
-						!jam &&
+						(!fetcher?.data?.jam || fetcher?.data?.jam === 'not on jf') &&
 						!rating &&
 						!comment && (
 							<button
@@ -2052,9 +2072,10 @@ export default function AddJam() {
 						)}
 					{/*logged in, existing jam, no rating*/}
 					{profile &&
-						jam &&
-						(jam?.sounds?.length !== soundsSelected?.length ||
-							(!jam?.listen_link && listenLink)) &&
+						fetcher?.data?.jam &&
+						fetcher?.data?.jam !== 'not on jf' &&
+						(fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length ||
+							(!fetcher?.data?.jam?.listen_link && listenLink)) &&
 						!rating &&
 						!comment && (
 							<button
@@ -2068,23 +2089,26 @@ export default function AddJam() {
 							</button>
 						)}
 					{/*logged in, add new jam, with rating/comment*/}
-					{profile && !jam && (rating || comment) && (
-						<button
-							type='submit'
-							name='_action'
-							value='add-and-rating'
-							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
-							disabled={showAddSong}
-						>
-							Add jam and rating/comment
-						</button>
-					)}
+					{profile &&
+						(!fetcher?.data?.jam || fetcher?.data?.jam === 'not on jf') &&
+						(rating || comment) && (
+							<button
+								type='submit'
+								name='_action'
+								value='add-and-rating'
+								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
+								disabled={showAddSong}
+							>
+								Add jam and rating/comment
+							</button>
+						)}
 					{/*logged in, jam exists, add rating/comment, no new sounds*/}
 					{profile &&
-						jam &&
+						fetcher?.data?.jam &&
+            fetcher?.data?.jam !== 'not on jf' &&
 						(rating || comment) &&
-						jam?.sounds?.length === soundsSelected?.length &&
-						(jam.listen_link || !listenLink) && (
+						fetcher?.data?.jam?.sounds?.length === soundsSelected?.length &&
+						(fetcher?.data?.jam.listen_link || !listenLink) && (
 							<button
 								type='submit'
 								name='_action'
@@ -2097,10 +2121,11 @@ export default function AddJam() {
 						)}
 					{/*logged in, jam exists, add rating/comment and sounds*/}
 					{profile &&
-						jam &&
+						fetcher?.data?.jam &&
+            fetcher?.data?.jam !== 'not on jf' &&
 						(rating || comment) &&
-						(jam?.sounds?.length !== soundsSelected?.length ||
-							(!jam?.listen_link && listenLink)) && (
+						(fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length ||
+							(!fetcher?.data?.jam?.listen_link && listenLink)) && (
 							<button
 								type='submit'
 								name='_action'

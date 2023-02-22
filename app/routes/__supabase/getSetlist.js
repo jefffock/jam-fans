@@ -60,6 +60,7 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const artist = queryParams?.artist;
 	const date = queryParams?.date;
+  console.log('artist, date', artist, date)
 	let jfVersions;
 	const { data, error } = await supabaseClient
 		.from('versions')
@@ -72,6 +73,7 @@ export const loader = async ({ request, params }) => {
 		jfVersions = data;
 	}
 	let setlist = [];
+  //phish or tab
 	if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 		let artistId;
 		switch (artist) {
@@ -107,6 +109,7 @@ export const loader = async ({ request, params }) => {
 			setlist = titles;
 		}
 	} else if (
+    //songfish artists
 		artist === 'Goose' ||
 		artist === 'Eggy' ||
 		artist === 'Neighbor' ||
@@ -163,6 +166,7 @@ export const loader = async ({ request, params }) => {
 		const transformedDate = [day, month, year].join('-');
 		const mbid = mbids[artist];
 		const setlistFMUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&date=${transformedDate}`;
+    console.log('setlistfm url', setlistFMUrl)
 		let apiKey = process.env.SETLISTFM_API_KEY;
 		const setlistData = await fetch(setlistFMUrl, {
 			headers: {
@@ -171,6 +175,7 @@ export const loader = async ({ request, params }) => {
 			},
 		});
 		setlist = await setlistData.json();
+    console.log('setlistfm setlist', setlist)
 		if (setlist && setlist.setlist && setlist.setlist.length > 0) {
 			const song = setlist.setlist[0];
 			location = `${song.venue.name}, ${song.venue.city.name}, ${
@@ -190,6 +195,8 @@ export const loader = async ({ request, params }) => {
 			setlist = titles;
 		}
 	}
+  console.log('setlist', setlist)
+  console.log('location', location)
 	return json(
 		{ setlist: setlist || [], location },
 		{
