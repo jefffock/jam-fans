@@ -890,6 +890,7 @@ export default function AddJam() {
 		fetcher?.data?.jam?.sounds &&
 		(!soundsSelected || soundsSelected.length === 0)
 	) {
+    console.log('setting sounds selected')
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
@@ -1821,7 +1822,7 @@ export default function AddJam() {
 									<legend className='block text-sm font-medium text-gray-700'>
 										Sounds to Add
 									</legend>
-									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll max-w-fit'>
+									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll max-w-fit'>
 										{sounds &&
 											sounds?.map((sound, soundIdx) => {
 												if (
