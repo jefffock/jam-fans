@@ -579,7 +579,6 @@ export default function AddJam() {
 			  });
 
 	function handleArtistChange(artist) {
-		console.log('changing artist');
 		submit({ _action: 'clear' });
 		setSongSelected('');
 		setJam(null);
@@ -604,44 +603,45 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-		setShowsBySong(null);
-		console.log('setting jam null 611');
-		setJam(null);
-		setQuery('');
-		if (
-			artist &&
-			artist.artist !== 'Squeaky Feet' &&
-			artist.artist !== 'Houseplant' &&
-			songSelected &&
-			useApis &&
-			(artist.artist === 'Goose' ||
-				artist.artist === 'Eggy' ||
-				artist.artist === 'Neighbor' ||
-				artist.artist === "Umphrey's McGee" ||
-				artist.artist === 'Phish' ||
-				artist.artist === "Taper's Choice" ||
-				artist.artist === 'Trey Anastasio, TAB')
-		) {
-			let urlToFetch =
-				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
-			fetcher.load(urlToFetch);
-		}
-		async function getSongObj() {
-			const { data, error } = await supabase
-				.from('songs')
-				.select('*')
-				.eq('song', songSelected)
-				.single();
-			if (data) {
-				setSongObj(data);
-				if (actionData?.body.includes('added song')) {
-					navigate('/');
-				}
-			}
-		}
-		if (filteredSongs?.length !== 0) {
-			getSongObj();
-		}
+    if (!actionData.body.includes('action complete')) {
+      setShowsBySong(null);
+      setJam(null);
+      setQuery('');
+      if (
+        artist &&
+        artist.artist !== 'Squeaky Feet' &&
+        artist.artist !== 'Houseplant' &&
+        songSelected &&
+        useApis &&
+        (artist.artist === 'Goose' ||
+          artist.artist === 'Eggy' ||
+          artist.artist === 'Neighbor' ||
+          artist.artist === "Umphrey's McGee" ||
+          artist.artist === 'Phish' ||
+          artist.artist === "Taper's Choice" ||
+          artist.artist === 'Trey Anastasio, TAB')
+      ) {
+        let urlToFetch =
+          '/getShows?artist=' + artist.artist + '&song=' + songSelected;
+        fetcher.load(urlToFetch);
+      }
+      async function getSongObj() {
+        const { data, error } = await supabase
+          .from('songs')
+          .select('*')
+          .eq('song', songSelected)
+          .single();
+        if (data) {
+          setSongObj(data);
+          if (actionData?.body.includes('added song')) {
+            navigate('/');
+          }
+        }
+      }
+      if (filteredSongs?.length !== 0) {
+        getSongObj();
+      }
+    }
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
@@ -663,7 +663,6 @@ export default function AddJam() {
 			setDate(show.showdate);
 			setLocation(show.location);
 			if (show.existingJam) {
-				console.log('setting jam 667');
 				setJam(show.existingJam);
 			}
 		}
@@ -688,7 +687,6 @@ export default function AddJam() {
 	}, [setlist]);
 
 	function clearArtist() {
-		console.log('clearing artist');
 		submit({ _action: 'clear' });
 		setArtist('');
 		setSong('');
@@ -708,7 +706,6 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
-		console.log('clearing song');
 		submit({ _action: 'clear' });
 		setSong('');
 		setSongSelected('');
@@ -716,7 +713,6 @@ export default function AddJam() {
 	}
 
 	function clearDate() {
-		console.log('clearing date');
 		submit({ _action: 'clear' });
 		setDate('');
 		setShow('');
@@ -891,9 +887,6 @@ export default function AddJam() {
     fetcher?.data?.jam?.sounds.length > 0 &&
 		(!soundsSelected || soundsSelected.length === 0 || JSON.stringify(fetcher?.data?.jam?.sounds) !== JSON.stringify(soundsSelected))
 	) {
-    console.log('going to set sounds')
-    console.log('fetcher?.data?.jam?.sounds', fetcher?.data?.jam?.sounds)
-    console.log('soundsSelected', soundsSelected)
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
 	if (fetcher?.data?.year && fetcher?.data?.year !== year) {
@@ -910,21 +903,14 @@ export default function AddJam() {
 
 	//check if song exists
 	useEffect(() => {
-		console.log('setting jam null');
 		setJam(null);
 		if (songSelected && artist && date) {
 			if (showsByYear) {
-				console.log(
-					'showsByYear[0].showdate.slice(0, 4)',
-					showsByYear[0].showdate.slice(0, 4)
-				);
-				console.log('date.slice(0, 4)', date.slice(0, 4));
 			}
 			const getShowsByYear =
 				!showsByYear || showsByYear[0].showdate.slice(0, 4) !== date.slice(0, 4)
 					? 'true'
 					: 'false';
-			console.log('getShowsByYear', getShowsByYear);
 			const getSetlist = !setlist ? 'true' : 'false';
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
@@ -937,7 +923,6 @@ export default function AddJam() {
 				getShowsByYear +
 				'&fetchSetlist=' +
 				getSetlist;
-			console.log('urlToFetch:', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date]);
