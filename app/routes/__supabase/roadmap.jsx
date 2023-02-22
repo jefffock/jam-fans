@@ -1,3 +1,5 @@
+import { Link } from "@remix-run/react";
+
 export default function RoadMap() {
 	return (
     <div className='w-100 h-100'>
@@ -12,10 +14,7 @@ export default function RoadMap() {
 				<li>Individual fan pages</li>
 				<li>Make each filtered jams results page have a shorter, shareable address</li>
 			</ul>
-      <p className='mx-4'>Think something else should be on here? Let me know!</p>
-
-      <p className='m-4'>Twitter: <a href='https://twitter.com/jeffphox' className='underline'>@jeffphox</a></p>
-      <p className='mx-4'>Email: <a className='underline' href='mailto:hi@jam.fans'>hi@jam.fans</a></p>
+      <p className='mx-4'>All ideas welcome: <Link to='/contact' className='underline hover:font-medium'>hit me up</Link>!</p>
 		</div>
     </div>
 	);
