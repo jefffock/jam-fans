@@ -9,21 +9,13 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 
-	async function wait500() {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve('resolved');
-			}, 500);
-		});
-	}
-
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
 		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v1',
 		neighborBaseUrl: 'https://neighbortunes.net/api/v1',
 		phishBaseUrl: 'https://api.phish.net/v5',
-    tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
+		tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
 	};
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
@@ -53,6 +45,7 @@ export const loader = async ({ request, params }) => {
 		Osees: '194272cc-dcc8-4640-a4a6-66da7d250d5c',
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
 		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
+    'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
@@ -66,23 +59,33 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 
 	const artist = queryParams?.artist;
-	let song = queryParams?.song;
-	const year = queryParams?.year;
+	let song = queryParams?.song || null;
+	const year = queryParams?.year || null;
 	let shows;
-	let songId
-  let jfVersions = []
+	let songId;
+	let jfVersions = [];
 	//get all versions of a song (for select artists)
+	let artistId;
+	let tableName;
 	if (artist && song && !year) {
+    console.log('artist and song', artist, song)
 		const { data, error } = await supabaseClient
 			.from('versions')
 			.select('*')
 			.eq('artist', artist)
 			.eq('song_name', song);
-    jfVersions = data
+		jfVersions = data;
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
-			const artistId = artist === 'Phish' ? '1' : '2';
-			const tableName = artist === 'Phish' ? 'phishnet_songs' : 'tab_songs';
+			switch (artist) {
+				case 'Trey Anastasio, TAB':
+					artistId = '2';
+					tableName = 'tab_songs';
+          break;
+        default:
+          artistId = '1';
+					tableName = 'phishnet_songs';
+			}
 			switch (song) {
 				case 'Also Sprach Zarathustra (2001)':
 					songId = 21;
@@ -99,6 +102,7 @@ export const loader = async ({ request, params }) => {
 					songId = data[0]?.songid;
 			}
 			if (songId) {
+        console.log('songId in getshows', songId)
 				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
 				shows = await fetch(url);
 				shows = await shows.json();
@@ -106,7 +110,9 @@ export const loader = async ({ request, params }) => {
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
 						const date = new Date(show.showdate + 'T18:00:00Z');
-						const alreadyAdded = jfVersions.find((version) => version.date === show.showdate);
+						const alreadyAdded = jfVersions.find(
+							(version) => version.date === show.showdate
+						);
 						return {
 							showdate: show.showdate,
 							location: `${show.venue}, ${show.city}, ${
@@ -128,7 +134,7 @@ export const loader = async ({ request, params }) => {
 			if (song === 'Echo of a Rose') song = 'Echo Of A Rose';
 			let dbName;
 			let baseUrl;
-      console.log('artist', artist)
+			console.log('artist', artist);
 			switch (artist) {
 				case 'Eggy':
 					dbName = 'eggy_songs';
@@ -145,9 +151,9 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					dbName = 'neighbor_songs';
 					baseUrl = baseUrls.neighborBaseUrl;
-        case "Taper's Choice":
-          dbName = 'tapers_choice_songs';
-          baseUrl = baseUrls.tapersChoiceBaseUrl;
+				case "Taper's Choice":
+					dbName = 'tapers_choice_songs';
+					baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
 			let songId;
 			//get song id from supabase
@@ -165,29 +171,33 @@ export const loader = async ({ request, params }) => {
 				const url = `${baseUrl}/setlists/song_id/${songId}`;
 				shows = await fetch(url);
 				shows = await shows.json();
-				shows = shows?.data.map((show) => {
-					const date = new Date(show.showdate + 'T18:00:00Z');
-					const alreadyAdded = jfVersions.find((version) => version.date === show.showdate);
-					return {
-						showdate: show.showdate,
-						location: `${show.venuename}, ${show.city}, ${
-							show.country === 'USA' ? show.state : show.country
-						}`,
-						label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
-							show.venuename
-						}, ${show.city}, ${
-							show.country === 'USA' ? show.state : show.country
-						}`,
-						existingJam: alreadyAdded ?? null,
-					};
-				});
+				shows = shows?.data
+					.filter((show) => show.artist_id === 1)
+					.map((show) => {
+						const date = new Date(show.showdate + 'T18:00:00Z');
+						const alreadyAdded = jfVersions.find(
+							(version) => version.date === show.showdate
+						);
+						return {
+							showdate: show.showdate,
+							location: `${show.venuename}, ${show.city}, ${
+								show.country === 'USA' ? show.state : show.country
+							}`,
+							label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
+								show.venuename
+							}, ${show.city}, ${
+								show.country === 'USA' ? show.state : show.country
+							}`,
+							existingJam: alreadyAdded ?? null,
+						};
+					});
 				// shows = shows.reverse();
 			}
 		}
 	} else if (artist && year) {
 		//get shows by year
+		let artistId;
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
-			let artistId;
 			switch (artist) {
 				case 'Phish':
 					artistId = '1';
@@ -224,7 +234,7 @@ export const loader = async ({ request, params }) => {
 			artist === 'Eggy' ||
 			artist === 'Neighbor' ||
 			artist === "Umphrey's McGee" ||
-      artist === "Taper's Choice"
+			artist === "Taper's Choice"
 		) {
 			let baseUrl;
 			switch (artist) {
@@ -240,25 +250,27 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					baseUrl = baseUrls.neighborBaseUrl;
 					break;
-        case "Taper's Choice":
-          baseUrl = baseUrls.tapersChoiceBaseUrl;
+				case "Taper's Choice":
+					baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
 			// const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`
 			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`;
 			const showsData = await fetch(url);
 			const showsRes = await showsData.json();
 			if (showsRes && showsRes.data && showsRes.data.length > 0) {
-				shows = showsRes.data.map((show) => {
-					const location = `${show.venuename}, ${show.city}, ${
-						show.country === 'USA' ? show.state : show.country
-					}`;
-					const date = new Date(show.showdate + 'T18:00:00Z');
-					return {
-						location,
-						showdate: show.showdate,
-						label: `${date.toLocaleDateString()} - ${location}`,
-					};
-				});
+				shows = showsRes.data
+					.filter((show) => show.artist_id === 1)
+					.map((show) => {
+						const location = `${show.venuename}, ${show.city}, ${
+							show.country === 'USA' ? show.state : show.country
+						}`;
+						const date = new Date(show.showdate + 'T18:00:00Z');
+						return {
+							location,
+							showdate: show.showdate,
+							label: `${date.toLocaleDateString()} - ${location}`,
+						};
+					});
 			}
 		} else {
 			//get shows from setlistfm for all other artists
@@ -276,7 +288,6 @@ export const loader = async ({ request, params }) => {
 				}) // Append the page number to the base URL
 					.then((response) => response.json())
 					.then((newResponse) => {
-						console.log('newResponse', newResponse);
 						const setlist = newResponse?.setlist || [];
 
 						const response = [...setlist, ...previousResponse]; // Combine the two arrays

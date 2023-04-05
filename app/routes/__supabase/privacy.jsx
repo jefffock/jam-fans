@@ -19,7 +19,7 @@ export default function Privacy() {
 				<p className='text-lg mb-4'>
 					3. We may use cookies and other tracking technologies to improve your
 					browsing experience and to understand how users use our website. You
-					can choose to disable cookies in your browser settings if you prefer.
+					can choose to disable cookies in your browser settings if you prefer. (Note: we currently do not use cookies)
 				</p>
 				<p className='text-lg mb-4'>
 					4. If you signed up with Google, we will store your email address to

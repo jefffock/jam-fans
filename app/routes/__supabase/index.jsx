@@ -12,6 +12,7 @@ import JamsHome from '../../components/JamsHome';
 import Hero from '../../components/Hero';
 
 export const loader = async ({ request, params }) => {
+  return redirect('/jams');
 	const response = new Response();
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,

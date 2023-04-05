@@ -33,6 +33,7 @@ export default function JamFiltersSlideout({
 	setOpen,
 	totalCount,
 	search,
+	showIframe,
 }) {
 	const [query, setQuery] = useState('');
 	const [songSelected, setSongSelected] = useState(null);
@@ -43,6 +44,8 @@ export default function JamFiltersSlideout({
 	const fetcher = useFetcher();
 	const [params] = useSearchParams();
 	const [count, setCount] = useState(totalCount);
+	const [date, setDate] = useState('');
+	const [dateInput, setDateInput] = useState('');
 
 	const dates = [];
 	let currentYear = new Date().getFullYear();
@@ -66,53 +69,58 @@ export default function JamFiltersSlideout({
 		: 'Played in 1965 or after';
 
 	function createQueryString(e, param, initialString) {
-    if (initialString) fetcher.load(initialString);
-    else {
-
-      let queryString = '/jamscount?';
-      const form = document.querySelector('#jam-filter-form');
-      const inputs = form?.querySelectorAll('input, select');
-      inputs.forEach((input) => {
-        if (
-          (input.type === 'checkbox' && input.checked) ||
-          (input.type !== 'checkbox' && input.value !== '' && input.name)
-        ) {
-          queryString += `${input.name}=${input.value || input.id}&`;
-        }
-      });
-      if (param?.hasOwnProperty('song')) {
-        if (queryString.includes('song=')) {
-            let startIndex = queryString.indexOf('song=') + 5;
-            let endIndex = queryString.indexOf(',', startIndex);
-            endIndex = endIndex === -1 ? queryString.length : endIndex;
-            queryString = queryString.slice(0, startIndex) + param.song + queryString.slice(endIndex);
-        } else {
-            queryString += `song=${param.song},`;
-        }
-    }
-    if (param?.hasOwnProperty('before')) {
-        if (queryString.includes('before=')) {
-            let startIndex = queryString.indexOf('before=') + 7;
-            let endIndex = queryString.indexOf(',', startIndex);
-            endIndex = endIndex === -1 ? queryString.length : endIndex;
-            queryString = queryString.slice(0, startIndex) + param.before + queryString.slice(endIndex);
-        } else {
-            queryString += `before=${param.before},`;
-        }
-    }
-    if (param?.hasOwnProperty('after')) {
-        if (queryString.includes('after=')) {
-            let startIndex = queryString.indexOf('after=') + 6;
-            let endIndex = queryString.indexOf(',', startIndex);
-            endIndex = endIndex === -1 ? queryString.length : endIndex;
-            queryString = queryString.slice(0, startIndex) + param.after + queryString.slice(endIndex);
-        } else {
-            queryString += `after=${param.after},`;
-        }
-    }
-      queryString = queryString?.slice(0, -1);
-      if (queryString) fetcher.load(queryString);
-    }
+		let queryString = '/jamscount?';
+		const form = document.querySelector('#jam-filter-form');
+		const inputs = form?.querySelectorAll('input, select');
+		inputs.forEach((input) => {
+			if (
+				(input.type === 'checkbox' && input.checked) ||
+					(input.type !== 'checkbox' && input.value !== '' && input.name)
+			) {
+				queryString += `${input.name}=${input.value || input.id}&`;
+			}
+		});
+		if (param?.hasOwnProperty('song')) {
+			if (queryString.includes('song=')) {
+				let startIndex = queryString.indexOf('song=') + 5;
+				let endIndex = queryString.indexOf(',', startIndex);
+				endIndex = endIndex === -1 ? queryString.length : endIndex;
+				queryString =
+					queryString.slice(0, startIndex) +
+					param.song +
+					queryString.slice(endIndex);
+			} else {
+				queryString += `song=${param.song},`;
+			}
+		}
+		if (param?.hasOwnProperty('before')) {
+			if (queryString.includes('before=')) {
+				let startIndex = queryString.indexOf('before=') + 7;
+				let endIndex = queryString.indexOf(',', startIndex);
+				endIndex = endIndex === -1 ? queryString.length : endIndex;
+				queryString =
+					queryString.slice(0, startIndex) +
+					param.before +
+					queryString.slice(endIndex);
+			} else {
+				queryString += `before=${param.before},`;
+			}
+		}
+		if (param?.hasOwnProperty('after')) {
+			if (queryString.includes('after=')) {
+				let startIndex = queryString.indexOf('after=') + 6;
+				let endIndex = queryString.indexOf(',', startIndex);
+				endIndex = endIndex === -1 ? queryString.length : endIndex;
+				queryString =
+					queryString.slice(0, startIndex) +
+					param.after +
+					queryString.slice(endIndex);
+			} else {
+				queryString += `after=${param.after},`;
+			}
+		}
+		queryString = queryString?.slice(0, -1);
+		if (queryString) fetcher.load(queryString);
 	}
 
 	function clearFilters() {
@@ -124,16 +132,49 @@ export default function JamFiltersSlideout({
 			else {
 				input.value = '';
 			}
-      setBeforeYearSelected(null)
-      setAfterYearSelected(null)
-      setSongSelected(null)
+			setBeforeYearSelected(null);
+			setAfterYearSelected(null);
+			setSongSelected(null);
 		});
 		setCount(totalCount);
+	}
+
+	function handleDateInputChange(e) {
+		setDateInput(e.target.value);
+		let dateInput = e.target.value;
+		if (dateInput.length === 8) {
+			let month = dateInput.slice(0, 2);
+			let day = dateInput.slice(2, 4);
+			let year = dateInput.slice(4, 8);
+			let date = new Date(year, month - 1, day);
+			if (date.toString() === 'Invalid Date') {
+				//handleerror
+			} else {
+				setDate(date.toJSON().slice(0, 10));
+			}
+		}
 	}
 
 	useEffect(() => {
 		if (fetcher.data) setCount(fetcher.data.count);
 	}, [fetcher.data]);
+
+	useEffect(() => {
+		if (date) {
+			createQueryString();
+		}
+	}, [date]);
+
+  function getOrder(search) {
+    let order = 'avg_rating';
+    let searchParams = new URLSearchParams(search);
+    if (searchParams.has('order')) {
+      order = searchParams.get('order');
+    }
+    return order;
+  }
+
+  const order = getOrder(search);
 
 	return (
 		<Transition.Root
@@ -160,7 +201,11 @@ export default function JamFiltersSlideout({
 								leaveTo='translate-x-full'
 							>
 								<Dialog.Panel className='pointer-events-auto w-screen max-w-md'>
-									<div className='flex h-full flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl'>
+									<div
+										className={`flex h-full flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl ${
+											showIframe ? 'pb-40' : 'pb-0'
+										} sm:pb-0`}
+									>
 										<div className='flex min-h-0 flex-1 flex-col overflow-y-scroll py-6'>
 											<div className='px-4 sm:px-6'>
 												<div className='flex items-start justify-between'>
@@ -188,6 +233,11 @@ export default function JamFiltersSlideout({
 												className='space-y-8 divide-y divide-gray-200'
 												id='jam-filter-form'
 											>
+												<input
+													type='hidden'
+													name='order'
+													value={order}
+												/>
 												<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 													<div className='space-y-8 divide-y divide-gray-200'>
 														{/* sound picker*/}
@@ -195,10 +245,10 @@ export default function JamFiltersSlideout({
 															<div className='sm:col-span-6 mx-4'>
 																<div className='mt-1 flex rounded-md shadow-sm'>
 																	<fieldset>
-																		<legend className='text-lg font-medium text-gray-900'>
+																		<legend className='text-2xl text-gray-900'>
 																			Sounds
 																		</legend>
-																		<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll sm:col-span-6'>
+																		<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll sm:col-span-6'>
 																			{sounds &&
 																				sounds?.map((sound, soundIdx) => (
 																					<div
@@ -221,7 +271,9 @@ export default function JamFiltersSlideout({
 																								type='checkbox'
 																								className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
 																								onChange={createQueryString}
-                                                defaultChecked={search?.includes(sound.text)}
+																								defaultChecked={search?.includes(
+																									sound.text
+																								)}
 																							/>
 																						</div>
 																					</div>
@@ -235,10 +287,10 @@ export default function JamFiltersSlideout({
 														<div className='sm:col-span-4 mx-4 mt-6'>
 															<div className='mt-1 flex rounded-md shadow-sm'>
 																<fieldset>
-																	<legend className='text-lg font-medium text-gray-900 pt-4'>
+																	<legend className='text-2xl text-gray-900 pt-4'>
 																		Bands
 																	</legend>
-																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-52 overflow-y-scroll'>
+																	<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll'>
 																		{artists &&
 																			artists?.map((artist, artistIdx) => (
 																				<div
@@ -261,7 +313,9 @@ export default function JamFiltersSlideout({
 																							type='checkbox'
 																							className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 mr-2 border-2'
 																							onChange={createQueryString}
-                                              defaultChecked={search?.includes(artist.url)}
+																							defaultChecked={search?.includes(
+																								artist.url
+																							)}
 																						/>
 																					</div>
 																				</div>
@@ -281,7 +335,7 @@ export default function JamFiltersSlideout({
 																}}
 																name='song'
 															>
-																<Combobox.Label className='block text-lg font-medium text-gray-900'>
+																<Combobox.Label className='block text-2xl  text-gray-900'>
 																	Song
 																</Combobox.Label>
 																<div className='relative mt-1 px-30'>
@@ -292,7 +346,7 @@ export default function JamFiltersSlideout({
 																			createQueryString();
 																		}}
 																		displayValue={(song) => song}
-                                    placeholder='Search for a song'
+																		placeholder='Search for a song'
 																	/>
 																	<Combobox.Button className='absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none'>
 																		<ChevronUpDownIcon
@@ -353,9 +407,35 @@ export default function JamFiltersSlideout({
 															</Combobox>
 														</div>
 														{/* Year Pickers */}
-														{/* <h3 className='block text-lg font-medium text-gray-900 px-4 pt-4'>
+														{/* <h3 className='block text-2xl font-medium text-gray-900 px-4 pt-4'>
 															When
 														</h3> */}
+														{/* On Date picker */}
+														<div className='p-4'>
+															<label
+																htmlFor='date'
+																// className='block text-md font-medium text-gray-700'
+																className='block text-2xl text-gray-900'
+															>
+																Date
+															</label>
+															<input
+																type='text'
+																name='date'
+																id='date'
+																value={dateInput}
+																onChange={handleDateInputChange}
+																className='border border-gray-300 rounded-md p-2'
+															/>
+															<p className='text-sm'>mmddyyyy</p>
+															<p className='text-2xl'>
+																{date
+																	? new Date(
+																			date + 'T16:00:00'
+																	  ).toLocaleDateString()
+																	: ''}
+															</p>
+														</div>
 														{/* Before year picker */}
 														<div className='p-4'>
 															<Listbox
@@ -369,7 +449,7 @@ export default function JamFiltersSlideout({
 															>
 																{({ open }) => (
 																	<div>
-																		<Listbox.Label className='block text-lg font-medium text-gray-900'>
+																		<Listbox.Label className='block text-2xl text-gray-900'>
 																			Before
 																		</Listbox.Label>
 																		<div className='relative mt-1'>
@@ -462,7 +542,7 @@ export default function JamFiltersSlideout({
 															>
 																{({ open }) => (
 																	<div>
-																		<Listbox.Label className='block text-lg font-medium text-gray-900'>
+																		<Listbox.Label className='block text-2xl text-gray-900'>
 																			After
 																		</Listbox.Label>
 																		<div className='relative mt-1'>
@@ -555,7 +635,7 @@ export default function JamFiltersSlideout({
 																			type='checkbox'
 																			className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 border-2'
 																			onChange={createQueryString}
-                                      defaultChecked={search?.includes('links')}
+																			defaultChecked={search?.includes('links')}
 																		/>
 																	</div>
 																	<div className='ml-3 text-sm'>
@@ -608,7 +688,7 @@ export default function JamFiltersSlideout({
 												<div className='absolute flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2'>
 													{count === 0 && (
 														<Link
-															to='/add'
+															to='/add/jam'
 															className='underline mr-2 bottom-0 self-center'
 														>
 															Add a Jam?
