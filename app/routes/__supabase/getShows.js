@@ -278,7 +278,6 @@ export const loader = async ({ request, params }) => {
 			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
 			let apiKey = process.env.SETLISTFM_API_KEY;
 			async function paginatedFetch(url, page = 1, previousResponse = []) {
-				console.log('in paginated fetch', url, page, previousResponse);
 				await new Promise((resolve) => setTimeout(resolve, 600));
 				return fetch(`${url}&p=${page}`, {
 					headers: {

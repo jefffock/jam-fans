@@ -527,8 +527,7 @@ export default function AddJam() {
 	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-	const [showsBySong, setShowsBySong] = useState(null);
-	const [showsByYear, setShowsByYear] = useState(null);
+	const [shows, setShows] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
 	const [ratingId, setRatingId] = useState(null);
@@ -583,8 +582,7 @@ export default function AddJam() {
 		submit({ _action: 'clear' });
 		setSongSelected('');
 		setJam(null);
-		setShowsByYear(null);
-		setShowsBySong(null);
+		setShows(null);
 		setShow(null);
 		setLocation('');
 		setDate('');
@@ -616,7 +614,7 @@ export default function AddJam() {
 	//get shows by song for select artists
 	useEffect(() => {
     if (!actionData?.body?.includes('action complete') && artist) {
-      setShowsBySong(null);
+      setShows(null);
       setJam(null);
       setQuery('');
       if (
@@ -717,8 +715,7 @@ export default function AddJam() {
 		setDate('');
 		setYear('');
 		setLocation('');
-		setShowsBySong(null);
-		setShowsByYear(null);
+		setShows(null);
 		setJam('');
 		setShow('');
 		setShowLoadingInfo(false);
@@ -754,7 +751,6 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
-		if (showsByYear) setShowsByYear(null);
 		if (location) setLocation('');
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
@@ -850,27 +846,15 @@ export default function AddJam() {
 	}
 
 	if (
-		artist &&
 		fetcher &&
 		fetcher.data &&
-		fetcher.data.showsBySong &&
-		fetcher.data.showsBySong[0] &&
-		(!showsBySong ||
-			fetcher.data.showsBySong[0].showdate.normalize() !==
-				showsBySong[0]?.showdate.normalize())
+		fetcher.data.shows &&
+		fetcher.data.shows[0] &&
+		(!shows ||
+			fetcher.data.shows[0].showdate.normalize() !==
+				shows[0]?.showdate.normalize())
 	) {
-		setShowsBySong(fetcher?.data?.showsBySong);
-	}
-	if (
-		artist &&
-		fetcher &&
-		fetcher.data &&
-		fetcher.data.showsByYear &&
-		fetcher.data.showsByYear[0] &&
-		(!showsByYear ||
-			fetcher.data.showsByYear[0].showdate !== showsByYear[0]?.showdate)
-	) {
-		setShowsByYear(fetcher?.data?.showsByYear);
+		setShows(fetcher?.data?.shows);
 	}
 	if (
 		fetcher?.data?.setlist &&
@@ -922,29 +906,17 @@ export default function AddJam() {
 
 	//check if song exists
 	useEffect(() => {
-		setJam('');
-		if (songSelected && artist && date) {
-			if (showsByYear) {
-			}
-			const getShowsByYear =
-				!showsByYear || showsByYear[0].showdate.slice(0, 4) !== date.slice(0, 4)
-					? 'true'
-					: 'false';
-			const getSetlist = !setlist ? 'true' : 'false';
+		if (songSelected && artist && date && setlist && shows) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
 				'&song=' +
 				songSelected +
 				'&date=' +
-				date +
-				'&fetchShowsByYear=' +
-				getShowsByYear +
-				'&fetchSetlist=' +
-				getSetlist;
+				date;
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date]);
+	}, [songSelected, date, setlist]);
 
 	useEffect(() => {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
@@ -1255,8 +1227,8 @@ export default function AddJam() {
 				{useApis &&
 					songSelected &&
 					artist &&
-					showsBySong &&
 					!date &&
+          !year &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
@@ -1295,7 +1267,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{showsBySong?.map((show, showIdx) => (
+													{shows?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
@@ -1471,8 +1443,8 @@ export default function AddJam() {
 				)}
 				{/* Show Picker if not from songfish artist + year*/}
 				{useApis &&
-					showsByYear &&
-					showsByYear?.length > 1 &&
+					shows &&
+					shows?.length > 1 &&
 					!date &&
 					year &&
 					(!fetcher ||
@@ -1508,7 +1480,7 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{showsByYear?.map((show, showIdx) => (
+													{shows?.map((show, showIdx) => (
 														<Listbox.Option
 															key={showIdx}
 															className={({ active }) =>
