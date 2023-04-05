@@ -641,7 +641,7 @@ export default function AddJam() {
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
-    console.log('handleShowChange', show)
+		console.log('handleShowChange', show);
 		if (show) {
 			setSetlist(null);
 			if (
@@ -843,15 +843,13 @@ export default function AddJam() {
 		setJam(fetcher?.data?.jam);
 		setSoundsSelected(fetcher?.data?.jam?.sounds);
 	}
-<<<<<<< HEAD
 	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
 		setShowSuccessAlert(true);
-=======
+	}
 	if (fetcher?.data?.rating && !rating && !comment) {
 		console.log('rating', fetcher?.data?.rating);
 		setRating(fetcher?.data?.rating.rating);
 		setComment(fetcher?.data?.rating.comment);
->>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 	}
 
 	//check if song exists
@@ -1598,7 +1596,7 @@ export default function AddJam() {
 							className='mt-2 text-sm text-gray-500'
 							id='date-description'
 						>
-							MMDDYYYY format please, no / or -
+							MMDDYYYY format, please
 						</p>
 						<div className='mt-1'>
 							<input
@@ -1706,19 +1704,14 @@ export default function AddJam() {
 								: 'setlist.fm'}
 						</a>
 						.{' '}
-            <div>
-						{(artist.artist === 'Phish' ||
+						{artist.artist === 'Phish' ||
 						artist.artist === 'Trey Anastasio, TAB' ||
 						artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
-<<<<<<< HEAD
 						artist.artist === "Taper's Choice" ||
 						artist.artist === "Umphrey's McGee" ? (
 							<p>
-=======
-						artist.artist === "Umphrey's McGee") ? 
->>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 								Thanks{' '}
 								<a
 									className='underline'
@@ -1727,15 +1720,15 @@ export default function AddJam() {
 									Adam Scheinberg
 								</a>
 								!
-<<<<<<< HEAD
 							</p>
 						) : !(artist && songSelected && date && location) ? (
 							"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"
 						) : (
 							''
 						)}
-					</p>
+					</div>
 				)}
+
 				{useApis &&
 					showLoadingInfo &&
 					(artist !== 'Phish' && artist !== 'Trey Anastasio, TAB')(
@@ -1753,15 +1746,6 @@ export default function AddJam() {
 							profile ? 'and your rating and comment' : ''
 						} below. Thanks for contributing!`}
 					/>
-=======
-                    : ''}
-
-						 {/* : !(artist && songSelected && date && location) ? (
-							<p>"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"</p>
-              ) : <p>''</p>
-             } */
-              </div>
->>>>>>> 5cbcc50 (add info fetching exising rating in add wip)
 				)}
 				{useApis &&
 					showLoadingInfo &&
