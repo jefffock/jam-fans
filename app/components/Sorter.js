@@ -14,7 +14,9 @@ export default function Sorter({ orderBy, setOrderBy, search }) {
   } else if (newSearch.charAt(0) !== '&' && newSearch.length > 0) {
     newSearch = '&' + newSearch;
   }
+  if (newSearch.length !== 0) {
 	console.log('newSearch', newSearch);
+  }
 	const ratingSearch = '?order=avg_rating' + newSearch;
 	const recentSearch = '?order=id' + newSearch;
 	const numRatingsSearch = '?order=num_ratings' + newSearch;
@@ -30,7 +32,7 @@ export default function Sorter({ orderBy, setOrderBy, search }) {
 						: search.includes('order=id')
 						? 'Recently Added'
 						: search.includes('order=num_ratings')
-						? 'Most Rated'
+						? 'Most Curated'
 						: 'Sort By'}
 					<ChevronDownIcon
 						className='-mr-1 ml-2 h-5 w-5'
@@ -85,7 +87,7 @@ export default function Sorter({ orderBy, setOrderBy, search }) {
 										'block px-4 py-2 text-sm'
 									)}
 								>
-									Most Rated
+									Most Curated
 								</Link>
 							)}
 						</Menu.Item>
