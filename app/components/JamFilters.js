@@ -161,6 +161,8 @@ export default function JamFiltersSlideout({
 
 	useEffect(() => {
 		if (date) {
+      //confirm date is good
+      
 			createQueryString();
 		}
 	}, [date]);
@@ -423,7 +425,7 @@ export default function JamFiltersSlideout({
 																type='text'
 																name='date'
 																id='date'
-																value={dateInput}
+																value={dateInput || ''}
 																onChange={handleDateInputChange}
 																className='border border-gray-300 rounded-md p-2'
 															/>
