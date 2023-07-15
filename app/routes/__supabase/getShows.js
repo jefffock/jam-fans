@@ -56,10 +56,7 @@ export const loader = async ({ request, params }) => {
 		Osees: '194272cc-dcc8-4640-a4a6-66da7d250d5c',
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
 		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
-<<<<<<< HEAD
     'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
-=======
->>>>>>> f12584b26490a5229ccb74e3bbd2be7df2f736d2
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
@@ -292,10 +289,7 @@ export const loader = async ({ request, params }) => {
 			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
 			let apiKey = process.env.SETLISTFM_API_KEY;
 			async function paginatedFetch(url, page = 1, previousResponse = []) {
-<<<<<<< HEAD
-=======
 				console.log('in paginated fetch', url, page, previousResponse);
->>>>>>> f12584b26490a5229ccb74e3bbd2be7df2f736d2
 				await new Promise((resolve) => setTimeout(resolve, 600));
 				return fetch(`${url}&p=${page}`, {
 					headers: {
@@ -350,10 +344,7 @@ export const loader = async ({ request, params }) => {
 			return new Date(b.showdate) - new Date(a.showdate);
 		});
 	}
-<<<<<<< HEAD
-=======
 	console.log('shows', shows);
->>>>>>> f12584b26490a5229ccb74e3bbd2be7df2f736d2
 	return json(
 		{ shows: shows || [] },
 		{

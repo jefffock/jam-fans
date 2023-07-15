@@ -118,50 +118,6 @@ export const loader = async ({ request, params }) => {
 		artist === "Taper's Choice"
 	) {
 		//use songfish api
-<<<<<<< HEAD
-		let baseUrl;
-		switch (artist) {
-			case 'Eggy':
-				baseUrl = baseUrls.eggyBaseUrl;
-				break;
-			case 'Goose':
-				baseUrl = baseUrls.gooseBaseUrl;
-				break;
-			case "Umphrey's McGee":
-				baseUrl = baseUrls.umphreysBaseUrl;
-				break;
-			case 'Neighbor':
-				baseUrl = baseUrls.neighborBaseUrl;
-			case "Taper's Choice":
-				baseUrl = baseUrls.tapersChoiceBaseUrl;
-		}
-		const url = `${baseUrl}/setlists/showdate/${date}`;
-		console.log('songfish url', url);
-		const setlistData = await fetch(url);
-		setlist = await setlistData.json();
-		if (setlist && setlist.data && setlist.data.length > 0) {
-			console.log('starting to format the setlist');
-			const song = setlist.data[0];
-			location = `${song.venuename}, ${song.city}, ${
-				song?.country === 'USA' ? song.state : song.country
-			}`;
-			const titles = setlist?.data
-				.filter((song) => song.artist_id === 1)
-				.map(({ songname }) => {
-					const alreadyAdded = jfVersions.find(
-						({ song_name }) => song_name === songname
-					);
-
-					if (songname === 'Echo Of A Rose') songname = 'Echo of a Rose';
-					return {
-						label: alreadyAdded ? '(Added) ' + songname : songname,
-						value: songname,
-					};
-				});
-			console.log('titles', titles);
-			setlist = titles || [];
-		}
-=======
 			let baseUrl;
 			switch (artist) {
 				case 'Eggy':
@@ -179,6 +135,9 @@ export const loader = async ({ request, params }) => {
 				case 'Neighbor':
 					dbName = 'neighbor_songs';
 					baseUrl = baseUrls.neighborBaseUrl;
+        case "Taper's Choice":
+          dbName = 'tapers_choice_songs'
+          baseUrl = baseUrls.tapersChoiceBaseUrl;
 			}
       const url = `${baseUrl}/setlists/showdate/${date}`
       console.log('url to fetch: ', url)
@@ -198,7 +157,6 @@ export const loader = async ({ request, params }) => {
         console.log('location: ', location)
       setlist = titles
     }
->>>>>>> f12584b26490a5229ccb74e3bbd2be7df2f736d2
 	} else {
 		//setlistfm for all other artists
 		const [year, month, day] = date.split('-');
