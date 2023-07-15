@@ -837,6 +837,8 @@ export default function AddJam() {
 	console.log('initialSounds', initialSounds);
 
 	function handleSoundsChange(e) {
+		console.log('e.target.value', e.target.value);
+		console.log('soundsSelected', soundsSelected);
 		// if e.target.value is not in soundsSelected, add it, else, remove it (if not in initial sounds)
 		//if new sound is already selected and not in initial sounds, remove it
 		if (soundsSelected?.includes(e.target.value)) {
@@ -846,6 +848,7 @@ export default function AddJam() {
 			setSoundsSelected(newSoundsSelected);
 		} else if (soundsSelected) {
 			const sortedSounds = [...soundsSelected, e.target.value].sort();
+			console.log('sortedSounds', sortedSounds);
 			setSoundsSelected(sortedSounds);
 		} else {
 			setSoundsSelected([e.target.value]);
@@ -898,13 +901,10 @@ export default function AddJam() {
 	// 	console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
 	// 	setJam(fetcher?.data?.jam);
 	// }
-	console.log('sounds', fetcher?.data?.jam?.sounds, soundsSelected);
 	if (
 		jam?.sounds &&
 		jam?.sounds.length > 0 &&
-		(!soundsSelected ||
-			soundsSelected.length === 0 ||
-			JSON.stringify(jam?.sounds) !== JSON.stringify(soundsSelected))
+		(!soundsSelected || soundsSelected.length === 0)
 	) {
 		setSoundsSelected(jam?.sounds);
 	}
@@ -1827,8 +1827,8 @@ export default function AddJam() {
 					songSelected &&
 					date &&
 					location &&
-					fetcher?.data?.jam &&
-					fetcher?.data?.jam !== 'not on jf' && (
+					jam &&
+					jam !== 'not on jf' && (
 						<SuccessAlert
 							title={"It's on Jam Fans!"}
 							description={`You can add sounds ${
@@ -1869,7 +1869,10 @@ export default function AddJam() {
 																name={`sounds-${sound.text}`}
 																type='checkbox'
 																className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
-																checked={jam?.sounds?.includes(sound.label)}
+																checked={
+																	jam?.sounds?.includes(sound.label) ||
+																	soundsSelected?.includes(sound.label)
+																}
 																onChange={handleSoundsChange}
 																disabled={jam?.sounds?.includes(sound.label)}
 															/>
@@ -2072,9 +2075,9 @@ export default function AddJam() {
 						)}
 					{/* not logged in, jam exists, update sounds*/}
 					{!profile &&
-						fetcher?.data?.jam &&
-						fetcher?.data?.jam !== 'not on jf' &&
-						fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length && (
+						jam &&
+						jam !== 'not on jf' &&
+						jam?.sounds?.length !== soundsSelected?.length && (
 							<button
 								type='submit'
 								name='_action'
