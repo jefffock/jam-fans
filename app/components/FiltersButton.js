@@ -2,7 +2,7 @@ import { FunnelIcon } from '@heroicons/react/20/solid';
 
 export default function FiltersButton({ open, setOpen }) {
 	const handleClick = () => {
-		setOpen(!open);
+		setOpen(true);
 	};
 
 	return (
@@ -17,12 +17,4 @@ export default function FiltersButton({ open, setOpen }) {
 			Filters - Find jams by sound, band, song, year
 		</button>
 	);
-}
-{
-	/* <button
-        type="button"
-        className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-      >
-        Button text
-      </button> */
 }

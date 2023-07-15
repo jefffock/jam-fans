@@ -25,6 +25,25 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
+export function ErrorBoundary({ error }:{ error: Error }) {
+  console.error(error);
+  return (
+    <html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+
+        {/* add the UI you want your users <to see */}
+        <p>Something went wrong :&#40; Please let me know on twitter <a href='https://twitter.com/jeffphox'>@jeffphox</a> so I can work on fixing it.</p>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
 export default function App() {
   return (
     <html lang="en">
