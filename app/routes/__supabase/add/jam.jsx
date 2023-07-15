@@ -306,8 +306,8 @@ export async function action({ request, params }) {
 			song_id: songObj?.id,
 			song_submitter_name: songObj?.submitter_name,
 		});
-		console.log('data', data);
-		console.log('error', error);
+		console.log('data (add-not-logged-in)', data);
+		console.log('error (add-not-logged-in)', error);
 		addOnePoint(songObj?.submitter_name);
 	}
 	if (_action === 'update-not-logged-in') {
@@ -317,8 +317,8 @@ export async function action({ request, params }) {
 				sounds: sounds,
 			})
 			.eq('id', jam?.id);
-		console.log('data', data);
-		console.log('error', error);
+		console.log('data (update-not-logged-in)', data);
+		console.log('error (update-not-logged-in)', error);
 	}
 	if (_action === 'add-logged-in') {
 		const { data, error } = await supabaseClient.from('versions').insert({
@@ -613,45 +613,45 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
-    if (!actionData?.body?.includes('action complete') && artist) {
-      setShows(null);
-      setJam(null);
-      setQuery('');
-      if (
-        artist &&
-        artist.artist !== 'Squeaky Feet' &&
-        artist.artist !== 'Houseplant' &&
-        songSelected &&
-        useApis &&
-        (artist.artist === 'Goose' ||
-          artist.artist === 'Eggy' ||
-          artist.artist === 'Neighbor' ||
-          artist.artist === "Umphrey's McGee" ||
-          artist.artist === 'Phish' ||
-          artist.artist === "Taper's Choice" ||
-          artist.artist === 'Trey Anastasio, TAB')
-      ) {
-        let urlToFetch =
-          '/getShows?artist=' + artist.artist + '&song=' + songSelected;
-        fetcher.load(urlToFetch);
-      }
-      async function getSongObj() {
-        const { data, error } = await supabase
-          .from('songs')
-          .select('*')
-          .eq('song', songSelected)
-          .single();
-        if (data) {
-          setSongObj(data);
-          if (actionData?.body.includes('added song')) {
-            navigate('/');
-          }
-        }
-      }
-      if (filteredSongs?.length !== 0) {
-        getSongObj();
-      }
-    }
+		if (!actionData?.body?.includes('action complete') && artist) {
+			setShows(null);
+			setJam(null);
+			setQuery('');
+			if (
+				artist &&
+				artist.artist !== 'Squeaky Feet' &&
+				artist.artist !== 'Houseplant' &&
+				songSelected &&
+				useApis &&
+				(artist.artist === 'Goose' ||
+					artist.artist === 'Eggy' ||
+					artist.artist === 'Neighbor' ||
+					artist.artist === "Umphrey's McGee" ||
+					artist.artist === 'Phish' ||
+					artist.artist === "Taper's Choice" ||
+					artist.artist === 'Trey Anastasio, TAB')
+			) {
+				let urlToFetch =
+					'/getShows?artist=' + artist.artist + '&song=' + songSelected;
+				fetcher.load(urlToFetch);
+			}
+			async function getSongObj() {
+				const { data, error } = await supabase
+					.from('songs')
+					.select('*')
+					.eq('song', songSelected)
+					.single();
+				if (data) {
+					setSongObj(data);
+					if (actionData?.body.includes('added song')) {
+						navigate('/');
+					}
+				}
+			}
+			if (filteredSongs?.length !== 0) {
+				getSongObj();
+			}
+		}
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
@@ -674,6 +674,7 @@ export default function AddJam() {
 			setDate(show.showdate);
 			setLocation(show.location);
 			if (show.existingJam) {
+				console.log('show.existingJam', show.existingJam);
 				setJam(show.existingJam);
 			}
 		}
@@ -698,11 +699,17 @@ export default function AddJam() {
 	}, [setlist]);
 
 	useEffect(() => {
-		console.log('jam chang, jam, profile', jam, profile);
+		// handle when user changes jam and is logged in
+		console.log('jam change, jam, profile', jam, profile);
 		if (profile && profile?.name && jam) {
 			let urlToFetch = `/getRating?jam=${jam.id}&name=${profile.name}`;
 			console.log('fetching rating, urlToFetch', urlToFetch);
 			fetcher.load(urlToFetch);
+		}
+		//update sounds when jam changes
+		if (jam) {
+			console.log('jam.sounds', jam.sounds);
+			setSoundsSelected(jam.sounds);
 		}
 	}, [jam, profile]);
 
@@ -738,6 +745,7 @@ export default function AddJam() {
 		setLocation('');
 		setJam('');
 		setSetlist('');
+		setSoundsSelected('');
 	}
 
 	function showEditLocation() {
@@ -826,8 +834,11 @@ export default function AddJam() {
 		setComment(e.target.value);
 	}
 
+	console.log('initialSounds', initialSounds);
+
 	function handleSoundsChange(e) {
-		// if e.target.value is not in soundsSelected, add it, else, remove it
+		// if e.target.value is not in soundsSelected, add it, else, remove it (if not in initial sounds)
+		//if new sound is already selected and not in initial sounds, remove it
 		if (soundsSelected?.includes(e.target.value)) {
 			let newSoundsSelected = soundsSelected.filter(
 				(sound) => sound !== e.target.value
@@ -874,8 +885,7 @@ export default function AddJam() {
 		setLocation(fetcher?.data?.location);
 	}
 	//setjam (if added to jamfans already)
-	// console.log('fetcher?.data?.jam', fetcher?.data?.jam)
-	// console.log('jam', jam)
+	console.log('jam', jam);
 	// if (fetcher?.data?.jam === 'not on jf' && jam) {
 	// 	console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
 	// 	setJam(null);
@@ -888,12 +898,15 @@ export default function AddJam() {
 	// 	console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
 	// 	setJam(fetcher?.data?.jam);
 	// }
+	console.log('sounds', fetcher?.data?.jam?.sounds, soundsSelected);
 	if (
-		fetcher?.data?.jam?.sounds &&
-    fetcher?.data?.jam?.sounds.length > 0 &&
-		(!soundsSelected || soundsSelected.length === 0 || JSON.stringify(fetcher?.data?.jam?.sounds) !== JSON.stringify(soundsSelected))
+		jam?.sounds &&
+		jam?.sounds.length > 0 &&
+		(!soundsSelected ||
+			soundsSelected.length === 0 ||
+			JSON.stringify(jam?.sounds) !== JSON.stringify(soundsSelected))
 	) {
-		setSoundsSelected(fetcher?.data?.jam?.sounds);
+		setSoundsSelected(jam?.sounds);
 	}
 	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
 		setShowSuccessAlert(true);
@@ -927,6 +940,7 @@ export default function AddJam() {
 	}, [artist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
+	console.log('fetcher?.data', fetcher?.data);
 
 	return (
 		<Form
@@ -1228,7 +1242,7 @@ export default function AddJam() {
 					songSelected &&
 					artist &&
 					!date &&
-          !year &&
+					!year &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
@@ -1835,38 +1849,38 @@ export default function AddJam() {
 									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll max-w-fit'>
 										{sounds &&
 											sounds?.map((sound, soundIdx) => {
-												if (
-													!fetcher?.data?.jam?.sounds?.includes(sound.label)
-												) {
-													return (
-														<div
-															key={soundIdx}
-															className='relative flex items-start py-4'
-														>
-															<div className='min-w-0 flex-1 text-sm'>
-																<label
-																	htmlFor={`${sound.text}`}
-																	className='select-none font-medium text-gray-700 mx-2'
-																>
-																	{sound?.label}
-																</label>
-															</div>
-															<div className='ml-3 flex h-5 items-center'>
-																<input
-																	value={`${sound.label}`}
-																	id={`${sound.text}`}
-																	name={`sounds-${sound.text}`}
-																	disabled={fetcher?.data?.jam?.sounds?.includes(
-																		sound.label
-																	)}
-																	type='checkbox'
-																	className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
-																	onChange={handleSoundsChange}
-																/>
-															</div>
+												return (
+													<div
+														key={soundIdx}
+														className='relative flex items-start py-4'
+													>
+														<div className='min-w-0 flex-1 text-sm'>
+															<label
+																htmlFor={`${sound.text}`}
+																className='select-none font-medium text-gray-700 mx-2'
+															>
+																{sound.label}
+															</label>
 														</div>
-													);
-												}
+														<div className='ml-3 flex h-5 items-center'>
+															<input
+																value={`${sound.label}`}
+																id={`${sound.text}`}
+																name={`sounds-${sound.text}`}
+																type='checkbox'
+																className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
+																checked={jam?.sounds?.includes(sound.label)}
+																onChange={handleSoundsChange}
+																disabled={jam?.sounds?.includes(sound.label)}
+															/>
+															<p>
+																{fetcher?.data?.jam?.sounds?.includes(
+																	sound.label
+																)}
+															</p>
+														</div>
+													</div>
+												);
 											})}
 									</div>
 								</fieldset>
@@ -1874,6 +1888,7 @@ export default function AddJam() {
 						</div>
 					</>
 				)}
+				{/* list of sounds selected */}
 				{artist &&
 					songSelected &&
 					date &&
@@ -1917,7 +1932,8 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-sm font-medium text-gray-700'>
-										Your subjective rating. This is just to help fans find it. No stress!
+										Your subjective rating. This is just to help fans find it.
+										No stress!
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -2123,7 +2139,7 @@ export default function AddJam() {
 					{/*logged in, jam exists, add rating/comment, no new sounds*/}
 					{profile &&
 						fetcher?.data?.jam &&
-            fetcher?.data?.jam !== 'not on jf' &&
+						fetcher?.data?.jam !== 'not on jf' &&
 						(rating || comment) &&
 						fetcher?.data?.jam?.sounds?.length === soundsSelected?.length &&
 						(fetcher?.data?.jam.listen_link || !listenLink) && (
@@ -2140,7 +2156,7 @@ export default function AddJam() {
 					{/*logged in, jam exists, add rating/comment and sounds*/}
 					{profile &&
 						fetcher?.data?.jam &&
-            fetcher?.data?.jam !== 'not on jf' &&
+						fetcher?.data?.jam !== 'not on jf' &&
 						(rating || comment) &&
 						(fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length ||
 							(!fetcher?.data?.jam?.listen_link && listenLink)) && (
