@@ -9,17 +9,6 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 
-<<<<<<< HEAD
-=======
-	async function wait500() {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve('resolved');
-			}, 500);
-		});
-	}
-
->>>>>>> f12584b26490a5229ccb74e3bbd2be7df2f736d2
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
