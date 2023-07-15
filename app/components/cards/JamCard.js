@@ -43,6 +43,7 @@ export default function JamCard({
 				<h5 className='mb-2 text-2xl font-bold tracking-tight text-gray-900'>
 					{jam.song_name}{' '}{songEmojis && songEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 				</h5>
+        {/* first row */}
 				<div className='flex justify-between'>
 					<h5 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.date}
@@ -66,12 +67,14 @@ export default function JamCard({
 						</p>
 					</div>
 				</div>
+        {/* second row */}
 				<div className='flex justify-between'>
 					<h6 className='mb-2 text-xl tracking-tight text-gray-900'>
 						{jam.artist}{' '}{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 					</h6>
-					<p className={`${(!showRatings || jam.num_ratings === 0) ? 'hidden' : 'flex float-right'}`}>{jam.num_ratings} ratings</p>
+					<p className={`${(!showRatings || jam.num_ratings === 0) ? 'hidden' : 'flex float-right'}`}>{jam.num_ratings} fan{jam.num_ratings != 1 ? 's' : ''}</p>
 				</div>
+        {/* third row */}
 				<p className='mb-3 font-normal text-gray-700 mr-auto'>{jam.location}</p>
 				{jam?.sounds && (
 					<p className='mb-3 font-normal text-gray-700'>
@@ -128,7 +131,7 @@ export default function JamCard({
 						to={link}
 						className='underline self-center align-middle text-cyan-500 hover:text-cyan-600'
 					>
-						{jam.listen_link ? 'Rate' : 'Rate and/or add a link'}
+						{jam.listen_link ? 'Curate' : 'Curate and/or add a link'}
 					</Link>
 				)}
 				<div className='transition-all ease-in hover:scale-125 duration-500 hover:duration-20000'>

@@ -52,7 +52,7 @@ export default function BottomNav({ supabase, session }) {
 								/>
 							</svg>
 						</div>
-						Contribute
+						Curate
 					</Link>
 				</div>
 			</nav>

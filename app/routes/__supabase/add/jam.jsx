@@ -1796,7 +1796,7 @@ export default function AddJam() {
 						<SuccessAlert
 							title={"It's on Jam Fans!"}
 							description={`You can add sounds ${
-								profile ? 'and your rating and comment' : ''
+								profile ? ' and your subjective rating and comment' : ''
 							} below. Thanks for helping other fans!`}
 						/>
 					)}
@@ -1895,7 +1895,7 @@ export default function AddJam() {
 							{({ open }) => (
 								<>
 									<Listbox.Label className='block text-sm font-medium text-gray-700'>
-										Rating
+										Your subjective rating. This is just to help fans find it. No stress!
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1917,7 +1917,7 @@ export default function AddJam() {
 											leaveFrom='opacity-100'
 											leaveTo='opacity-0'
 										>
-											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
+											<Listbox.Options className='absolute z-10 mt-1 max-h-50 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
 												{[10, 9, 8, 7, 6, 5, 4, 'No rating'].map(
 													(rating, ratingIdx) => (
 														<Listbox.Option
@@ -1976,7 +1976,7 @@ export default function AddJam() {
 							>
 								Comment
 							</label>
-							<div className='mt-1'>
+							<div className='mt-1 mb-10'>
 								<textarea
 									type='text'
 									name='comment'
@@ -2144,7 +2144,7 @@ export default function AddJam() {
 								'Something went wrong. Please try again and/or let me know on twitter'
 							}
 						/>
-						<a href='https://twitter.com/jeffphox'>@jeffphox on twitter</a>
+						<a href='https://twitter.com/jeffphox'>@jeffphox</a>
 					</div>
 				)}
 			</div>
