@@ -732,12 +732,12 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
-    console.log('clearing song')
+		console.log('clearing song');
 		submit({ _action: 'clear' });
 		setSong('');
 		setSongSelected('');
 		setJam(null);
-    setSoundsSelected('')
+		setSoundsSelected('');
 	}
 
 	function clearDate() {
@@ -899,7 +899,7 @@ export default function AddJam() {
 		fetcher?.data?.jam &&
 		fetcher?.data?.jam !== 'not on jf' &&
 		(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
-    songSelected === fetcher?.data?.jam?.song_name
+		songSelected === fetcher?.data?.jam?.song_name
 	) {
 		console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
 		setJam(fetcher?.data?.jam);
@@ -930,7 +930,7 @@ export default function AddJam() {
 				songSelected +
 				'&date=' +
 				date;
-      console.log('urlToFetch in check if song exists', urlToFetch);
+			console.log('urlToFetch in check if song exists', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist, shows]);
@@ -1144,6 +1144,7 @@ export default function AddJam() {
 				{artist &&
 					(!setlist || !date) &&
 					!songSelected &&
+					!year &&
 					(artist.artist === 'Goose' ||
 						artist.artist === 'Eggy' ||
 						artist.artist === 'Neighbor' ||
@@ -1559,7 +1560,7 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Date picker input */}
-				{useApis && !date && artist && !songSelected && (
+				{useApis && !date && artist && !songSelected && !year && (
 					<div>
 						<p>Or enter a date to get the setlist</p>
 						<p className='text-sm'>MMDDYYYY format</p>
@@ -1568,7 +1569,7 @@ export default function AddJam() {
 							value={dateInput}
 							onChange={handleDateInputChange}
 							className='border border-gray-300 rounded-md p-2'
-						/>
+						/> 
 					</div>
 				)}
 				{/* song picker from setlist */}
@@ -2062,7 +2063,7 @@ export default function AddJam() {
 				>
 					{/* not logged in, add new jam*/}
 					{!profile &&
-						fetcher?.data?.jam === 'not on jf' &&
+						!jam &&
 						artist &&
 						songSelected &&
 						date &&
