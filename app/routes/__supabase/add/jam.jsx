@@ -732,10 +732,12 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
+    console.log('clearing song')
 		submit({ _action: 'clear' });
 		setSong('');
 		setSongSelected('');
 		setJam(null);
+    setSoundsSelected('')
 	}
 
 	function clearDate() {
@@ -889,18 +891,19 @@ export default function AddJam() {
 	}
 	//setjam (if added to jamfans already)
 	console.log('jam', jam);
-	// if (fetcher?.data?.jam === 'not on jf' && jam) {
-	// 	console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
-	// 	setJam(null);
-	// }
-	// if (
-	// 	fetcher?.data?.jam &&
-	// 	fetcher?.data?.jam !== 'not on jf' &&
-	// 	(!jam || fetcher?.data?.jam?.id !== jam?.id)
-	// ) {
-	// 	console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
-	// 	setJam(fetcher?.data?.jam);
-	// }
+	if (fetcher?.data?.jam === 'not on jf' && jam) {
+		console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
+		setJam(null);
+	}
+	if (
+		fetcher?.data?.jam &&
+		fetcher?.data?.jam !== 'not on jf' &&
+		(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
+    songSelected === fetcher?.data?.jam?.song_name
+	) {
+		console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
+		setJam(fetcher?.data?.jam);
+	}
 	if (
 		jam?.sounds &&
 		jam?.sounds.length > 0 &&
@@ -927,9 +930,10 @@ export default function AddJam() {
 				songSelected +
 				'&date=' +
 				date;
+      console.log('urlToFetch in check if song exists', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date, setlist]);
+	}, [songSelected, date, setlist, shows]);
 
 	useEffect(() => {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
@@ -940,7 +944,7 @@ export default function AddJam() {
 	}, [artist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
-	console.log('fetcher?.data', fetcher?.data);
+	console.log('fetcher', fetcher);
 
 	return (
 		<Form
@@ -1374,7 +1378,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* Year picker */}
-				{useApis && artist && !date && (
+				{useApis && artist && !date && !songSelected && (
 					<div className='max-h-40 max-w-xs'>
 						<Listbox
 							value={year}
@@ -1554,8 +1558,8 @@ export default function AddJam() {
 							<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
 						</div>
 					)}
-				{/* Date input */}
-				{useApis && !date && artist && (
+				{/* Date picker input */}
+				{useApis && !date && artist && !songSelected && (
 					<div>
 						<p>Or enter a date to get the setlist</p>
 						<p className='text-sm'>MMDDYYYY format</p>
