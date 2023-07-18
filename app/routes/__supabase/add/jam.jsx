@@ -655,7 +655,6 @@ export default function AddJam() {
 	}, [songSelected, actionData?.body]);
 
 	function handleShowChange(show) {
-		console.log('handleShowChange', show);
 		if (show) {
 			setSetlist(null);
 			//dont get setlist song bc checkJamAdded takes care of it
@@ -732,16 +731,24 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
+		console.log('show', show);
 		console.log('clearing song');
 		submit({ _action: 'clear' });
 		setSong('');
 		setSongSelected('');
 		setJam(null);
 		setSoundsSelected('');
+		if (!setlist && show) {
+			//use fetcher.load to get setlist
+			let urlToFetch =
+				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+			fetcher.load(urlToFetch);
+		}
 	}
 
 	function clearDate() {
 		submit({ _action: 'clear' });
+    fetcher.load('/resetFetcher')
 		setDate('');
 		setShow('');
 		setLocation('');
@@ -761,6 +768,7 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
+    console.log('location in year change', location)
 		if (location) setLocation('');
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
@@ -836,8 +844,6 @@ export default function AddJam() {
 		setComment(e.target.value);
 	}
 
-	console.log('initialSounds', initialSounds);
-
 	function handleSoundsChange(e) {
 		console.log('e.target.value', e.target.value);
 		console.log('soundsSelected', soundsSelected);
@@ -886,6 +892,7 @@ export default function AddJam() {
 		artist &&
 		fetcher?.data?.location &&
 		fetcher?.data?.location !== location
+    && date
 	) {
 		setLocation(fetcher?.data?.location);
 	}
@@ -922,7 +929,8 @@ export default function AddJam() {
 
 	//check if song exists
 	useEffect(() => {
-		if (songSelected && artist && date && setlist && shows) {
+		if (songSelected && artist && date && setlist && show) {
+      console.log('songSelected', songSelected, 'artist', artist, 'date', date, 'setlist', setlist, 'show', show)
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -933,7 +941,7 @@ export default function AddJam() {
 			console.log('urlToFetch in check if song exists', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date, setlist, shows]);
+	}, [songSelected, date, setlist, show]);
 
 	useEffect(() => {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
@@ -1569,7 +1577,7 @@ export default function AddJam() {
 							value={dateInput}
 							onChange={handleDateInputChange}
 							className='border border-gray-300 rounded-md p-2'
-						/> 
+						/>
 					</div>
 				)}
 				{/* song picker from setlist */}
@@ -2062,22 +2070,17 @@ export default function AddJam() {
 					}`}
 				>
 					{/* not logged in, add new jam*/}
-					{!profile &&
-						!jam &&
-						artist &&
-						songSelected &&
-						date &&
-						location && (
-							<button
-								type='submit'
-								name='_action'
-								value='add-not-logged-in'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
-								disabled={showAddSong}
-							>
-								Add this jam
-							</button>
-						)}
+					{!profile && !jam && artist && songSelected && date && location && (
+						<button
+							type='submit'
+							name='_action'
+							value='add-not-logged-in'
+							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
+							disabled={showAddSong}
+						>
+							Add this jam
+						</button>
+					)}
 					{/* not logged in, jam exists, update sounds*/}
 					{!profile &&
 						jam &&
