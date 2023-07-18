@@ -528,6 +528,8 @@ export default function AddJam() {
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
 	const [shows, setShows] = useState(null);
+	const [showsBySong, setShowsBySong] = useState(null);
+	const [showsByYear, setShowsByYear] = useState(null);
 	const [songId, setSongId] = useState(null);
 	const [useApis, setUseApis] = useState(true);
 	const [ratingId, setRatingId] = useState(null);
@@ -614,7 +616,7 @@ export default function AddJam() {
 	//get shows by song for select artists
 	useEffect(() => {
 		if (!actionData?.body?.includes('action complete') && artist) {
-			setShows(null);
+			console.log('setting shows to null');
 			setJam(null);
 			setQuery('');
 			if (
@@ -631,8 +633,10 @@ export default function AddJam() {
 					artist.artist === "Taper's Choice" ||
 					artist.artist === 'Trey Anastasio, TAB')
 			) {
+				setShows(null);
 				let urlToFetch =
 					'/getShows?artist=' + artist.artist + '&song=' + songSelected;
+				console.log('fetching shows', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 			async function getSongObj() {
@@ -748,14 +752,36 @@ export default function AddJam() {
 
 	function clearDate() {
 		submit({ _action: 'clear' });
-    fetcher.load('/resetFetcher')
 		setDate('');
 		setShow('');
 		setLocation('');
 		setJam('');
 		setSetlist('');
 		setSoundsSelected('');
+		if (
+			artist &&
+			songSelected &&
+			useApis &&
+			[
+				'Phish',
+				"Umphrey's McGee",
+				'Trey Anastasio, TAB',
+				'Goose',
+				'Eggy',
+				'Neighbor',
+				"Taper's Choice",
+			].includes(artist.artist)
+		) {
+			let urlToFetch =
+				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
+			fetcher.load(urlToFetch);
+		} else {
+			clearSong();
+		}
 	}
+
+	console.log('year', year);
+	console.log('shows', shows);
 
 	function showEditLocation() {
 		setShowLocationInput(true);
@@ -768,7 +794,7 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
-    console.log('location in year change', location)
+		console.log('location in year change', location);
 		if (location) setLocation('');
 		if (setlist) setSetlist(null);
 		if (e === 'Clear Year') {
@@ -876,6 +902,7 @@ export default function AddJam() {
 			fetcher.data.shows[0].showdate.normalize() !==
 				shows[0]?.showdate.normalize())
 	) {
+		console.log('setting shows from fetcher?.data?.shows');
 		setShows(fetcher?.data?.shows);
 	}
 	if (
@@ -891,12 +918,12 @@ export default function AddJam() {
 	if (
 		artist &&
 		fetcher?.data?.location &&
-		fetcher?.data?.location !== location
-    && date
+		fetcher?.data?.location !== location &&
+		date
 	) {
 		setLocation(fetcher?.data?.location);
 	}
-	//setjam (if added to jamfans already)
+	//setjam (if added to jamfans already)z
 	console.log('jam', jam);
 	if (fetcher?.data?.jam === 'not on jf' && jam) {
 		console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
@@ -930,7 +957,18 @@ export default function AddJam() {
 	//check if song exists
 	useEffect(() => {
 		if (songSelected && artist && date && setlist && show) {
-      console.log('songSelected', songSelected, 'artist', artist, 'date', date, 'setlist', setlist, 'show', show)
+			console.log(
+				'songSelected',
+				songSelected,
+				'artist',
+				artist,
+				'date',
+				date,
+				'setlist',
+				setlist,
+				'show',
+				show
+			);
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -1150,16 +1188,28 @@ export default function AddJam() {
 				)}
 				{/* song picker (not setlist)*/}
 				{artist &&
-					(!setlist || !date) &&
 					!songSelected &&
-					!year &&
-					(artist.artist === 'Goose' ||
-						artist.artist === 'Eggy' ||
-						artist.artist === 'Neighbor' ||
-						artist.artist === "Umphrey's McGee" ||
-						artist.artist === 'Phish' ||
-						artist.artist === "Taper's Choice" ||
-						artist.artist === 'Trey Anastasio, TAB' ||
+					(((!setlist || !date) &&
+						!year &&
+						[
+							'Goose',
+							'Eggy',
+							'Neighbor',
+							"Umphrey's McGee",
+							'Phish',
+							"Taper's Choice",
+							'Trey Anastasio, TAB',
+						].includes(artist.artist)) ||
+						(![
+							'Goose',
+							'Eggy',
+							'Neighbor',
+							"Umphrey's McGee",
+							'Phish',
+							"Taper's Choice",
+							'Trey Anastasio, TAB',
+						].includes(artist.artist) &&
+							date) ||
 						!useApis) && (
 						<div className='max-w-sm py-4'>
 							<Combobox
@@ -1271,7 +1321,15 @@ export default function AddJam() {
 								{({ open }) => (
 									<>
 										<Listbox.Label className='block text-md font-medium text-gray-700'>
-											Shows with a {songSelected}
+											Shows with a
+											{songSelected[0] === 'A' ||
+											songSelected[0] === 'E' ||
+											songSelected[0] === 'I' ||
+											songSelected[0] === 'O' ||
+											songSelected[0] === 'U'
+												? 'n'
+												: ''}{' '}
+											{songSelected}
 										</Listbox.Label>
 										<div className='relative mt-1'>
 											<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
@@ -1352,7 +1410,9 @@ export default function AddJam() {
 							title={`No songs containing ${
 								query && query !== '' ? query : songSelected
 							} found`}
-							description={`This is a travesty! Please rectify this situation by adding a new song below`}
+							description={`Click the button below to add ${
+								query && query !== '' ? query : songSelected
+							} below`}
 						/>
 						<label
 							htmlFor='new-song'
@@ -1365,9 +1425,10 @@ export default function AddJam() {
 								type='text'
 								name='new-song'
 								id='new-song'
-								defaultValue={query !== '' ? query : songSelected}
+								value={songSelected !== '' ? songSelected : query}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='new-song'
+								onChange={() => setQuery(event.target.value)}
 							/>
 						</div>
 						<p
@@ -1813,7 +1874,7 @@ export default function AddJam() {
 								!
 							</p>
 						) : !(artist && songSelected && date && location) ? (
-							"If the info isn't on setlist.fm, please consider adding it if you know it. Thanks for contributing!"
+							"If the info isn't on setlist.fm, please consider adding it there if you know it. Thanks for contributing!"
 						) : (
 							''
 						)}
