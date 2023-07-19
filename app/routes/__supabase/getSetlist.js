@@ -9,8 +9,8 @@ export const loader = async ({ request, params }) => {
 		{ request, response }
 	);
 	let urlToFetch;
-  let location
-  let dbName;
+	let location;
+	let dbName;
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
 		gooseBaseUrl: 'https://elgoose.net/api/v1',
@@ -48,7 +48,7 @@ export const loader = async ({ request, params }) => {
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
 		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
-    'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
+		'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
 		'String Cheese Incident': 'cff95140-6d57-498a-8834-10eb72865b29',
@@ -61,7 +61,7 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const artist = queryParams?.artist;
 	const date = queryParams?.date;
-  console.log('artist, date', artist, date)
+	console.log('artist, date', artist, date);
 	let jfVersions;
 	const { data, error } = await supabaseClient
 		.from('versions')
@@ -74,7 +74,7 @@ export const loader = async ({ request, params }) => {
 		jfVersions = data;
 	}
 	let setlist = [];
-  //phish or tab
+	//phish or tab
 	if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 		let artistId;
 		switch (artist) {
@@ -97,20 +97,22 @@ export const loader = async ({ request, params }) => {
 			}`;
 			const titles = setlist.data
 				.filter((song) => song.artistid === artistId)
-				.map(({ song }) => {
-          if (song === 'Also Sprach Zarathustra') song = 'Also Sprach Zarathustra (2001)'
+				.map((song) => {
+          let title = song.song
+					if (song.song === 'Also Sprach Zarathustra')
+						title = 'Also Sprach Zarathustra (2001)';
 					const alreadyAdded = jfVersions.find(
-						({ song_name }) => song_name === song
+						({ song_name }) => song_name === song.song
 					);
 					return {
-						label: alreadyAdded ? '(Added) ' + song : song,
-						value: song,
+						label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
+						value: title,
 					};
 				});
 			setlist = titles;
 		}
 	} else if (
-    //songfish artists
+		//songfish artists
 		artist === 'Goose' ||
 		artist === 'Eggy' ||
 		artist === 'Neighbor' ||
@@ -118,52 +120,54 @@ export const loader = async ({ request, params }) => {
 		artist === "Taper's Choice"
 	) {
 		//use songfish api
-			let baseUrl;
-			switch (artist) {
-				case 'Eggy':
-					dbName = 'eggy_songs';
-					baseUrl = baseUrls.eggyBaseUrl;
-					break;
-				case 'Goose':
-					dbName = 'goose_songs';
-					baseUrl = baseUrls.gooseBaseUrl;
-					break;
-				case "Umphrey's McGee":
-					dbName = 'um_songs';
-					baseUrl = baseUrls.umphreysBaseUrl;
-					break;
-				case 'Neighbor':
-					dbName = 'neighbor_songs';
-					baseUrl = baseUrls.neighborBaseUrl;
-        case "Taper's Choice":
-          dbName = 'tapers_choice_songs'
-          baseUrl = baseUrls.tapersChoiceBaseUrl;
-			}
-      const url = `${baseUrl}/setlists/showdate/${date}`
-      console.log('url to fetch: ', url)
-    const setlistData = await fetch(url)
-    setlist = await setlistData.json()
-    console.log('setlist: ', setlist)
-    if (setlist && setlist.data && setlist.data.length > 0) {
-      const song = setlist.data[0]
-      location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
-      const titles = setlist.data
-        .filter((song) => song.artist_id === 1)
-        .map(({ songname }) => {
-          if (songname === 'Echo Of A Rose') return 'Echo of a Rose'
-          return songname
-        })
-        console.log('titles: ', titles)
-        console.log('location: ', location)
-      setlist = titles
-    }
+		let baseUrl;
+		switch (artist) {
+			case 'Eggy':
+				dbName = 'eggy_songs';
+				baseUrl = baseUrls.eggyBaseUrl;
+				break;
+			case 'Goose':
+				dbName = 'goose_songs';
+				baseUrl = baseUrls.gooseBaseUrl;
+				break;
+			case "Umphrey's McGee":
+				dbName = 'um_songs';
+				baseUrl = baseUrls.umphreysBaseUrl;
+				break;
+			case 'Neighbor':
+				dbName = 'neighbor_songs';
+				baseUrl = baseUrls.neighborBaseUrl;
+			case "Taper's Choice":
+				dbName = 'tapers_choice_songs';
+				baseUrl = baseUrls.tapersChoiceBaseUrl;
+		}
+		const url = `${baseUrl}/setlists/showdate/${date}`;
+		console.log('url to fetch: ', url);
+		const setlistData = await fetch(url);
+		setlist = await setlistData.json();
+		console.log('setlist: ', setlist);
+		if (setlist && setlist.data && setlist.data.length > 0) {
+			const song = setlist.data[0];
+			location = `${song.venuename}, ${song.city}, ${
+				song?.country === 'USA' ? song.state : song.country
+			}`;
+			const titles = setlist.data
+				.filter((song) => song.artist_id === 1)
+				.map(({ songname }) => {
+					if (songname === 'Echo Of A Rose') return 'Echo of a Rose';
+					return songname;
+				});
+			console.log('titles: ', titles);
+			console.log('location: ', location);
+			setlist = titles;
+		}
 	} else {
 		//setlistfm for all other artists
 		const [year, month, day] = date.split('-');
 		const transformedDate = [day, month, year].join('-');
 		const mbid = mbids[artist];
 		const setlistFMUrl = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&date=${transformedDate}`;
-    console.log('setlistfm url', setlistFMUrl)
+		console.log('setlistfm url', setlistFMUrl);
 		let apiKey = process.env.SETLISTFM_API_KEY;
 		const setlistData = await fetch(setlistFMUrl, {
 			headers: {
@@ -172,7 +176,7 @@ export const loader = async ({ request, params }) => {
 			},
 		});
 		setlist = await setlistData.json();
-    console.log('setlistfm setlist', setlist)
+		console.log('setlistfm setlist', setlist);
 		if (setlist && setlist.setlist && setlist.setlist.length > 0) {
 			const song = setlist.setlist[0];
 			location = `${song.venue.name}, ${song.venue.city.name}, ${
@@ -181,19 +185,23 @@ export const loader = async ({ request, params }) => {
 					: song.venue.city.country.name
 			}`;
 			const titles = setlist.setlist[0].sets.set
-				.map(({ song }) => song.map(({ name }) => {
-          const alreadyAdded = jfVersions.find(({song_name}) => song_name === name)
-          return {
-						label: alreadyAdded ? '(Added) ' + name : name,
-						value: name,
-					};
-        }))
+				.map(({ song }) =>
+					song.map(({ name }) => {
+						const alreadyAdded = jfVersions.find(
+							({ song_name }) => song_name === name
+						);
+						return {
+							label: alreadyAdded ? '(Added) ' + name : name,
+							value: name,
+						};
+					})
+				)
 				.flat();
 			setlist = titles;
 		}
 	}
-  console.log('setlist', setlist)
-  console.log('location', location)
+	console.log('setlist', setlist);
+	console.log('location', location);
 	return json(
 		{ setlist: setlist || [], location },
 		{

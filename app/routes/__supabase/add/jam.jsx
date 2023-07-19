@@ -646,8 +646,7 @@ export default function AddJam() {
 				useApis &&
 				artist &&
 				artist !== 'Squeaky Feet' &&
-				artist !== 'Houseplant' &&
-				!songSelected
+				artist !== 'Houseplant'
 			) {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
