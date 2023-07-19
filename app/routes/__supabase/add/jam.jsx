@@ -1627,15 +1627,15 @@ export default function AddJam() {
 							</Listbox>
 						</div>
 					)}
-				{/* Loading spinner*/}
+				{/* Loading spinner
 				{fetcher &&
 					fetcher.state &&
 					fetcher.state === 'loading' &&
 					!(artist && songSelected && date && location) && (
 						<div className='flex flex-col justify-center'>
-							<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-900'></div>
+							<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700'></div>
 						</div>
-					)}
+					)} */}
 				{/* Date picker input */}
 				{useApis && !date && artist && !songSelected && !year && (
 					<div>
@@ -1893,7 +1893,7 @@ export default function AddJam() {
 				{useApis &&
 					showLoadingInfo &&
 					!(artist && songSelected && date && location) &&
-					[
+					![
 						'Goose',
 						'Eggy',
 						'Neighbor',
