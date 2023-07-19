@@ -746,7 +746,7 @@ export default function AddJam() {
 				"Taper's Choice",
 			].includes(artist.artist)
 		) {
-      setYear('')
+			setYear('');
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
 
@@ -889,7 +889,7 @@ export default function AddJam() {
 		artist &&
 		fetcher?.data?.location &&
 		fetcher?.data?.location !== location &&
-    !showEditLocation &&
+		!showEditLocation &&
 		date
 	) {
 		setLocation(fetcher?.data?.location);
@@ -1078,47 +1078,52 @@ export default function AddJam() {
 											leaveTo='opacity-0'
 										>
 											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-												{artists?.map((artist, artistIdx) => (
-													<Listbox.Option
-														key={artistIdx}
-														className={({ active }) =>
-															classNames(
-																active
-																	? 'text-white bg-cyan-600'
-																	: 'text-gray-900',
-																'relative cursor-default select-none py-2 pl-3 pr-9'
-															)
-														}
-														value={artist}
-													>
-														{({ selected, active }) => (
-															<>
-																<span
-																	className={classNames(
-																		selected ? 'font-semibold' : 'font-normal',
-																		'block truncate'
-																	)}
-																>
-																	{artist.artist}
-																</span>
-
-																{selected ? (
+												{artists &&
+													artists?.map((artist, artistIdx) => (
+														<Listbox.Option
+															key={artistIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-cyan-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={artist}
+														>
+															{({ selected, active }) => (
+																<>
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-cyan-600',
-																			'absolute inset-y-0 right-0 flex items-center pr-4'
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
 																		)}
 																	>
-																		<CheckIcon
-																			className='h-5 w-5'
-																			aria-hidden='true'
-																		/>
+																		{artist.artist}
 																	</span>
-																) : ''}
-															</>
-														)}
-													</Listbox.Option>
-												))}
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active ? 'text-white' : 'text-cyan-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : (
+																		''
+																	)}
+																</>
+															)}
+														</Listbox.Option>
+													))}
 											</Listbox.Options>
 										</Transition>
 									</div>
@@ -1194,47 +1199,48 @@ export default function AddJam() {
 
 									{filteredSongs?.length > 0 && (
 										<Combobox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
-											{filteredSongs?.map((song, songIdx) => (
-												<Combobox.Option
-													key={songIdx}
-													value={song.song}
-													className={({ active }) =>
-														classNames(
-															'relative cursor-default select-none py-2 pl-3 pr-9',
-															active
-																? 'bg-cyan-600 text-white'
-																: 'text-gray-900'
-														)
-													}
-												>
-													{({ active, songSelected }) => (
-														<>
-															<span
-																className={classNames(
-																	'block truncate',
-																	songSelected && 'font-semibold'
-																)}
-															>
-																{song.song}
-															</span>
-
-															{songSelected && (
+											{filteredSongs &&
+												filteredSongs?.map((song, songIdx) => (
+													<Combobox.Option
+														key={songIdx}
+														value={song.song}
+														className={({ active }) =>
+															classNames(
+																'relative cursor-default select-none py-2 pl-3 pr-9',
+																active
+																	? 'bg-cyan-600 text-white'
+																	: 'text-gray-900'
+															)
+														}
+													>
+														{({ active, songSelected }) => (
+															<>
 																<span
 																	className={classNames(
-																		'absolute inset-y-0 right-0 flex items-center pr-4',
-																		active ? 'text-white' : 'text-cyan-600'
+																		'block truncate',
+																		songSelected && 'font-semibold'
 																	)}
 																>
-																	<CheckIcon
-																		className='h-5 w-5'
-																		aria-hidden='true'
-																	/>
+																	{song.song}
 																</span>
-															)}
-														</>
-													)}
-												</Combobox.Option>
-											))}
+
+																{songSelected && (
+																	<span
+																		className={classNames(
+																			'absolute inset-y-0 right-0 flex items-center pr-4',
+																			active ? 'text-white' : 'text-cyan-600'
+																		)}
+																	>
+																		<CheckIcon
+																			className='h-5 w-5'
+																			aria-hidden='true'
+																		/>
+																	</span>
+																)}
+															</>
+														)}
+													</Combobox.Option>
+												))}
 										</Combobox.Options>
 									)}
 								</div>
@@ -1307,49 +1313,54 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
-														<Listbox.Option
-															key={showIdx}
-															className={({ active }) =>
-																classNames(
-																	active
-																		? 'text-white bg-cyan-600'
-																		: 'text-gray-900',
-																	'relative cursor-default select-none py-2 pl-3 pr-9'
-																)
-															}
-															value={show}
-														>
-															{({ selected, active }) => (
-																<>
-																	<span
-																		className={classNames(
-																			selected
-																				? 'font-semibold'
-																				: 'font-normal',
-																			'block truncate'
-																		)}
-																	>
-																		{show?.label}
-																	</span>
-
-																	{selected ? (
+													{shows &&
+														shows?.map((show, showIdx) => (
+															<Listbox.Option
+																key={showIdx}
+																className={({ active }) =>
+																	classNames(
+																		active
+																			? 'text-white bg-cyan-600'
+																			: 'text-gray-900',
+																		'relative cursor-default select-none py-2 pl-3 pr-9'
+																	)
+																}
+																value={show}
+															>
+																{({ selected, active }) => (
+																	<>
 																		<span
 																			className={classNames(
-																				active ? 'text-white' : 'text-cyan-600',
-																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																				selected
+																					? 'font-semibold'
+																					: 'font-normal',
+																				'block truncate'
 																			)}
 																		>
-																			<CheckIcon
-																				className='h-5 w-5'
-																				aria-hidden='true'
-																			/>
+																			{show?.label}
 																		</span>
-																	) : ''}
-																</>
-															)}
-														</Listbox.Option>
-													))}
+
+																		{selected ? (
+																			<span
+																				className={classNames(
+																					active
+																						? 'text-white'
+																						: 'text-cyan-600',
+																					'absolute inset-y-0 right-0 flex items-center pr-4'
+																				)}
+																			>
+																				<CheckIcon
+																					className='h-5 w-5'
+																					aria-hidden='true'
+																				/>
+																			</span>
+																		) : (
+																			''
+																		)}
+																	</>
+																)}
+															</Listbox.Option>
+														))}
 												</Listbox.Options>
 											</Transition>
 										</div>
@@ -1435,47 +1446,52 @@ export default function AddJam() {
 											leaveTo='opacity-0'
 										>
 											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-												{yearsArr?.map((year, yearIdx) => (
-													<Listbox.Option
-														key={yearIdx}
-														className={({ active }) =>
-															classNames(
-																active
-																	? 'text-white bg-cyan-600'
-																	: 'text-gray-900',
-																'relative cursor-default select-none py-2 pl-3 pr-9'
-															)
-														}
-														value={year}
-													>
-														{({ selected, active }) => (
-															<>
-																<span
-																	className={classNames(
-																		selected ? 'font-semibold' : 'font-normal',
-																		'block truncate'
-																	)}
-																>
-																	{year}
-																</span>
-
-																{selected ? (
+												{yearsArr &&
+													yearsArr?.map((year, yearIdx) => (
+														<Listbox.Option
+															key={yearIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-cyan-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={year}
+														>
+															{({ selected, active }) => (
+																<>
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-cyan-600',
-																			'absolute inset-y-0 right-0 flex items-center pr-4'
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
 																		)}
 																	>
-																		<CheckIcon
-																			className='h-5 w-5'
-																			aria-hidden='true'
-																		/>
+																		{year}
 																	</span>
-																) : ''}
-															</>
-														)}
-													</Listbox.Option>
-												))}
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active ? 'text-white' : 'text-cyan-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : (
+																		''
+																	)}
+																</>
+															)}
+														</Listbox.Option>
+													))}
 											</Listbox.Options>
 										</Transition>
 									</div>
@@ -1524,49 +1540,54 @@ export default function AddJam() {
 												leaveTo='opacity-0'
 											>
 												<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-													{shows?.map((show, showIdx) => (
-														<Listbox.Option
-															key={showIdx}
-															className={({ active }) =>
-																classNames(
-																	active
-																		? 'text-white bg-cyan-600'
-																		: 'text-gray-900',
-																	'relative cursor-default select-none py-2 pl-3 pr-9'
-																)
-															}
-															value={show}
-														>
-															{({ selected, active }) => (
-																<>
-																	<span
-																		className={classNames(
-																			selected
-																				? 'font-semibold'
-																				: 'font-normal',
-																			'block truncate'
-																		)}
-																	>
-																		{show?.label}
-																	</span>
-
-																	{selected ? (
+													{shows &&
+														shows?.map((show, showIdx) => (
+															<Listbox.Option
+																key={showIdx}
+																className={({ active }) =>
+																	classNames(
+																		active
+																			? 'text-white bg-cyan-600'
+																			: 'text-gray-900',
+																		'relative cursor-default select-none py-2 pl-3 pr-9'
+																	)
+																}
+																value={show}
+															>
+																{({ selected, active }) => (
+																	<>
 																		<span
 																			className={classNames(
-																				active ? 'text-white' : 'text-cyan-600',
-																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																				selected
+																					? 'font-semibold'
+																					: 'font-normal',
+																				'block truncate'
 																			)}
 																		>
-																			<CheckIcon
-																				className='h-5 w-5'
-																				aria-hidden='true'
-																			/>
+																			{show?.label}
 																		</span>
-																	) : ''}
-																</>
-															)}
-														</Listbox.Option>
-													))}
+
+																		{selected ? (
+																			<span
+																				className={classNames(
+																					active
+																						? 'text-white'
+																						: 'text-cyan-600',
+																					'absolute inset-y-0 right-0 flex items-center pr-4'
+																				)}
+																			>
+																				<CheckIcon
+																					className='h-5 w-5'
+																					aria-hidden='true'
+																				/>
+																			</span>
+																		) : (
+																			''
+																		)}
+																	</>
+																)}
+															</Listbox.Option>
+														))}
 												</Listbox.Options>
 											</Transition>
 										</div>
@@ -1630,47 +1651,52 @@ export default function AddJam() {
 											leaveTo='opacity-0'
 										>
 											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
-												{setlist?.map((songInSet, songInSetIdx) => (
-													<Listbox.Option
-														key={songInSetIdx}
-														className={({ active }) =>
-															classNames(
-																active
-																	? 'text-white bg-cyan-600'
-																	: 'text-gray-900',
-																'relative cursor-default select-none py-2 pl-3 pr-9'
-															)
-														}
-														value={songInSet.value}
-													>
-														{({ selected, active }) => (
-															<>
-																<span
-																	className={classNames(
-																		selected ? 'font-semibold' : 'font-normal',
-																		'block truncate'
-																	)}
-																>
-																	{songInSet.label}
-																</span>
-
-																{selected ? (
+												{setlist &&
+													setlist?.map((songInSet, songInSetIdx) => (
+														<Listbox.Option
+															key={songInSetIdx}
+															className={({ active }) =>
+																classNames(
+																	active
+																		? 'text-white bg-cyan-600'
+																		: 'text-gray-900',
+																	'relative cursor-default select-none py-2 pl-3 pr-9'
+																)
+															}
+															value={songInSet.value}
+														>
+															{({ selected, active }) => (
+																<>
 																	<span
 																		className={classNames(
-																			active ? 'text-white' : 'text-cyan-600',
-																			'absolute inset-y-0 right-0 flex items-center pr-4'
+																			selected
+																				? 'font-semibold'
+																				: 'font-normal',
+																			'block truncate'
 																		)}
 																	>
-																		<CheckIcon
-																			className='h-5 w-5'
-																			aria-hidden='true'
-																		/>
+																		{songInSet.label}
 																	</span>
-																) : ''}
-															</>
-														)}
-													</Listbox.Option>
-												))}
+
+																	{selected ? (
+																		<span
+																			className={classNames(
+																				active ? 'text-white' : 'text-cyan-600',
+																				'absolute inset-y-0 right-0 flex items-center pr-4'
+																			)}
+																		>
+																			<CheckIcon
+																				className='h-5 w-5'
+																				aria-hidden='true'
+																			/>
+																		</span>
+																	) : (
+																		''
+																	)}
+																</>
+															)}
+														</Listbox.Option>
+													))}
 											</Listbox.Options>
 										</Transition>
 									</div>
@@ -2032,7 +2058,9 @@ export default function AddJam() {
 																				aria-hidden='true'
 																			/>
 																		</span>
-																	) : ''}
+																	) : (
+																		''
+																	)}
 																</>
 															)}
 														</Listbox.Option>
