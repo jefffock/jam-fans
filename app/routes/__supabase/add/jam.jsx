@@ -774,8 +774,10 @@ export default function AddJam() {
 				"Taper's Choice",
 			].includes(artist.artist)
 		) {
+      setYear('')
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
+
 			fetcher.load(urlToFetch);
 		} else {
 			clearSong();
@@ -1449,9 +1451,7 @@ export default function AddJam() {
 							value='new-song'
 							className=' my-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500'
 						>
-							Add "{
-								query && query !== '' ? query : songSelected
-							}"
+							Add "{query && query !== '' ? query : songSelected}"
 						</button>
 					</div>
 				)}
@@ -1540,9 +1540,10 @@ export default function AddJam() {
 				{/* Show Picker if not from songfish artist + year*/}
 				{useApis &&
 					shows &&
-					shows?.length > 1 &&
+					shows?.length > 0 &&
 					!date &&
 					year &&
+					!songSelected &&
 					(!fetcher ||
 						(fetcher && fetcher.state && fetcher.state !== 'loading')) && (
 						<div className='max-h-40'>
