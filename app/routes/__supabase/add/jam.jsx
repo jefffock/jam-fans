@@ -496,44 +496,24 @@ export default function AddJam() {
 	const [query, setQuery] = useState('');
 	const [artist, setArtist] = useState(initialArtist ?? '');
 	const [song, setSong] = useState(initialSong ?? '');
-	const [songObj, setSongObj] = useState(initialSongObj ?? null);
-	const [songExists, setSongExists] = useState(false);
+	const [songObj, setSongObj] = useState(initialSongObj ?? '');
 	const [showLoadingInfo, setShowLoadingInfo] = useState(false);
-	const [open, setOpen] = useState(false);
-	const [songErrorText, setSongErrorText] = useState(null);
-	const [artistErrorText, setArtistErrorText] = useState(null);
-	const [dateErrorText, setDateErrorText] = useState(null);
-	const [locationErrorText, setLocationErrorText] = useState(null);
 	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-	const [successAlertText, setSuccessAlertText] = useState(null);
-	const [setlist, setSetlist] = useState(null);
-	const [tags, setTags] = useState([]);
+	const [setlist, setSetlist] = useState('');
 	const [date, setDate] = useState(initialDate ?? '');
 	const [location, setLocation] = useState(initialLocation ?? '');
-	const [tagsText, setTagsText] = useState('');
 	const [rating, setRating] = useState('');
 	const [comment, setComment] = useState('');
 	const [listenLink, setListenLink] = useState('');
 	const [show, setShow] = useState('');
-	const [loadingShows, setLoadingShows] = useState(false);
-	const [loadingSetlist, setLoadingSetlist] = useState(false);
-	const [jam, setJam] = useState(initialJam ?? null);
+	const [jam, setJam] = useState(initialJam ?? '');
 	const [year, setYear] = useState('');
 	const [showLocationInput, setShowLocationInput] = useState(false);
-	const [noSetlistFound, setNoSetlistFound] = useState(false);
-	const [setlistUrl, setSetlistUrl] = useState(null);
-	const [showsInYearFromSetlistFM, setShowsInYearFromSetlistFM] =
-		useState(false);
-	const [added, setAdded] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-	const [shows, setShows] = useState(null);
-	const [showsBySong, setShowsBySong] = useState(null);
-	const [showsByYear, setShowsByYear] = useState(null);
-	const [songId, setSongId] = useState(null);
+	const [shows, setShows] = useState([]);
 	const [useApis, setUseApis] = useState(true);
-	const [ratingId, setRatingId] = useState(null);
-	const [showPickerLabel, setShowPickerLabel] = useState('Shows');
+	const [ratingId, setRatingId] = useState('');
 	const navigate = useNavigate();
 	const submit = useSubmit();
 
@@ -583,9 +563,9 @@ export default function AddJam() {
 	function handleArtistChange(artist) {
 		submit({ _action: 'clear' });
 		setSongSelected('');
-		setJam(null);
-		setShows(null);
-		setShow(null);
+		setJam('');
+		setShows('');
+		setShow('');
 		setLocation('');
 		setDate('');
 		setYear('');
@@ -616,8 +596,7 @@ export default function AddJam() {
 	//get shows by song for select artists
 	useEffect(() => {
 		if (!actionData?.body?.includes('action complete') && artist) {
-			console.log('setting shows to null');
-			setJam(null);
+			setJam('');
 			setQuery('');
 			if (
 				artist &&
@@ -635,10 +614,9 @@ export default function AddJam() {
 					'Trey Anastasio, TAB',
 				].includes(artist.artist)
 			) {
-				setShows(null);
+				setShows('');
 				let urlToFetch =
 					'/getShows?artist=' + artist.artist + '&song=' + songSelected;
-				console.log('fetching shows', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 			async function getSongObj() {
@@ -662,7 +640,7 @@ export default function AddJam() {
 
 	function handleShowChange(show) {
 		if (show) {
-			setSetlist(null);
+			setSetlist('');
 			//dont get setlist song bc checkJamAdded takes care of it
 			if (
 				useApis &&
@@ -679,7 +657,6 @@ export default function AddJam() {
 			setDate(show.showdate);
 			setLocation(show.location);
 			if (show.existingJam) {
-				console.log('show.existingJam', show.existingJam);
 				setJam(show.existingJam);
 			}
 		}
@@ -687,7 +664,7 @@ export default function AddJam() {
 
 	function handleRatingChange(rating) {
 		if (rating === 'No rating') {
-			setRating(null);
+			setRating('');
 		} else {
 			setRating(rating);
 		}
@@ -705,15 +682,12 @@ export default function AddJam() {
 
 	useEffect(() => {
 		// handle when user changes jam and is logged in
-		console.log('jam change, jam, profile', jam, profile);
 		if (profile && profile?.name && jam) {
 			let urlToFetch = `/getRating?jam=${jam.id}&name=${profile.name}`;
-			console.log('fetching rating, urlToFetch', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 		//update sounds when jam changes
 		if (jam) {
-			console.log('jam.sounds', jam.sounds);
 			setSoundsSelected(jam.sounds);
 		}
 	}, [jam, profile]);
@@ -727,7 +701,7 @@ export default function AddJam() {
 		setDate('');
 		setYear('');
 		setLocation('');
-		setShows(null);
+		setShows('');
 		setJam('');
 		setShow('');
 		setShowLoadingInfo(false);
@@ -737,12 +711,10 @@ export default function AddJam() {
 	}
 
 	function clearSong() {
-		console.log('show', show);
-		console.log('clearing song');
 		submit({ _action: 'clear' });
 		setSong('');
 		setSongSelected('');
-		setJam(null);
+		setJam('');
 		setSoundsSelected('');
 		if (!setlist && show) {
 			//use fetcher.load to get setlist
@@ -784,9 +756,6 @@ export default function AddJam() {
 		}
 	}
 
-	console.log('year', year);
-	console.log('shows', shows);
-
 	function showEditLocation() {
 		setShowLocationInput(true);
 	}
@@ -798,9 +767,8 @@ export default function AddJam() {
 	}
 
 	async function handleYearChange(e) {
-		console.log('location in year change', location);
 		if (location) setLocation('');
-		if (setlist) setSetlist(null);
+		if (setlist) setSetlist('');
 		if (e === 'Clear Year') {
 			setYear('');
 		} else {
@@ -842,12 +810,12 @@ export default function AddJam() {
 
 	useEffect(() => {
 		if (!date) {
-			setDateInput(null);
+			setDateInput('');
 		}
 	}, [date]);
 
 	function handleDateInputChange(e) {
-		if (setlist) setSetlist(null);
+		if (setlist) setSetlist('');
 		setDateInput(e.target.value);
 		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
@@ -877,8 +845,6 @@ export default function AddJam() {
 	}
 
 	function handleSoundsChange(e) {
-		console.log('e.target.value', e.target.value);
-		console.log('soundsSelected', soundsSelected);
 		// if e.target.value is not in soundsSelected, add it, else, remove it (if not in initial sounds)
 		//if new sound is already selected and not in initial sounds, remove it
 		if (soundsSelected?.includes(e.target.value)) {
@@ -888,7 +854,6 @@ export default function AddJam() {
 			setSoundsSelected(newSoundsSelected);
 		} else if (soundsSelected) {
 			const sortedSounds = [...soundsSelected, e.target.value].sort();
-			console.log('sortedSounds', sortedSounds);
 			setSoundsSelected(sortedSounds);
 		} else {
 			setSoundsSelected([e.target.value]);
@@ -908,7 +873,6 @@ export default function AddJam() {
 			fetcher.data.shows[0].showdate.normalize() !==
 				shows[0]?.showdate.normalize())
 	) {
-		console.log('setting shows from fetcher?.data?.shows');
 		setShows(fetcher?.data?.shows);
 	}
 	if (
@@ -925,15 +889,14 @@ export default function AddJam() {
 		artist &&
 		fetcher?.data?.location &&
 		fetcher?.data?.location !== location &&
+    !showEditLocation &&
 		date
 	) {
 		setLocation(fetcher?.data?.location);
 	}
 	//setjam (if added to jamfans already)z
-	console.log('jam', jam);
 	if (fetcher?.data?.jam === 'not on jf' && jam) {
-		console.log('jam is null', fetcher?.data?.jam, 'jam', jam);
-		setJam(null);
+		setJam('');
 	}
 	if (
 		fetcher?.data?.jam &&
@@ -941,7 +904,6 @@ export default function AddJam() {
 		(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
 		songSelected === fetcher?.data?.jam?.song_name
 	) {
-		console.log('jam is not null', fetcher?.data?.jam, 'jam', jam);
 		setJam(fetcher?.data?.jam);
 	}
 	if (
@@ -955,7 +917,6 @@ export default function AddJam() {
 		setShowSuccessAlert(true);
 	}
 	if (fetcher?.data?.rating && !rating && !comment) {
-		console.log('rating', fetcher?.data?.rating);
 		setRating(fetcher?.data?.rating.rating);
 		setComment(fetcher?.data?.rating.comment);
 	}
@@ -963,18 +924,6 @@ export default function AddJam() {
 	//check if song exists
 	useEffect(() => {
 		if (songSelected && artist && date && setlist && show) {
-			console.log(
-				'songSelected',
-				songSelected,
-				'artist',
-				artist,
-				'date',
-				date,
-				'setlist',
-				setlist,
-				'show',
-				show
-			);
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -982,7 +931,6 @@ export default function AddJam() {
 				songSelected +
 				'&date=' +
 				date;
-			console.log('urlToFetch in check if song exists', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 	}, [songSelected, date, setlist, show]);
@@ -996,7 +944,6 @@ export default function AddJam() {
 	}, [artist]);
 
 	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
-	console.log('fetcher', fetcher);
 
 	return (
 		<Form
@@ -1167,7 +1114,7 @@ export default function AddJam() {
 																			aria-hidden='true'
 																		/>
 																	</span>
-																) : null}
+																) : ''}
 															</>
 														)}
 													</Listbox.Option>
@@ -1398,7 +1345,7 @@ export default function AddJam() {
 																				aria-hidden='true'
 																			/>
 																		</span>
-																	) : null}
+																	) : ''}
 																</>
 															)}
 														</Listbox.Option>
@@ -1524,7 +1471,7 @@ export default function AddJam() {
 																			aria-hidden='true'
 																		/>
 																	</span>
-																) : null}
+																) : ''}
 															</>
 														)}
 													</Listbox.Option>
@@ -1615,7 +1562,7 @@ export default function AddJam() {
 																				aria-hidden='true'
 																			/>
 																		</span>
-																	) : null}
+																	) : ''}
 																</>
 															)}
 														</Listbox.Option>
@@ -1719,7 +1666,7 @@ export default function AddJam() {
 																			aria-hidden='true'
 																		/>
 																	</span>
-																) : null}
+																) : ''}
 															</>
 														)}
 													</Listbox.Option>
@@ -2085,7 +2032,7 @@ export default function AddJam() {
 																				aria-hidden='true'
 																			/>
 																		</span>
-																	) : null}
+																	) : ''}
 																</>
 															)}
 														</Listbox.Option>
