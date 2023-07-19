@@ -645,8 +645,8 @@ export default function AddJam() {
 			if (
 				useApis &&
 				artist &&
-				artist !== 'Squeaky Feet' &&
-				artist !== 'Houseplant'
+				artist.artist !== 'Squeaky Feet' &&
+				artist.artist !== 'Houseplant'
 			) {
 				let urlToFetch =
 					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
@@ -888,9 +888,10 @@ export default function AddJam() {
 		artist &&
 		fetcher?.data?.location &&
 		fetcher?.data?.location !== location &&
-		!showEditLocation &&
+		!showLocationInput &&
 		date
 	) {
+    console.log('should get location to ', fetcher?.data?.location)
 		setLocation(fetcher?.data?.location);
 	}
 	//setjam (if added to jamfans already)z
@@ -1752,7 +1753,7 @@ export default function AddJam() {
 						<p className='text-lg'>{location}</p>
 						<button
 							type='button'
-							onClick={() => showEditLocation()}
+							onClick={showEditLocation}
 						>
 							Edit Location
 						</button>
