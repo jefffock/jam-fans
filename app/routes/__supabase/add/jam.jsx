@@ -625,13 +625,15 @@ export default function AddJam() {
 				artist.artist !== 'Houseplant' &&
 				songSelected &&
 				useApis &&
-				(artist.artist === 'Goose' ||
-					artist.artist === 'Eggy' ||
-					artist.artist === 'Neighbor' ||
-					artist.artist === "Umphrey's McGee" ||
-					artist.artist === 'Phish' ||
-					artist.artist === "Taper's Choice" ||
-					artist.artist === 'Trey Anastasio, TAB')
+				[
+					'Goose',
+					'Eggy',
+					'Neighbor',
+					"Umphrey's McGee",
+					'Phish',
+					"Taper's Choice",
+					'Trey Anastasio, TAB',
+				].includes(artist.artist)
 			) {
 				setShows(null);
 				let urlToFetch =
@@ -811,13 +813,15 @@ export default function AddJam() {
 			}
 			setYear(e);
 			if (
-				artist.artist !== 'Phish' &&
-				artist.artist !== "Umphrey's McGee" &&
-				artist.artist !== 'Trey Anastasio, TAB' &&
-				artist.artist !== 'Goose' &&
-				artist.artist !== 'Eggy' &&
-				artist.artist !== 'Neighbor' &&
-				artist.artist !== "Taper's Choice"
+				![
+					'Goose',
+					'Eggy',
+					'Neighbor',
+					"Umphrey's McGee",
+					'Phish',
+					"Taper's Choice",
+					'Trey Anastasio, TAB',
+				].includes(artist.artist)
 			) {
 				setShowLoadingInfo(true);
 			}
@@ -1306,13 +1310,15 @@ export default function AddJam() {
 					artist &&
 					!date &&
 					!year &&
-					(artist.artist === 'Goose' ||
-						artist.artist === 'Eggy' ||
-						artist.artist === 'Neighbor' ||
-						artist.artist === "Umphrey's McGee" ||
-						artist.artist === 'Phish' ||
-						artist.artist === "Taper's Choice" ||
-						artist.artist === 'Trey Anastasio, TAB') && (
+					[
+						'Goose',
+						'Eggy',
+						'Neighbor',
+						"Umphrey's McGee",
+						'Phish',
+						"Taper's Choice",
+						'Trey Anastasio, TAB',
+					].includes(artist.artist) && (
 						<div className='max-h-40'>
 							<Listbox
 								value={show}
@@ -1407,12 +1413,12 @@ export default function AddJam() {
 				{(query || songSelected) && filteredSongs?.length === 0 && (
 					<div>
 						<InfoAlert
-							title={`No songs containing ${
+							title={`No songs containing "${
 								query && query !== '' ? query : songSelected
-							} found`}
-							description={`Click the button below to add ${
+							}" found`}
+							description={`Click the button below to add "${
 								query && query !== '' ? query : songSelected
-							} below`}
+							}" to Jam Fans`}
 						/>
 						<label
 							htmlFor='new-song'
@@ -1443,7 +1449,9 @@ export default function AddJam() {
 							value='new-song'
 							className=' my-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500'
 						>
-							Add Song
+							Add "{
+								query && query !== '' ? query : songSelected
+							}"
 						</button>
 					</div>
 				)}
@@ -1856,13 +1864,15 @@ export default function AddJam() {
 								: 'setlist.fm'}
 						</a>
 						.{' '}
-						{artist.artist === 'Phish' ||
-						artist.artist === 'Trey Anastasio, TAB' ||
-						artist.artist === 'Goose' ||
-						artist.artist === 'Eggy' ||
-						artist.artist === 'Neighbor' ||
-						artist.artist === "Taper's Choice" ||
-						artist.artist === "Umphrey's McGee" ? (
+						{[
+							'Goose',
+							'Eggy',
+							'Neighbor',
+							"Umphrey's McGee",
+							'Phish',
+							"Taper's Choice",
+							'Trey Anastasio, TAB',
+						].includes(artist.artist) ? (
 							<p>
 								Thanks{' '}
 								<a
@@ -1883,13 +1893,15 @@ export default function AddJam() {
 				{useApis &&
 					showLoadingInfo &&
 					!(artist && songSelected && date && location) &&
-					artist.artist !== 'Phish' &&
-					artist.artist !== 'Trey Anastasio, TAB' &&
-					artist.artist !== 'Eggy' &&
-					artist.artist !== 'Goose' &&
-					artist.artist !== 'Neighbor' &&
-					artist.artist !== "Umphrey's Mcgee" &&
-					artist.artist !== "Taper's Choice" && (
+					[
+						'Goose',
+						'Eggy',
+						'Neighbor',
+						"Umphrey's McGee",
+						'Phish',
+						"Taper's Choice",
+						'Trey Anastasio, TAB',
+					].includes(artist.artist) && (
 						<InfoAlert
 							title={'Thanks for your patience!'}
 							description={
