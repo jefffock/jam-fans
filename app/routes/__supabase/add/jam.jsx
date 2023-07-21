@@ -929,7 +929,7 @@ export default function AddJam() {
 
 	//check if song exists
 	useEffect(() => {
-		if (songSelected && artist && date && setlist && show) {
+		if (songSelected && artist && date && location) {
 			let urlToFetch =
 				'/checkJamAdded?artist=' +
 				artist.artist +
@@ -939,7 +939,7 @@ export default function AddJam() {
 				date;
 			fetcher.load(urlToFetch);
 		}
-	}, [songSelected, date, setlist, show]);
+	}, [songSelected, date]);
 
 	useEffect(() => {
 		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
@@ -980,12 +980,12 @@ export default function AddJam() {
 										name='adding-method'
 										type='radio'
 										defaultChecked={
-											artist === 'Squeaky Feet' || artist === 'Houseplant'
+											artist.artist === 'Squeaky Feet' || artist.artist === 'Houseplant'
 												? addingMethod.id === 'manual'
 												: addingMethod.id === 'auto'
 										}
 										disabled={
-											artist === 'Squeaky Feet' || artist === 'Houseplant'
+											artist.artist === 'Squeaky Feet' || artist.artist === 'Houseplant'
 												? addingMethod.id === 'auto'
 												: false
 										}
@@ -1889,6 +1889,7 @@ export default function AddJam() {
 							}
 						/>
 					)}
+          <p>{`artist ${artist.artist}, songSelected: ${songSelected}, date ${date} + location ${location} + jam ${JSON.stringify(jam)} + show: ${JSON.stringify(show)} + setlist ${JSON.stringify(setlist)}`}</p>
 				{artist &&
 					songSelected &&
 					date &&
