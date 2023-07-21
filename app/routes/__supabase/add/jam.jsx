@@ -715,10 +715,16 @@ export default function AddJam() {
 		setSongSelected('');
 		setJam('');
 		setSoundsSelected('');
-		if (!setlist && show) {
-			//use fetcher.load to get setlist
-			let urlToFetch =
-				'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+		if (!setlist) {
+      let urlToFetch
+      if (show) {
+        //use fetcher.load to get setlist
+        urlToFetch =
+          '/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+      } else if (date) {
+        urlToFetch =
+          '/getSetlist?artist=' + artist.artist + '&date=' + date;
+      }
 			fetcher.load(urlToFetch);
 		}
 	}
@@ -1964,8 +1970,8 @@ export default function AddJam() {
 					date &&
 					location &&
 					profile &&
-					(!fetcher?.data?.jam ||
-						(fetcher?.data?.jam && !fetcher?.data?.jam?.listen_link)) && (
+					(!jam ||
+						(jam && !jam?.listen_link)) && (
 						<div className='mt-6'>
 							<label
 								htmlFor='listen-link'
