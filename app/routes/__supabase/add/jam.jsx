@@ -716,15 +716,14 @@ export default function AddJam() {
 		setJam('');
 		setSoundsSelected('');
 		if (!setlist) {
-      let urlToFetch
-      if (show) {
-        //use fetcher.load to get setlist
-        urlToFetch =
-          '/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
-      } else if (date) {
-        urlToFetch =
-          '/getSetlist?artist=' + artist.artist + '&date=' + date;
-      }
+			let urlToFetch;
+			if (show) {
+				//use fetcher.load to get setlist
+				urlToFetch =
+					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+			} else if (date) {
+				urlToFetch = '/getSetlist?artist=' + artist.artist + '&date=' + date;
+			}
 			fetcher.load(urlToFetch);
 		}
 	}
@@ -897,7 +896,7 @@ export default function AddJam() {
 		!showLocationInput &&
 		date
 	) {
-    console.log('should get location to ', fetcher?.data?.location)
+		console.log('should get location to ', fetcher?.data?.location);
 		setLocation(fetcher?.data?.location);
 	}
 	//setjam (if added to jamfans already)z
@@ -980,12 +979,14 @@ export default function AddJam() {
 										name='adding-method'
 										type='radio'
 										defaultChecked={
-											artist.artist === 'Squeaky Feet' || artist.artist === 'Houseplant'
+											artist.artist === 'Squeaky Feet' ||
+											artist.artist === 'Houseplant'
 												? addingMethod.id === 'manual'
 												: addingMethod.id === 'auto'
 										}
 										disabled={
-											artist.artist === 'Squeaky Feet' || artist.artist === 'Houseplant'
+											artist.artist === 'Squeaky Feet' ||
+											artist.artist === 'Houseplant'
 												? addingMethod.id === 'auto'
 												: false
 										}
@@ -1889,7 +1890,7 @@ export default function AddJam() {
 							}
 						/>
 					)}
-          <p>{`artist ${artist.artist}, songSelected: ${songSelected}, date ${date} + location ${location} + jam ${JSON.stringify(jam)} + show: ${JSON.stringify(show)} + setlist ${JSON.stringify(setlist)}`}</p>
+				{/* <p>{`artist ${artist.artist}, songSelected: ${songSelected}, date ${date} + location ${location} + jam ${JSON.stringify(jam)} + show: ${JSON.stringify(show)} + setlist ${JSON.stringify(setlist)}`}</p> */}
 				{artist &&
 					songSelected &&
 					date &&
@@ -1899,8 +1900,10 @@ export default function AddJam() {
 						<SuccessAlert
 							title={"It's on Jam Fans!"}
 							description={`You can add sounds ${
-								profile ? ' and your subjective rating and comment' : ''
-							} below. Thanks for helping other fans!`}
+								profile
+									? ' and your subjective rating and comments below'
+									: 'below. If you want to rate or comment, please log in'
+							}. Thanks for helping other fans!`}
 						/>
 					)}
 				{artist && songSelected && date && location && (
@@ -1943,11 +1946,6 @@ export default function AddJam() {
 																onChange={handleSoundsChange}
 																disabled={jam?.sounds?.includes(sound.label)}
 															/>
-															<p>
-																{fetcher?.data?.jam?.sounds?.includes(
-																	sound.label
-																)}
-															</p>
 														</div>
 													</div>
 												);
@@ -1971,8 +1969,7 @@ export default function AddJam() {
 					date &&
 					location &&
 					profile &&
-					(!jam ||
-						(jam && !jam?.listen_link)) && (
+					(!jam || (jam && !jam?.listen_link)) && (
 						<div className='mt-6'>
 							<label
 								htmlFor='listen-link'
@@ -2158,7 +2155,7 @@ export default function AddJam() {
 						songSelected &&
 						date &&
 						location &&
-						(!fetcher?.data?.jam || fetcher?.data?.jam === 'not on jf') &&
+						(!jam || jam === 'not on jf') &&
 						!rating &&
 						!comment && (
 							<button
@@ -2173,10 +2170,10 @@ export default function AddJam() {
 						)}
 					{/*logged in, existing jam, no rating*/}
 					{profile &&
-						fetcher?.data?.jam &&
-						fetcher?.data?.jam !== 'not on jf' &&
-						(fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length ||
-							(!fetcher?.data?.jam?.listen_link && listenLink)) &&
+						jam &&
+						jam !== 'not on jf' &&
+						(jam?.sounds?.length !== soundsSelected?.length ||
+							(!jam?.listen_link && listenLink)) &&
 						!rating &&
 						!comment && (
 							<button
@@ -2190,26 +2187,24 @@ export default function AddJam() {
 							</button>
 						)}
 					{/*logged in, add new jam, with rating/comment*/}
+					{profile && (!jam || jam === 'not on jf') && (rating || comment) && (
+						<button
+							type='submit'
+							name='_action'
+							value='add-and-rating'
+							className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
+							disabled={showAddSong}
+						>
+							Add jam and rating/comment
+						</button>
+					)}
+					{/*logged in, jam exists, add rating/comment, no new sounds, no link*/}
 					{profile &&
-						(!fetcher?.data?.jam || fetcher?.data?.jam === 'not on jf') &&
-						(rating || comment) && (
-							<button
-								type='submit'
-								name='_action'
-								value='add-and-rating'
-								className={`inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2`}
-								disabled={showAddSong}
-							>
-								Add jam and rating/comment
-							</button>
-						)}
-					{/*logged in, jam exists, add rating/comment, no new sounds*/}
-					{profile &&
-						fetcher?.data?.jam &&
-						fetcher?.data?.jam !== 'not on jf' &&
+						jam &&
+						jam !== 'not on jf' &&
 						(rating || comment) &&
-						fetcher?.data?.jam?.sounds?.length === soundsSelected?.length &&
-						(fetcher?.data?.jam.listen_link || !listenLink) && (
+						jam?.sounds?.length === soundsSelected?.length &&
+						(jam.listen_link || !listenLink) && (
 							<button
 								type='submit'
 								name='_action'
@@ -2222,11 +2217,11 @@ export default function AddJam() {
 						)}
 					{/*logged in, jam exists, add rating/comment and sounds*/}
 					{profile &&
-						fetcher?.data?.jam &&
-						fetcher?.data?.jam !== 'not on jf' &&
+						jam &&
+						jam !== 'not on jf' &&
 						(rating || comment) &&
-						(fetcher?.data?.jam?.sounds?.length !== soundsSelected?.length ||
-							(!fetcher?.data?.jam?.listen_link && listenLink)) && (
+						(jam?.sounds?.length !== soundsSelected?.length ||
+							(!jam?.listen_link && listenLink)) && (
 							<button
 								type='submit'
 								name='_action'
