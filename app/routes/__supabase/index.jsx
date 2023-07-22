@@ -12,7 +12,7 @@ import JamsHome from '../../components/JamsHome';
 import Hero from '../../components/Hero';
 
 export const loader = async ({ request, params }) => {
-  return redirect('/jams');
+	return redirect('/jams');
 	const response = new Response();
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
@@ -82,7 +82,7 @@ export const loader = async ({ request, params }) => {
 		.order('avg_rating', { ascending: false })
 		.order('num_ratings', { ascending: false })
 		.order('song_name', { ascending: true })
-    .order('id', { ascending: false })
+		.order('id', { ascending: false })
 		.range(startRange, endRange);
 
 	artists = [
@@ -128,7 +128,7 @@ export default function Index({ supabase, session }) {
 	const { artists, songs, sounds, title, count, user, profile, initialJams } =
 		useLoaderData();
 	const navigate = useNavigate();
-	const [open, setOpen] = useState(false);
+	const [open, setOpen] = useState(false); //for slideout filters
 	const [scrollPosition, setScrollPosition] = useState(0);
 	const [clientHeight, setClientHeight] = useState(null);
 	const [shouldFetch, setShouldFetch] = useState(true);
@@ -168,7 +168,7 @@ export default function Index({ supabase, session }) {
 		}
 
 		if (fetcher.data && fetcher.data.initialJams.length > 0) {
-      setJams((jams) => [...jams, ...fetcher.data.initialJams]);
+			setJams((jams) => [...jams, ...fetcher.data.initialJams]);
 			setPage((page) => page + 1);
 			setShouldFetch(true);
 		}
@@ -176,7 +176,10 @@ export default function Index({ supabase, session }) {
 
 	return (
 		<>
-			<Hero />
+			<Hero
+				open={open}
+				setOpen={setOpen}
+			/>
 			<JamsHome
 				supabase={supabase}
 				session={session}

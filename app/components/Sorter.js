@@ -14,9 +14,6 @@ export default function Sorter({ orderBy, setOrderBy, search }) {
 	} else if (newSearch.charAt(0) !== '&' && newSearch.length > 0) {
 		newSearch = '&' + newSearch;
 	}
-	if (newSearch.length !== 0) {
-		console.log('newSearch', newSearch);
-	}
 	const ratingSearch = '?order=avg_rating' + newSearch;
 	const recentSearch = '?order=id' + newSearch;
 	const numRatingsSearch = '?order=num_ratings' + newSearch;
