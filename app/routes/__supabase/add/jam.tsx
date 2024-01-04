@@ -10,11 +10,88 @@ import {
 import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { Listbox, Transition, Dialog, Combobox } from '@headlessui/react';
-import { Fragment, useState, useEffect, useRef } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import InfoAlert from '../../../components/alerts/InfoAlert';
-import SuccessAlert from '../../../components/alerts/SuccessAlert';
+import SuccessAlert from '../../../components/alerts/successAlert';
 import { createParenthesizedType, textSpanContainsPosition } from 'typescript';
+
+type song = {
+	song: string;
+	artist: string;
+};
+
+type artist = {
+	artist: string;
+	nickname: string;
+	emoji_code: string;
+	url: string;
+	start_year: number;
+	end_year: number;
+};
+
+type sound = {
+	label: string;
+	text: string;
+};
+
+type jam = {
+	id: number;
+	artist: string;
+	song_name: string;
+	date: string;
+	location: string;
+	sounds: string[];
+	user_id: string;
+	submitter_name: string;
+	song_id: number;
+	song_submitter_name: string;
+};
+
+type profile = {
+	id: string;
+	name: string;
+};
+
+type rating = {
+	id: number;
+	user_id: string;
+	version_id: number;
+	rating: string;
+	comment: string;
+	submitter_name: string;
+};
+
+type show = {
+	showdate: string;
+	location: string;
+	existingJam: jam;
+};
+
+type shows = show[];
+
+type setlist = {
+	value: string;
+};
+
+type setlists = setlist[];
+
+type data = {
+	artists: artist[];
+	songs: song[];
+	sounds: sound[];
+	user: any;
+	profile: profile;
+	initialArtist: artist;
+	initialSong: string;
+	initialDate: string;
+	initialLocation: string;
+	initialSounds: string[];
+	initialSongObj: song;
+	initialJam: jam;
+};
+
+
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
@@ -27,7 +104,7 @@ export const loader = async ({ request, params }) => {
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(searchParams);
 	console.log('queryParams', queryParams);
-	let jam = null;
+	let jam;
 	if (queryParams?.jamid) {
 		const { data } = await supabaseClient
 			.from('versions')
@@ -214,7 +291,7 @@ export async function action({ request, params }) {
 		}
 	}
 
-	async function addRatingCountToVersion(versionId) {
+	async function addRatingCountToVersion(versionId: string) {
 		let version_id = parseInt(versionId);
 		const { error } = await supabaseClient.rpc(
 			'increment_version_rating_count',
@@ -242,9 +319,9 @@ export async function action({ request, params }) {
 	}
 
 	console.log('values', values);
-	let sounds = [];
+	let sounds: string[] = [];
 	if (values.sounds) {
-		values.sounds.split(',').forEach((sound) => {
+		values.sounds.split(',').forEach((sound: string) => {
 			sounds.push(sound);
 		});
 	}
@@ -376,7 +453,7 @@ export async function action({ request, params }) {
 			})
 			.select();
 		console.log('data', data);
-		if (data && data.length > 0) {
+		if (data && data?.length > 0) {
 			console.log('going to add rating to this jam', data);
 			const jamId = data[0].id;
 			const { dataFromAddRating, error } = await supabaseClient
@@ -691,6 +768,53 @@ export default function AddJam() {
 		}
 	}, [jam, profile]);
 
+	useEffect(() => {
+		const { data } = fetcher || {};
+	
+		if (data?.shows?.[0] && (!shows || data.shows[0].showdate.normalize() !== shows[0]?.showdate.normalize())) {
+			setShows(data.shows);
+		}
+	
+		if (data?.setlist?.length > 0 && (!setlist || 
+			(setlist[0].value !== data.setlist[0].value &&
+			 setlist[1].value !== data.setlist[1].value &&
+			 setlist[2].value !== data.setlist[2].value))) {
+			setSetlist(data.setlist);
+		}
+	
+		if (artist && data?.location && data.location !== location && !showLocationInput && date) {
+			console.log('should get location to ', data.location);
+			setLocation(data.location);
+		}
+	
+		if (data?.jam === 'not on jf' && jam) {
+			setJam('');
+		}
+	
+		if (data?.jam && data.jam !== 'not on jf' && (!jam || data.jam.id !== jam.id) && songSelected === data.jam.song_name) {
+			setJam(data.jam);
+		}
+	
+		if (data?.rating && !rating && !comment) {
+			setRating(data.rating.rating);
+			setComment(data.rating.comment);
+		}
+	
+	}, [fetcher, shows, setlist, artist, location, showLocationInput, date, jam, soundsSelected, rating, comment]);
+
+	useEffect(() => {
+		if (actionData?.status === 200 && !jam && !showSuccessAlert) {
+			setShowSuccessAlert(true);
+		}
+	}
+	, [actionData, jam, showSuccessAlert]);
+
+	useEffect(() => {
+		if (jam?.sounds?.length > 0 && (!soundsSelected || soundsSelected.length === 0)) {
+			setSoundsSelected(jam.sounds);
+		}
+	}, [jam, soundsSelected]);
+
 	function clearArtist() {
 		submit({ _action: 'clear' });
 		setArtist('');
@@ -826,9 +950,10 @@ export default function AddJam() {
 			let month = dateInput.slice(0, 2);
 			let day = dateInput.slice(2, 4);
 			let year = dateInput.slice(4, 8);
-			let date = new Date(year, month - 1, day);
+			//Dates in JavaScript are zero-indexed LOL
+			let date = new Date(year, month - 1 , day);
 			if (date.toString() === 'Invalid Date') {
-				setdateInputError(true);
+				setDateInputError(true);
 			} else {
 				setDateInputError(false);
 				setDate(date.toJSON().slice(0, 10));
@@ -868,63 +993,67 @@ export default function AddJam() {
 		setListenLink(e.target.value);
 	}
 
-	if (
-		fetcher &&
-		fetcher.data &&
-		fetcher.data.shows &&
-		fetcher.data.shows[0] &&
-		(!shows ||
-			fetcher.data.shows[0].showdate.normalize() !==
-				shows[0]?.showdate.normalize())
-	) {
-		setShows(fetcher?.data?.shows);
-	}
-	if (
-		fetcher?.data?.setlist &&
-		fetcher?.data?.setlist.length > 0 &&
-		(!setlist ||
-			(setlist[0].value !== fetcher?.data?.setlist[0].value &&
-				setlist[1].value !== fetcher?.data?.setlist[1].value &&
-				setlist[2].value !== fetcher?.data?.setlist[2].value))
-	) {
-		setSetlist(fetcher?.data?.setlist);
-	}
-	if (
-		artist &&
-		fetcher?.data?.location &&
-		fetcher?.data?.location !== location &&
-		!showLocationInput &&
-		date
-	) {
-		console.log('should get location to ', fetcher?.data?.location);
-		setLocation(fetcher?.data?.location);
-	}
-	//setjam (if added to jamfans already)z
-	if (fetcher?.data?.jam === 'not on jf' && jam) {
-		setJam('');
-	}
-	if (
-		fetcher?.data?.jam &&
-		fetcher?.data?.jam !== 'not on jf' &&
-		(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
-		songSelected === fetcher?.data?.jam?.song_name
-	) {
-		setJam(fetcher?.data?.jam);
-	}
-	if (
-		jam?.sounds &&
-		jam?.sounds.length > 0 &&
-		(!soundsSelected || soundsSelected.length === 0)
-	) {
-		setSoundsSelected(jam?.sounds);
-	}
-	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
-		setShowSuccessAlert(true);
-	}
-	if (fetcher?.data?.rating && !rating && !comment) {
-		setRating(fetcher?.data?.rating.rating);
-		setComment(fetcher?.data?.rating.comment);
-	}
+	
+
+
+
+	// if (
+	// 	fetcher &&
+	// 	fetcher.data &&
+	// 	fetcher.data.shows &&
+	// 	fetcher.data.shows[0] &&
+	// 	(!shows ||
+	// 		fetcher.data.shows[0].showdate.normalize() !==
+	// 			shows[0]?.showdate.normalize())
+	// ) {
+	// 	setShows(fetcher?.data?.shows);
+	// }
+	// if (
+	// 	fetcher?.data?.setlist &&
+	// 	fetcher?.data?.setlist.length > 0 &&
+	// 	(!setlist ||
+	// 		(setlist[0].value !== fetcher?.data?.setlist[0].value &&
+	// 			setlist[1].value !== fetcher?.data?.setlist[1].value &&
+	// 			setlist[2].value !== fetcher?.data?.setlist[2].value))
+	// ) {
+	// 	setSetlist(fetcher?.data?.setlist);
+	// }
+	// if (
+	// 	artist &&
+	// 	fetcher?.data?.location &&
+	// 	fetcher?.data?.location !== location &&
+	// 	!showLocationInput &&
+	// 	date
+	// ) {
+	// 	console.log('should get location to ', fetcher?.data?.location);
+	// 	setLocation(fetcher?.data?.location);
+	// }
+	// //setjam (if added to jamfans already)z
+	// if (fetcher?.data?.jam === 'not on jf' && jam) {
+	// 	setJam('');
+	// }
+	// if (
+	// 	fetcher?.data?.jam &&
+	// 	fetcher?.data?.jam !== 'not on jf' &&
+	// 	(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
+	// 	songSelected === fetcher?.data?.jam?.song_name
+	// ) {
+	// 	setJam(fetcher?.data?.jam);
+	// }
+	// if (
+	// 	jam?.sounds &&
+	// 	jam?.sounds.length > 0 &&
+	// 	(!soundsSelected || soundsSelected.length === 0)
+	// ) {
+	// 	setSoundsSelected(jam?.sounds);
+	// }
+	// if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
+	// 	setShowSuccessAlert(true);
+	// }
+	// if (fetcher?.data?.rating && !rating && !comment) {
+	// 	setRating(fetcher?.data?.rating.rating);
+	// 	setComment(fetcher?.data?.rating.comment);
+	// }
 
 	//check if song exists
 	useEffect(() => {
@@ -1401,7 +1530,7 @@ export default function AddJam() {
 								value={songSelected !== '' ? songSelected : query}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='new-song'
-								onChange={() => setQuery(event.target.value)}
+								onChange={(event) => event && setQuery(event.target.value)}
 							/>
 						</div>
 						<p
@@ -1962,7 +2091,7 @@ export default function AddJam() {
 					date &&
 					location &&
 					soundsSelected &&
-					soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
+					soundsSelected.length > 0 && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&
@@ -2248,7 +2377,7 @@ export default function AddJam() {
 						<ErrorAlert
 							title={'Error :('}
 							description={
-								'Something went wrong. Please try again and/or let me know on twitter'
+								'Something went wrong. Please try again and/or let me know'
 							}
 						/>
 						<a href='https://twitter.com/jeffphox'>@jeffphox</a>
