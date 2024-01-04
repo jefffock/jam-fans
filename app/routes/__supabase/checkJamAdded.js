@@ -41,8 +41,7 @@ export const loader = async ({ request, params }) => {
 	console.log('year', year);
 	let urlToFetch;
 	let location;
-	let showsBySong;
-	let showsByYear;
+	let shows;
 	let setlist = [];
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v1',
@@ -286,7 +285,7 @@ export const loader = async ({ request, params }) => {
 						existingJam: alreadyAdded ?? null,
 					};
 				});
-			showsBySong = shows.reverse();
+			shows = shows.reverse();
 		}
 	} else {
 		//artist & song & not Phish or TAB = use songfish api
@@ -350,7 +349,7 @@ export const loader = async ({ request, params }) => {
 							existingJam: alreadyAdded ?? null,
 						};
 					});
-				showsBySong = shows.reverse();
+				shows = shows.reverse();
 			}
 		}
 	}
@@ -386,7 +385,7 @@ export const loader = async ({ request, params }) => {
 									label: `${date.toLocaleDateString()} - ${location}`,
 								};
 							});
-						showsByYear = showsRes;
+						shows = showsRes;
 					}
 				});
 		} else if (
@@ -418,7 +417,7 @@ export const loader = async ({ request, params }) => {
 			const showsData = await fetch(url);
 			const showsRes = await showsData.json();
 			if (showsRes && showsRes.data && showsRes.data.length > 0) {
-				let shows = showsRes.data
+				shows = showsRes.data
 					.filter((show) => show.artist_id === 1)
 					.map((show) => {
 						const location = `${show.venuename}, ${show.city}, ${
@@ -431,7 +430,6 @@ export const loader = async ({ request, params }) => {
 							label: `${date.toLocaleDateString()} - ${location}`,
 						};
 					});
-				showsByYear = shows;
 			}
 		} else {
 			//get shows from setlistfm for all other artists
@@ -463,7 +461,7 @@ export const loader = async ({ request, params }) => {
 			}
 			if (mbid && year) {
 				const data = await paginatedFetch(url);
-				let shows = data.map((show) => {
+				shows = data.map((show) => {
 					const location = `${show?.venue?.name ? show.venue.name + ', ' : ''}${
 						show.venue.city.name
 					}, ${
@@ -480,23 +478,20 @@ export const loader = async ({ request, params }) => {
 						label: `${date.toLocaleDateString()} - ${location}`,
 					};
 				});
-				showsByYear = shows;
 			}
 		}
 	}
 	console.log('jam in checkJamAdded', jam);
 	console.log('setlist in checkJamAdded', setlist);
 	console.log('location in checkJamAdded', location);
-	console.log('showsByYear in checkJamAdded', showsByYear);
-	console.log('showsBySong in checkJamAdded', showsBySong);
+	console.log('shows in checkJamAdded', shows);
 	console.log('year in checkJamAdded', year);
 	return json(
 		{
 			jam: jam || 'not on jf',
 			setlist,
 			location,
-			showsByYear,
-			showsBySong,
+			shows,
 			year,
 		},
 		{

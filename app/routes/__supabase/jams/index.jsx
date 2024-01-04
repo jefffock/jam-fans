@@ -369,7 +369,7 @@ export default function Jams({ supabase, session }) {
 
 	return (
 		<>
-			{!search && <Hero />}
+			{!search && <Hero open={open} setOpen={setOpen}/>}
 			<JamsHome
 				supabase={supabase}
 				session={session}

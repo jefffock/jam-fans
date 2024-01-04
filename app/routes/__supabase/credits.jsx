@@ -1,14 +1,14 @@
 export default function Credits() {
 	return (
 		<div className='p-4 w-full h-full pb-20'>
-			<div class='flex flex-col items-center mt-10 p-4 mx-auto max-w-xl border rounded-xl text-gray-800'>
-				<h1 class='text-3xl self-center pb-6'>Credits</h1>
-				<p class='text-lg  mb-6'>
+			<div className='flex flex-col items-center mt-10 p-4 mx-auto max-w-xl border rounded-xl text-gray-800'>
+				<h1 className='text-3xl self-center pb-6'>Credits</h1>
+				<p className='text-lg  mb-6'>
 					When adding jams, the show and setlist data comes from:
 				</p>
 
-				<h2 class='text-2xl font-bold mb-2'>Phish.net</h2>
-				<p class='text-lg  mb-6'>Phish, Trey Anastasio, TAB</p>
+				<h2 className='text-2xl font-bold mb-2'>Phish.net</h2>
+				<p className='text-lg  mb-6'>Phish, Trey Anastasio, TAB</p>
 				<p className='text-lg mb-6'>
 					<a
 						className='underline text-blue-700 hover:text-blue-800'
@@ -43,7 +43,7 @@ export default function Credits() {
 						Umphrey's McGee - <a href='https://allthings.umphreys.com' className='underline text-blue-700 hover:text-blue-800'>allthings.umphreys.com</a>
 					</li>
 				</ul>
-				<p class='text-lg  mb-6'>
+				<p className='text-lg  mb-6'>
 					Thank you to the fans who created, maintain and update these sites. Check them out!<br/><br/>They all use <a
 						className='underline text-blue-700 hover:text-blue-800'
 						href='https://songfishapp.com/'
@@ -61,9 +61,9 @@ export default function Credits() {
 					</a>
 					!
 				</p>
-				<h2 class='text-2xl font-bold mb-2 mt-8'>Setlist.fm</h2>
-				<p class='text-lg  mb-6'>All other artists</p>
-				<p class='text-lg  mb-10 self-start'>
+				<h2 className='text-2xl font-bold mb-2 mt-8'>Setlist.fm</h2>
+				<p className='text-lg  mb-6'>All other artists</p>
+				<p className='text-lg  mb-10 self-start'>
 					<a
 						className='underline text-blue-700 hover:text-blue-800'
 						href='https://www.setlist.fm/'

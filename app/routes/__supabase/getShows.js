@@ -67,7 +67,6 @@ export const loader = async ({ request, params }) => {
 	//get all versions of a song (for select artists)
 	let artistId;
 	let tableName;
-  console.log('song in getshows', song)
 	if (artist && song && !year) {
     console.log('artist and song', artist, song)
 		const { data, error } = await supabaseClient
@@ -279,7 +278,8 @@ export const loader = async ({ request, params }) => {
 			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
 			let apiKey = process.env.SETLISTFM_API_KEY;
 			async function paginatedFetch(url, page = 1, previousResponse = []) {
-				await new Promise((resolve) => setTimeout(resolve, 1000));
+				console.log('in paginated fetch', url, page, previousResponse);
+				await new Promise((resolve) => setTimeout(resolve, 600));
 				return fetch(`${url}&p=${page}`, {
 					headers: {
 						'x-api-key': `${apiKey}`,
@@ -323,26 +323,21 @@ export const loader = async ({ request, params }) => {
 			}
 		}
 	}
-	//sort by showdate
-	if (song) {
-		shows?.sort((a, b) => {
+	if (artist && year) {
+		shows.sort((a, b) => {
+			return new Date(a.showdate) - new Date(b.showdate);
+		});
+	}
+	if (artist && song) {
+		shows.sort((a, b) => {
 			return new Date(b.showdate) - new Date(a.showdate);
 		});
-		return json(
-			{ showsBySong: shows || [] },
-			{
-				headers: response.headers,
-			}
-		);
-	} else if (year) {
-    shows?.sort((a, b) => {
-      return new Date(a.showdate) - new Date(b.showdate);
-    });
-		return json(
-			{ showsByYear: shows || [] },
-			{
-				headers: response.headers,
-			}
-		);
 	}
+	console.log('shows', shows);
+	return json(
+		{ shows: shows || [] },
+		{
+			headers: response.headers,
+		}
+	);
 };
