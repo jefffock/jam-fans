@@ -333,7 +333,6 @@ export const loader = async ({ request, params }) => {
 			return new Date(b.showdate) - new Date(a.showdate);
 		});
 	}
-	console.log('shows', shows);
 	return json(
 		{ shows: shows || [] },
 		{

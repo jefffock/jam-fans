@@ -481,11 +481,6 @@ export const loader = async ({ request, params }) => {
 			}
 		}
 	}
-	console.log('jam in checkJamAdded', jam);
-	console.log('setlist in checkJamAdded', setlist);
-	console.log('location in checkJamAdded', location);
-	console.log('shows in checkJamAdded', shows);
-	console.log('year in checkJamAdded', year);
 	return json(
 		{
 			jam: jam || 'not on jf',
