@@ -10,24 +10,115 @@ import {
 import { json, redirect } from '@remix-run/node';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { Listbox, Transition, Dialog, Combobox } from '@headlessui/react';
-import { Fragment, useState, useEffect, useRef } from 'react';
+import React, { Fragment, useState, useEffect, useRef, useMemo } from 'react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
 import InfoAlert from '../../../components/alerts/InfoAlert';
-import SuccessAlert from '../../../components/alerts/SuccessAlert';
-import { createParenthesizedType, textSpanContainsPosition } from 'typescript';
+import SuccessAlert from '../../../components/alerts/successAlert';
+import type { ActionArgs, LoaderArgs } from '@remix-run/node';
 
-export const loader = async ({ request, params }) => {
+interface SongInSonglist {
+	song: string;
+	artist: string;
+};
+
+interface SongInSetlist {
+	value: string;
+	label: string;
+};
+
+interface Artist {
+	artist: string;
+	nickname: string;
+	emoji_code: string;
+	url: string;
+	start_year: number;
+	end_year: number;
+};
+
+interface SongObj {
+	id: number;
+	song: string;
+	artist: string;
+	submitter_name: string;
+};
+
+interface Sound {
+	label: string;
+	text: string;
+};
+
+interface Jam {
+	id: number;
+	artist: string;
+	song_name: string;
+	date: string;
+	location: string;
+	sounds?: string[];
+	user_id: string;
+	submitter_name: string;
+	song_id: number;
+	song_submitter_name: string;
+	listen_link: string;
+};
+
+interface Profile {
+	id: string;
+	name: string;
+};
+
+interface Rating {
+	id: number;
+	user_id: string;
+	version_id: number;
+	rating: string;
+	comment: string;
+	submitter_name: string;
+};
+
+interface Show {
+	showdate: string;
+	location: string;
+	existingJam: Jam;
+	label: string;
+};
+interface Data {
+	artists: Artist[];
+	songs: SongInSonglist[];
+	sounds: Sound[];
+	user: any;
+	profile: Profile;
+	initialArtist: Artist;
+	initialSong: string;
+	initialDate: string;
+	initialLocation: string;
+	initialSounds: string[];
+	initialSongObj: SongObj;
+	initialJam: Jam;
+};
+
+export const loader = async ({ request }: LoaderArgs) => {
 	const response = new Response();
+
+	if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+		throw new Error("Supabase URL and ANON KEY must be defined");
+	}
+
 	const supabaseClient = createServerClient(
-		process.env.SUPABASE_URL,
+		process.env.SUPABASE_URL || '',
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
-	const url = new URL(request.url);
-	const searchParams = new URLSearchParams(url.search);
+	const { searchParams } = new URL(request.url);
+
 	const queryParams = Object.fromEntries(searchParams);
 	console.log('queryParams', queryParams);
-	let jam = null;
+	let initialArtist;
+	let initialSong;
+	let initialDate;
+	let initialLocation;
+	let initialSounds;
+	let initialSongObj;
+	let jam;
 	if (queryParams?.jamid) {
 		const { data } = await supabaseClient
 			.from('versions')
@@ -35,32 +126,8 @@ export const loader = async ({ request, params }) => {
 			.eq('id', JSON.parse(queryParams.jamid))
 			.single();
 		jam = data;
-	}
-	let initialArtist;
-	let initialSong;
-	let initialDate;
-	let initialLocation;
-	let initialSounds;
-	let initialSongObj;
-	if (jam) {
-		initialSong = jam.song_name;
-		initialDate = jam.date;
-		initialLocation = jam.location;
-		initialSounds = jam.sounds;
-		const { data: songObj } = await supabaseClient
-			.from('songs')
-			.select('*')
-			.eq('name', jam.song_name)
-			.single();
-		initialSongObj = songObj;
-		//get artist obj
-		const { data: artistObj } = await supabaseClient
-			.from('artists')
-			.select('*')
-			.eq('artist', jam.artist)
-			.single();
-		initialArtist = artistObj;
-	} else if (queryParams?.song) {
+	} 
+	if (queryParams?.song) {
 		initialSong = queryParams.song;
 		const { data: songObj } = await supabaseClient
 			.from('songs')
@@ -105,45 +172,27 @@ export const loader = async ({ request, params }) => {
 		profile = data;
 	}
 
-	//get artists
 	//get supabase session
+	//get songs
+	const { data: songs } = await supabaseClient
+	.from('songs')
+	.select('song, artist')
+	.order('song', { ascending: true });
+	const { data: sounds } = await supabaseClient
+	.from('sounds')
+	.select('label, text')
+	.order('label', { ascending: true });
+	//get artists
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('*')
 		.order('name_for_order', { ascending: true });
-	//get songs
-	const { data: songs } = await supabaseClient
-		.from('songs')
-		.select('song, artist')
-		.order('song', { ascending: true });
-	const { data: sounds } = await supabaseClient
-		.from('sounds')
-		.select('label, text')
-		.order('label', { ascending: true });
-	artists = [
-		{
-			nickname: 'Phish',
-			emoji_code: '0x1F41F',
-			url: 'phish',
-			artist: 'Phish',
-			start_year: 1983,
-			end_year: null,
-		},
-		{
-			nickname: 'Grateful Dead',
-			emoji_code: '0x1F480',
-			url: 'grateful-dead',
-			artist: 'Grateful Dead',
-			start_year: 1965,
-			end_year: 1995,
-		},
-	].concat(artists);
 	console.log('initialSong in loader', initialSong);
 	console.log('initialSongObj', initialSongObj);
 	return json(
 		{
 			artists,
-			songs,
+			initialSongs: songs,
 			sounds,
 			user,
 			profile,
@@ -161,17 +210,22 @@ export const loader = async ({ request, params }) => {
 	);
 };
 
-export async function action({ request, params }) {
+export async function action({ request, params }: ActionArgs) {
 	const response = new Response();
 	let formData = await request.formData();
 	let { _action, ...values } = Object.fromEntries(formData);
 	console.log('_action', _action);
+
+	if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+		throw new Error("Supabase URL and ANON KEY must be defined");
+	}
+
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
-	async function addOnePoint(profileName) {
+	async function addOnePoint(profileName: string) {
 		const { error } = await supabaseClient.rpc('add_one_point', {
 			username: profileName,
 		});
@@ -180,7 +234,7 @@ export async function action({ request, params }) {
 		} else console.log('added one point');
 	}
 
-	async function addTenPoints(profileName) {
+	async function addTenPoints(profileName: string) {
 		const { error } = await supabaseClient.rpc('add_ten_points', {
 			username: profileName,
 		});
@@ -191,7 +245,7 @@ export async function action({ request, params }) {
 		}
 	}
 
-	async function addRatingCountToArtist(artistId) {
+	async function addRatingCountToArtist(artistId: string) {
 		const { error } = await supabaseClient.rpc('add_rating_count_artist', {
 			artistid: artistId,
 		});
@@ -202,7 +256,7 @@ export async function action({ request, params }) {
 		}
 	}
 
-	async function addRatingCountToSong(songId) {
+	async function addRatingCountToSong(songId: string) {
 		let song_id = parseInt(songId);
 		const { error } = await supabaseClient.rpc('increment_song_rating_count', {
 			songid: song_id,
@@ -214,7 +268,7 @@ export async function action({ request, params }) {
 		}
 	}
 
-	async function addRatingCountToVersion(versionId) {
+	async function addRatingCountToVersion(versionId: string) {
 		let version_id = parseInt(versionId);
 		const { error } = await supabaseClient.rpc(
 			'increment_version_rating_count',
@@ -229,7 +283,7 @@ export async function action({ request, params }) {
 		}
 	}
 
-	async function calcAverageForVersion(versionId) {
+	async function calcAverageForVersion(versionId: string) {
 		let version = parseInt(versionId);
 		const { error } = await supabaseClient.rpc('calc_average', {
 			versionid: version,
@@ -241,25 +295,25 @@ export async function action({ request, params }) {
 		}
 	}
 
-	console.log('values', values);
-	let sounds = [];
+	let sounds: string[] = [];
 	if (values.sounds) {
-		values.sounds.split(',').forEach((sound) => {
+		String(values.sounds).split(',').forEach((sound: string) => {
 			sounds.push(sound);
 		});
 	}
 	let jam;
 	if (values.jam) {
-		jam = JSON.parse(values.jam);
+		jam = JSON.parse(String(values.jam));
 	}
 	let profile;
 	if (values.profile) {
-		profile = JSON.parse(values.profile);
+		profile = JSON.parse(String(values.profile));
 	}
 	let songObj;
+	console.log('values', values, 'typeof values', typeof values)
 	if (values.songObj) {
-		songObj = JSON.parse(values.songObj);
-	} else if (!values.songObj || values.songObj === '"') {
+		songObj = JSON.parse(String(values.songObj));
+	} else if (!values.songObj || values.songObj === '') {
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.select('*')
@@ -267,9 +321,6 @@ export async function action({ request, params }) {
 			.single();
 		songObj = data;
 	}
-	console.log('songObj', songObj);
-	console.log('song_id', songObj?.id);
-	console.log('profile', profile);
 	if (_action === 'clear') {
 		return {
 			status: 200,
@@ -277,6 +328,7 @@ export async function action({ request, params }) {
 		};
 	}
 	if (_action === 'new-song') {
+		console.log('in new song')
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.insert({ song: values['new-song'], artist: values.artist });
@@ -285,12 +337,12 @@ export async function action({ request, params }) {
 		}
 		//make search params string with artist, song, date, location
 		let searchParams = new URLSearchParams();
-		searchParams.append('artist', values.artist);
-		searchParams.append('song', values['new-song']);
-		if (values?.date) searchParams.append('date', values.date);
-		if (values?.location) searchParams.append('location', values.location);
+		searchParams.append('artist', String(values.artist));
+		searchParams.append('song', String(values['new-song']));
+		if (values?.date) searchParams.append('date', String(values.date));
+		if (values?.location) searchParams.append('location', String(values.location));
 		console.log('searchParams', searchParams.toString());
-		console.log('params', searchParams.toString());
+		console.log('params in new song', searchParams.toString());
 		return redirect(`/add/jam?${searchParams.toString()}`);
 	}
 	if (_action === 'add-not-logged-in') {
@@ -347,14 +399,13 @@ export async function action({ request, params }) {
 				})
 				.eq('id', jam?.id);
 			addTenPoints(profile?.name);
-			console.log('data', data);
 			console.log('error', error);
 		} else {
 			const { data, error } = await supabaseClient.from('versions').update({
 				sounds: sounds,
-			});
-			addOnePoint(profile?.name).eq('id', jam?.id);
-			console.log('data', data);
+			})
+			.eq('id', jam?.id);
+			addOnePoint(profile?.name)
 			console.log('error', error);
 		}
 	}
@@ -375,11 +426,9 @@ export async function action({ request, params }) {
 				song_submitter_name: songObj?.submitter_name,
 			})
 			.select();
-		console.log('data', data);
-		if (data && data.length > 0) {
-			console.log('going to add rating to this jam', data);
+		if (data && data?.length > 0) {
 			const jamId = data[0].id;
-			const { dataFromAddRating, error } = await supabaseClient
+			const { data: dataFromAddRating, error } = await supabaseClient
 				.from('ratings')
 				.insert({
 					user_id: profile?.id,
@@ -389,13 +438,12 @@ export async function action({ request, params }) {
 					submitter_name: profile?.name,
 				})
 				.select();
-			console.log('data add rating', dataFromAddRating);
 			console.log('error add rating', error);
 			addTenPoints(profile?.name);
 			addTenPoints(profile?.name);
 			addOnePoint(songObj?.submitter_name);
-			addRatingCountToArtist(values.artist);
-			addRatingCountToSong(values.song);
+			addRatingCountToArtist(String(values.artist));
+			addRatingCountToSong(String(values.song));
 			addRatingCountToVersion(jamId);
 			calcAverageForVersion(jamId);
 		}
@@ -413,13 +461,12 @@ export async function action({ request, params }) {
 				submitter_name: profile?.name,
 			})
 			.select();
-		console.log('data', data);
 		console.log('error', error);
 		addTenPoints(profile?.name);
 		addOnePoint(songObj?.submitter_name);
 		addOnePoint(jam?.submitter_name);
-		addRatingCountToArtist(values.artist);
-		addRatingCountToSong(values.song);
+		addRatingCountToArtist(String(values.artist));
+		addRatingCountToSong(String(values.song));
 		addRatingCountToVersion(jam?.id);
 		calcAverageForVersion(jam?.id);
 	}
@@ -437,7 +484,6 @@ export async function action({ request, params }) {
 				submitter_name: profile?.name,
 			})
 			.select();
-		console.log('data', data);
 		console.log('error', error);
 		if (values['listen-link']) {
 			console.log('has listen link');
@@ -449,7 +495,6 @@ export async function action({ request, params }) {
 				})
 				.eq('id', jam?.id)
 				.select();
-			console.log('data', data);
 			console.log('error', error);
 		} else {
 			const { data, error } = await supabaseClient
@@ -464,8 +509,8 @@ export async function action({ request, params }) {
 			addTenPoints(profile?.name);
 			addOnePoint(songObj?.submitter_name);
 			addOnePoint(jam?.submitter_name);
-			addRatingCountToArtist(values.artist);
-			addRatingCountToSong(values.song);
+			addRatingCountToArtist(String(values.artist));
+			addRatingCountToSong(String(values.song));
 			addRatingCountToVersion(jam?.id);
 			calcAverageForVersion(jam?.id);
 		}
@@ -474,12 +519,11 @@ export async function action({ request, params }) {
 }
 
 export default function AddJam() {
-	const { supabase, session } = useOutletContext();
 	const fetcher = useFetcher();
 	const actionData = useActionData();
 	const {
 		artists,
-		songs,
+		initialSongs,
 		sounds,
 		initialArtist,
 		initialSong,
@@ -491,85 +535,99 @@ export default function AddJam() {
 		profile,
 		initialJam,
 	} = useLoaderData();
-	const [songSelected, setSongSelected] = useState(initialSong ?? '');
-	const [soundsSelected, setSoundsSelected] = useState(initialSounds ?? '');
-	const [query, setQuery] = useState('');
-	const [artist, setArtist] = useState(initialArtist ?? '');
-	const [song, setSong] = useState(initialSong ?? '');
-	const [songObj, setSongObj] = useState(initialSongObj ?? '');
+	const [songSelected, setSongSelected] = useState<string | null>(initialSong ?? null);
+	const [songs, setSongs] = useState<SongInSonglist[] | null>(initialSongs ?? null);
+	const [soundsSelected, setSoundsSelected] = useState<string[] | null>(initialSounds ?? null);
+	const [query, setQuery] = useState<string>('');
+	const [artist, setArtist] = useState<Artist | null>(initialArtist ?? null);
+	const [songObj, setSongObj] = useState<SongObj | null>(initialSongObj ?? null);
 	const [showLoadingInfo, setShowLoadingInfo] = useState(false);
 	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-	const [setlist, setSetlist] = useState('');
-	const [date, setDate] = useState(initialDate ?? '');
-	const [location, setLocation] = useState(initialLocation ?? '');
-	const [rating, setRating] = useState('');
-	const [comment, setComment] = useState('');
-	const [listenLink, setListenLink] = useState('');
-	const [show, setShow] = useState('');
-	const [jam, setJam] = useState(initialJam ?? '');
-	const [year, setYear] = useState('');
+	const [setlist, setSetlist] = useState<SongInSetlist[] | null>(null);
+	const [date, setDate] = useState<string | null>(initialDate ?? null);
+	const [location, setLocation] = useState<string | null>(initialLocation ?? null);
+	const [rating, setRating] = useState<string | null>(null);
+	const [comment, setComment] = useState<string>('');
+	const [listenLink, setListenLink] = useState<string>('');
+	const [show, setShow] = useState<Show | null>(null);
+	const [jam, setJam] = useState<Jam | null | string>(initialJam ?? null);
+	const [year, setYear] = useState<string | null>(null);
 	const [showLocationInput, setShowLocationInput] = useState(false);
 	const [dateInput, setDateInput] = useState('');
 	const [dateInputError, setDateInputError] = useState(false);
-	const [shows, setShows] = useState([]);
+	const [shows, setShows] = useState<Show[] | null>([]);
 	const [useApis, setUseApis] = useState(true);
 	const [ratingId, setRatingId] = useState('');
 	const navigate = useNavigate();
 	const submit = useSubmit();
+	// const [showAddSong, setShowAddSong] = useState(false);
+	// const [filteredSongs, setFilteredSongs] = useState<SongInSonglist[] | null>(null);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
 			navigate('/welcome');
 		}
-		if (initialSong && !songObj) {
-			async function getSongObj() {
-				const { data, error } = await supabase
-					.from('songs')
-					.select('*')
-					.eq('song', initialSong)
-					.single();
-				if (data) {
-					setSongObj(data);
-				}
-			}
-			getSongObj();
-		}
 	}, []);
 
-	const sortedSongs = artist
-		? songs.sort((a, b) => {
+	const sortedSongs = useMemo(() => {
+		return artist ? songs?.sort((a: SongInSonglist, b: SongInSonglist) => {
 				if (a.artist === artist.artist) return -1;
 				if (b.artist === artist.artist) return 1;
 				if (a.song < b.song) return -1;
 				if (a.song > b.song) return 1;
 				return 0;
 		  })
-		: songs;
+		: songs}, [artist, songs]);
 
-	const filteredSongs =
-		query === ''
-			? songSelected
-				? sortedSongs?.filter((song) => {
-						return (
-							song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
-							song.song.length === songSelected.length
-						);
-				  })
-				: sortedSongs
-			: sortedSongs?.filter((song) => {
-					return song.song.toLowerCase().includes(query.toLowerCase());
-			  });
+		// useEffect(()=> {
+		// 	let newlyFilteredSongs: SongInSonglist[] | null = null
+		// 	if (sortedSongs && query && query !== '') {
+		// 		newlyFilteredSongs = sortedSongs.filter((song: SongInSonglist) => {
+		// 			return song.song.toLowerCase().includes(query.toLowerCase());
+		// 	  });
+		// 	} else if (songSelected && query === '' && sortedSongs) {
+		// 		newlyFilteredSongs = sortedSongs.filter((song: SongInSonglist) => {
+		// 			return (
+		// 				song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
+		// 				song.song.length === songSelected.length
+		// 			);
+		// 	  });
+		// 	} else if (sortedSongs) {
+		// 		newlyFilteredSongs = sortedSongs;
+		// 	}
+		// 	setFilteredSongs(newlyFilteredSongs);
+		// }, [sortedSongs, query, songSelected])
+	const filteredSongs = useMemo(() => {
+		if (query === '') {
+			if (songSelected) {
+				return sortedSongs?.filter((song: SongInSonglist) => {
+					return (
+						song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
+						song.song.length === songSelected.length
+					);
+				});
+			} else {
+				return sortedSongs;
+			}
+		} else {
+			return sortedSongs?.filter((song: SongInSonglist) => {
+				return song.song.toLowerCase().includes(query.toLowerCase());
+			});
+		}
+	}, [sortedSongs, query, songSelected]);
 
-	function handleArtistChange(artist) {
+	console.log('filteredSongs', filteredSongs?.length);
+
+	function handleArtistChange(artist: Artist) {
 		submit({ _action: 'clear' });
 		setSongSelected('');
-		setJam('');
-		setShows('');
-		setShow('');
+		setJam(null);
+		setShows([]);
+		setShow(null);
 		setLocation('');
 		setDate('');
-		setYear('');
-		setSoundsSelected('');
+		setYear(null);
+		setSoundsSelected(null);
 		setShowLoadingInfo(false);
 		if (
 			artist &&
@@ -580,23 +638,26 @@ export default function AddJam() {
 		) {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
+			console.log('going to get shows', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 		setArtist(artist);
 	}
 
-	function handleAddMethodChange(addMethod) {
+	function handleAddMethodChange(addMethod: 'auto' | 'manual') {
 		setUseApis(addMethod === 'auto');
 	}
 
-	function classNames(...classes) {
+	//ts-ignore
+	function classNames(...classes: string[]) {
 		return classes.filter(Boolean).join(' ');
 	}
 
 	//get shows by song for select artists
 	useEffect(() => {
+		console.log('actionData?.body', actionData?.body)
 		if (!actionData?.body?.includes('action complete') && artist) {
-			setJam('');
+			setJam(null);
 			setQuery('');
 			if (
 				artist &&
@@ -608,39 +669,46 @@ export default function AddJam() {
 					'Goose',
 					'Eggy',
 					'Neighbor',
-					"Umphrey's McGee",
+					// "Umphrey's McGee",
 					'Phish',
 					"Taper's Choice",
 					'Trey Anastasio, TAB',
+					'King Gizzard & the Lizard Wizard',
 				].includes(artist.artist)
 			) {
-				setShows('');
+				setShows([]);
 				let urlToFetch =
 					'/getShows?artist=' + artist.artist + '&song=' + songSelected;
 				fetcher.load(urlToFetch);
-			}
-			async function getSongObj() {
-				const { data, error } = await supabase
-					.from('songs')
-					.select('*')
-					.eq('song', songSelected)
-					.single();
-				if (data) {
-					setSongObj(data);
-					if (actionData?.body.includes('added song')) {
-						navigate('/');
-					}
-				}
-			}
-			if (filteredSongs?.length !== 0) {
-				getSongObj();
+			} else if (filteredSongs?.length !== 0 && songSelected) {
+				console.log('fetcher.state before get song not songfish', fetcher.state)
+				const urlToFetch = '/getSong?song=' + songSelected;
+				fetcher.load(urlToFetch);
 			}
 		}
 	}, [songSelected, actionData?.body]);
 
-	function handleShowChange(show) {
+	useEffect(() => {
+		if (shows && shows.length > 0 && filteredSongs?.length !== 0 && songSelected && useApis && artist &&
+			[
+				'Goose',
+				'Eggy',
+				'Neighbor',
+				// "Umphrey's McGee",
+				'Phish',
+				"Taper's Choice",
+				'Trey Anastasio, TAB',
+				'King Gizzard & the Lizard Wizard',
+			].includes(artist.artist)) {
+			console.log('fetcher.state before get song songfish', fetcher.state)
+				const urlToFetch = '/getSong?song=' + songSelected;
+				fetcher.load(urlToFetch);
+		}
+	}, [shows])
+
+	function handleShowChange(show: Show) {
 		if (show) {
-			setSetlist('');
+			setSetlist(null);
 			//dont get setlist song bc checkJamAdded takes care of it
 			if (
 				useApis &&
@@ -661,7 +729,8 @@ export default function AddJam() {
 		}
 	}
 
-	function handleRatingChange(rating) {
+	function handleRatingChange(rating: string) {
+		console.log('typeof rating', typeof rating);
 		if (rating === 'No rating') {
 			setRating('');
 		} else {
@@ -681,81 +750,141 @@ export default function AddJam() {
 
 	useEffect(() => {
 		// handle when user changes jam and is logged in
-		if (profile && profile?.name && jam) {
+		if (profile && profile?.name && jam && typeof jam !== 'string') {
 			let urlToFetch = `/getRating?jam=${jam.id}&name=${profile.name}`;
 			fetcher.load(urlToFetch);
 		}
 		//update sounds when jam changes
-		if (jam) {
-			setSoundsSelected(jam.sounds);
+		if (jam && typeof jam !== 'string') {
+			setSoundsSelected(jam.sounds ?? null);
 		}
 	}, [jam, profile]);
 
+	useEffect(() => {
+		const { data } = fetcher || {};
+	
+		console.log('data', data);
+		if (data?.shows?.[0] && (!shows || data.shows[0].showdate.normalize() !== shows[0]?.showdate.normalize())) {
+			console.log('should set shows')
+			setShows(data.shows);
+		}
+	
+		if (data?.setlist?.length > 0 && (!setlist || 
+			(setlist[0].value !== data.setlist[0].value &&
+			 setlist[1].value !== data.setlist[1].value &&
+			 setlist[2].value !== data.setlist[2].value))) {
+			setSetlist(data.setlist);
+		}
+	
+		if (artist && data?.location && data.location !== location && !showLocationInput && date) {
+			setLocation(data.location);
+		}
+	
+		if (data?.jam === 'not on jf' && jam) {
+			setJam(null);
+		}
+	
+		if (data?.jam && data.jam !== 'not on jf' && (!jam || typeof jam === 'string' || data.jam.id !== jam.id) && songSelected === data.jam.song_name) {
+			setJam(data.jam);
+		}
+	
+		if (data?.rating && !rating && !comment) {
+			setRating(data.rating.rating);
+			setComment(data.rating.comment);
+		}
+
+		if (data?.song && !songObj) {
+			setSongObj(data.song);
+		}
+
+		if (data?.songs && data?.songs.length !== songs?.length) {
+			console.log('should set songs', data.songs.length, songs?.length)
+			setSongs(data.songs)
+		}
+		console.log('songs.length', songs?.length)
+	
+	}, [fetcher, shows, setlist, artist, location, showLocationInput, date, jam, soundsSelected, rating, comment, songs]);
+
+	useEffect(() => {
+		if (actionData?.status === 200 && !jam && !showSuccessAlert) {
+			setShowSuccessAlert(true);
+		}
+	}
+	, [actionData, jam, showSuccessAlert]);
+
+	useEffect(() => {
+		if (typeof jam !== 'string' && jam?.sounds && jam?.sounds?.length > 0 && (!soundsSelected || soundsSelected.length === 0)) {
+			setSoundsSelected(jam.sounds);
+		}
+	}, [jam, soundsSelected]);
+
 	function clearArtist() {
 		submit({ _action: 'clear' });
-		setArtist('');
-		setSong('');
+		setArtist(null);
 		setQuery('');
-		setSongSelected('');
-		setDate('');
-		setYear('');
+		setSongSelected(null);
+		setDate(null);
+		setYear(null);
 		setLocation('');
-		setShows('');
-		setJam('');
-		setShow('');
+		setShows(null);
+		setJam(null);
+		setShow(null);
 		setShowLoadingInfo(false);
 		setShowLocationInput(false);
-		setSoundsSelected('');
+		setSoundsSelected(null);
 		setShowSuccessAlert(false);
 	}
 
 	function clearSong() {
 		submit({ _action: 'clear' });
-		setSong('');
-		setSongSelected('');
-		setJam('');
-		setSoundsSelected('');
+		setSongSelected(null);
+		setJam(null);
+		setSoundsSelected(null);
 		if (!setlist) {
 			let urlToFetch;
 			if (show) {
 				//use fetcher.load to get setlist
 				urlToFetch =
-					'/getSetlist?artist=' + artist.artist + '&date=' + show.showdate;
+					'/getSetlist?artist=' + artist?.artist + '&date=' + show?.showdate;
 			} else if (date) {
-				urlToFetch = '/getSetlist?artist=' + artist.artist + '&date=' + date;
+				urlToFetch = '/getSetlist?artist=' + artist?.artist + '&date=' + date;
 			}
-			fetcher.load(urlToFetch);
+			if (urlToFetch) {
+				fetcher.load(urlToFetch);
+			}
 		}
 	}
 
 	function clearDate() {
 		submit({ _action: 'clear' });
-		setDate('');
-		setShow('');
-		setLocation('');
-		setJam('');
-		setSetlist('');
-		setSoundsSelected('');
+		setDate(null);
+		setShow(null);
+		setLocation(null);
+		setJam(null);
+		setSetlist(null);
+		setSoundsSelected(null);
 		if (
 			artist &&
 			songSelected &&
 			useApis &&
 			[
 				'Phish',
-				"Umphrey's McGee",
+				// "Umphrey's McGee",
 				'Trey Anastasio, TAB',
 				'Goose',
 				'Eggy',
 				'Neighbor',
 				"Taper's Choice",
+				'King Gizzard & the Lizard Wizard',
 			].includes(artist.artist)
 		) {
-			setYear('');
+			setYear(null);
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
-
+			console.log('going to get shows by song', urlToFetch);
 			fetcher.load(urlToFetch);
 		} else {
+			console.log('clearing song')
 			clearSong();
 		}
 	}
@@ -764,17 +893,17 @@ export default function AddJam() {
 		setShowLocationInput(true);
 	}
 
-	function handleLocationChange(e) {
+	function handleLocationChange(e: React.ChangeEvent<HTMLInputElement>) {
 		if (e.target.value !== location) {
 			setLocation(e.target.value);
 		}
 	}
 
-	async function handleYearChange(e) {
-		if (location) setLocation('');
-		if (setlist) setSetlist('');
-		if (e === 'Clear Year') {
-			setYear('');
+	async function handleYearChange(year: string) {
+		if (location) setLocation(null);
+		if (setlist) setSetlist(null);
+		if (year === 'Clear Year') {
+			setYear(null);
 		} else {
 			if (
 				useApis &&
@@ -782,32 +911,34 @@ export default function AddJam() {
 				artist.artist !== 'Squeaky Feet' &&
 				artist.artist !== 'Houseplant'
 			) {
-				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + e;
+				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
+				console.log('going to get shows year change', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
-			setYear(e);
-			if (
+			if (artist &&
 				![
 					'Goose',
 					'Eggy',
 					'Neighbor',
-					"Umphrey's McGee",
+					// "Umphrey's McGee",
 					'Phish',
 					"Taper's Choice",
 					'Trey Anastasio, TAB',
+					'King Gizzard & the Lizard Wizard',
 				].includes(artist.artist)
-			) {
-				setShowLoadingInfo(true);
+				) {
+					setShowLoadingInfo(true);
+				}
+				setYear(year);
 			}
-		}
 	}
 
 	const startYear = artist?.start_year;
 	const endYear = artist?.end_year || new Date().getFullYear();
-	let yearsArr = [];
+	let yearsArr: string[] = [];
 	if (startYear && endYear) {
 		for (var i = endYear; i >= startYear; i--) {
-			yearsArr.push(i);
+			yearsArr.push(String(i));
 		}
 		yearsArr.push('Clear Year');
 	}
@@ -818,21 +949,22 @@ export default function AddJam() {
 		}
 	}, [date]);
 
-	function handleDateInputChange(e) {
-		if (setlist) setSetlist('');
+	function handleDateInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+		if (setlist) setSetlist(null);
 		setDateInput(e.target.value);
 		let dateInput = e.target.value;
 		if (dateInput.length === 8) {
-			let month = dateInput.slice(0, 2);
-			let day = dateInput.slice(2, 4);
-			let year = dateInput.slice(4, 8);
-			let date = new Date(year, month - 1, day);
+			let month = Number(dateInput.slice(0, 2))
+			let day = Number(dateInput.slice(2, 4));
+			let year = Number(dateInput.slice(4, 8));
+			//Dates in JavaScript are zero-indexed LOL
+			let date = new Date(year, month - 1 , day);
 			if (date.toString() === 'Invalid Date') {
-				setdateInputError(true);
+				setDateInputError(true);
 			} else {
 				setDateInputError(false);
 				setDate(date.toJSON().slice(0, 10));
-				if (useApis) {
+				if (useApis && artist) {
 					let urlToFetch =
 						'/getSetlist?artist=' +
 						artist.artist +
@@ -844,11 +976,11 @@ export default function AddJam() {
 		}
 	}
 
-	function handleCommentChange(e) {
+	function handleCommentChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
 		setComment(e.target.value);
 	}
 
-	function handleSoundsChange(e) {
+	function handleSoundsChange(e: React.ChangeEvent<HTMLInputElement>) {
 		// if e.target.value is not in soundsSelected, add it, else, remove it (if not in initial sounds)
 		//if new sound is already selected and not in initial sounds, remove it
 		if (soundsSelected?.includes(e.target.value)) {
@@ -864,66 +996,8 @@ export default function AddJam() {
 		}
 	}
 
-	function handleLinkChange(e) {
+	function handleLinkChange(e: React.ChangeEvent<HTMLInputElement>) {
 		setListenLink(e.target.value);
-	}
-
-	if (
-		fetcher &&
-		fetcher.data &&
-		fetcher.data.shows &&
-		fetcher.data.shows[0] &&
-		(!shows ||
-			fetcher.data.shows[0].showdate.normalize() !==
-				shows[0]?.showdate.normalize())
-	) {
-		setShows(fetcher?.data?.shows);
-	}
-	if (
-		fetcher?.data?.setlist &&
-		fetcher?.data?.setlist.length > 0 &&
-		(!setlist ||
-			(setlist[0].value !== fetcher?.data?.setlist[0].value &&
-				setlist[1].value !== fetcher?.data?.setlist[1].value &&
-				setlist[2].value !== fetcher?.data?.setlist[2].value))
-	) {
-		setSetlist(fetcher?.data?.setlist);
-	}
-	if (
-		artist &&
-		fetcher?.data?.location &&
-		fetcher?.data?.location !== location &&
-		!showLocationInput &&
-		date
-	) {
-		console.log('should get location to ', fetcher?.data?.location);
-		setLocation(fetcher?.data?.location);
-	}
-	//setjam (if added to jamfans already)z
-	if (fetcher?.data?.jam === 'not on jf' && jam) {
-		setJam('');
-	}
-	if (
-		fetcher?.data?.jam &&
-		fetcher?.data?.jam !== 'not on jf' &&
-		(!jam || fetcher?.data?.jam?.id !== jam?.id) &&
-		songSelected === fetcher?.data?.jam?.song_name
-	) {
-		setJam(fetcher?.data?.jam);
-	}
-	if (
-		jam?.sounds &&
-		jam?.sounds.length > 0 &&
-		(!soundsSelected || soundsSelected.length === 0)
-	) {
-		setSoundsSelected(jam?.sounds);
-	}
-	if (actionData && actionData?.status === 200 && !jam && !showSuccessAlert) {
-		setShowSuccessAlert(true);
-	}
-	if (fetcher?.data?.rating && !rating && !comment) {
-		setRating(fetcher?.data?.rating.rating);
-		setComment(fetcher?.data?.rating.comment);
 	}
 
 	//check if song exists
@@ -941,14 +1015,42 @@ export default function AddJam() {
 	}, [songSelected, date]);
 
 	useEffect(() => {
-		if (artist.artist === 'Houseplant' || artist.artist === 'Squeaky Feet') {
+		if (artist?.artist === 'Houseplant' || artist?.artist === 'Squeaky Feet') {
 			setUseApis(false);
 		} else {
 			setUseApis(true);
 		}
 	}, [artist]);
 
-	const showAddSong = (query || songSelected) && filteredSongs?.length === 0;
+	// useEffect(() => {
+	// 	//console.log all dependencies
+	// 	console.log('artist', artist);
+	// 	console.log('songSelected', songSelected);
+	// 	console.log('query', query);
+	// 	console.log('filteredSongs', filteredSongs);
+	// 	console.log('initialSongObj', initialSongObj);
+	// 	console.log('initialSong', initialSong);
+	// 	console.log('showAddSong', showAddSong);
+	// 	console.log('songObj', songObj);
+	// 	if ((query || songSelected) && filteredSongs?.length === 0 && !initialSongObj && !initialSong && !showAddSong && !songObj) {
+	// 		setShowAddSong(true);
+	// 	} if (songObj || initialSongObj || initialSong && showAddSong) {
+	// 		setShowAddSong(false);
+	// 	}
+	// }, [query, songSelected, filteredSongs, initialSongObj, initialSong, showAddSong, songObj]);
+	console.log('query', query, songSelected, filteredSongs?.length)
+	const showAddSong: boolean = Boolean((query || songSelected) && filteredSongs?.length === 0)
+
+
+	interface AddingMethod {
+		id: 'auto' | 'manual';
+		title: string;
+	}
+
+	const addingMethods: AddingMethod[] = [
+		{ id: 'auto', title: 'Easiest way' },
+		{ id: 'manual', title: 'Still pretty easy way' }
+		];
 
 	return (
 		<Form
@@ -965,10 +1067,7 @@ export default function AddJam() {
 						<legend className='sr-only'>Jam Adding Method</legend>
 						{/* <div className='space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10'> */}
 						<div className='space-y-0 space-x-4 flex items-center'>
-							{[
-								{ id: 'auto', title: 'Easiest way' },
-								{ id: 'manual', title: 'Still pretty easy way' },
-							].map((addingMethod) => (
+							{addingMethods.map((addingMethod) => (
 								<div
 									key={addingMethod?.id}
 									className='flex align-middle'
@@ -979,14 +1078,14 @@ export default function AddJam() {
 										name='adding-method'
 										type='radio'
 										defaultChecked={
-											artist.artist === 'Squeaky Feet' ||
-											artist.artist === 'Houseplant'
+											artist?.artist === 'Squeaky Feet' ||
+											artist?.artist === 'Houseplant'
 												? addingMethod.id === 'manual'
 												: addingMethod.id === 'auto'
 										}
 										disabled={
-											artist.artist === 'Squeaky Feet' ||
-											artist.artist === 'Houseplant'
+											artist?.artist === 'Squeaky Feet' ||
+											artist?.artist === 'Houseplant'
 												? addingMethod.id === 'auto'
 												: false
 										}
@@ -1007,37 +1106,37 @@ export default function AddJam() {
 				<input
 					type='hidden'
 					name='artist'
-					value={artist.artist}
+					value={artist?.artist}
 				/>
 				<input
 					type='hidden'
 					name='song'
-					value={songSelected}
+					value={songSelected ?? undefined}
 				/>
 				<input
 					type='hidden'
 					name='date'
-					value={date}
+					value={date ?? undefined}
 				/>
 				<input
 					type='hidden'
 					name='location'
-					value={location}
+					value={location ?? undefined}
 				/>
 				<input
 					type='hidden'
 					name='jam'
-					value={JSON.stringify(fetcher?.data?.jam)}
+					value={JSON.stringify(jam)}
 				/>
 				<input
 					type='hidden'
 					name='sounds'
-					value={soundsSelected}
+					value={soundsSelected ?? undefined}
 				/>
 				<input
 					type='hidden'
 					name='rating'
-					value={rating}
+					value={rating ?? undefined}
 				/>
 				<input
 					type='hidden'
@@ -1059,7 +1158,7 @@ export default function AddJam() {
 					<div className='max-h-40 max-w-sm'>
 						<Listbox
 							value={artist}
-							onChange={(e) => handleArtistChange(e)}
+							onChange={handleArtistChange}
 						>
 							{({ open }) => (
 								<>
@@ -1068,7 +1167,7 @@ export default function AddJam() {
 									</Listbox.Label>
 									<div className='relative mt-1'>
 										<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm h-10'>
-											<span className='block truncate'>{artist.artist}</span>
+											<span className='block truncate'>{''}</span>
 											<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
 												<ChevronUpDownIcon
 													className='h-8 w-8 text-gray-400'
@@ -1086,7 +1185,7 @@ export default function AddJam() {
 										>
 											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
 												{artists &&
-													artists?.map((artist, artistIdx) => (
+													artists?.map((artist: Artist, artistIdx: number) => (
 														<Listbox.Option
 															key={artistIdx}
 															className={({ active }) =>
@@ -1160,19 +1259,21 @@ export default function AddJam() {
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist)) ||
 						(![
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist) &&
 							date) ||
 						!useApis) && (
@@ -1180,7 +1281,7 @@ export default function AddJam() {
 							<Combobox
 								as='div'
 								value={songSelected}
-								onChange={(e) => {
+								onChange={(e: string) => {
 									setSongSelected(e);
 								}}
 								name='song'
@@ -1194,7 +1295,7 @@ export default function AddJam() {
 										onChange={(event) => {
 											setQuery(event.target.value);
 										}}
-										displayValue={(song) => song}
+										// displayValue={(songItem) => songSelected ?? ''}
 										placeholder='Search for a song'
 									/>
 									<Combobox.Button className='absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none'>
@@ -1204,10 +1305,10 @@ export default function AddJam() {
 										/>
 									</Combobox.Button>
 
-									{filteredSongs?.length > 0 && (
+									{filteredSongs && filteredSongs?.length > 0 && (
 										<Combobox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
 											{filteredSongs &&
-												filteredSongs?.map((song, songIdx) => (
+												filteredSongs?.map((song: SongInSonglist, songIdx: number) => (
 													<Combobox.Option
 														key={songIdx}
 														value={song.song}
@@ -1220,18 +1321,18 @@ export default function AddJam() {
 															)
 														}
 													>
-														{({ active, songSelected }) => (
+														{({ active, selected }: { active: boolean; selected: boolean }) => (
 															<>
 																<span
 																	className={classNames(
 																		'block truncate',
-																		songSelected && 'font-semibold'
+																		selected ? 'font-semibold' : ''
 																	)}
 																>
 																	{song.song}
 																</span>
 
-																{songSelected && (
+																{selected && (
 																	<span
 																		className={classNames(
 																			'absolute inset-y-0 right-0 flex items-center pr-4',
@@ -1272,14 +1373,16 @@ export default function AddJam() {
 					artist &&
 					!date &&
 					!year &&
+					shows &&
 					[
 						'Goose',
 						'Eggy',
 						'Neighbor',
-						"Umphrey's McGee",
+						// "Umphrey's McGee",
 						'Phish',
 						"Taper's Choice",
 						'Trey Anastasio, TAB',
+						'King Gizzard & the Lizard Wizard',
 					].includes(artist.artist) && (
 						<div className='max-h-40'>
 							<Listbox
@@ -1377,7 +1480,7 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Add Song if doesnt exist*/}
-				{(query || songSelected) && filteredSongs?.length === 0 && (
+				{showAddSong && (
 					<div>
 						<InfoAlert
 							title={`No songs containing "${
@@ -1398,10 +1501,10 @@ export default function AddJam() {
 								type='text'
 								name='new-song'
 								id='new-song'
-								value={songSelected !== '' ? songSelected : query}
+								value={songSelected ?? query ?? ''}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='new-song'
-								onChange={() => setQuery(event.target.value)}
+								onChange={(event) => event && setQuery(event.target.value)}
 							/>
 						</div>
 						<p
@@ -1626,7 +1729,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* song picker from setlist */}
-				{useApis && setlist && setlist !== '' && date && !songSelected && (
+				{useApis && setlist && date && !songSelected && (
 					<div className='max-h-40'>
 						<Listbox
 							value={songSelected || ''}
@@ -1659,7 +1762,7 @@ export default function AddJam() {
 										>
 											<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm h-60'>
 												{setlist &&
-													setlist?.map((songInSet, songInSetIdx) => (
+													setlist?.map((songInSet: SongInSetlist, songInSetIdx: number) => (
 														<Listbox.Option
 															key={songInSetIdx}
 															className={({ active }) =>
@@ -1786,7 +1889,7 @@ export default function AddJam() {
 								type='text'
 								name='location'
 								id='location'
-								defaultValue={location}
+								defaultValue={location ?? ''}
 								onChange={handleLocationChange}
 								className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 								aria-describedby='location-description'
@@ -1801,7 +1904,7 @@ export default function AddJam() {
 					</div>
 				)}
 				{/* api attribution */}
-				{useApis && artist.artist && (
+				{useApis && artist?.artist && (
 					<div
 						className={`text-sm text-gray-500 ${
 							!(artist && songSelected && date) && !showLoadingInfo
@@ -1817,14 +1920,16 @@ export default function AddJam() {
 									? 'https://phish.net'
 									: artist.artist === 'Goose'
 									? 'https://elgoose.net'
-									: artist.artist === "Umphrey's McGee"
-									? 'https://allthings.umphreys.com'
+									// : artist.artist === "Umphrey's McGee"
+									// ? 'https://allthings.umphreys.com'
 									: artist.artist === 'Neighbor'
 									? 'https://neighbortunes.net'
 									: artist.artist === 'Eggy'
 									? 'https://thecarton.net'
 									: artist.artist === "Taper's Choice"
 									? 'https://taperschoice.net'
+									: artist.artist === 'King Gizzard & the Lizard Wizard' ?
+									'https://kglw.net'
 									: 'https://www.setlist.fm'
 							}
 							className='underline'
@@ -1834,14 +1939,16 @@ export default function AddJam() {
 								? 'phish.net'
 								: artist.artist === 'Goose'
 								? 'elgoose.net'
-								: artist.artist === "Umphrey's McGee"
-								? 'allthings.umphreys.com'
+								// : artist.artist === "Umphrey's McGee"
+								// ? 'allthings.umphreys.com'
 								: artist.artist === 'Neighbor'
 								? 'neighbortunes.net'
 								: artist.artist === 'Eggy'
 								? 'thecarton.net'
 								: artist.artist === "Taper's Choice"
 								? 'taperschoice.net'
+								: artist.artist === 'King Gizzard & the Lizard Wizard'
+								? 'kglw.net'
 								: 'setlist.fm'}
 						</a>
 						.{' '}
@@ -1849,10 +1956,11 @@ export default function AddJam() {
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist) ? (
 							<p>
 								Thanks{' '}
@@ -1873,15 +1981,17 @@ export default function AddJam() {
 				)}
 				{useApis &&
 					showLoadingInfo &&
-					!(artist && songSelected && date && location) &&
+					artist && 
+					!(songSelected && date && location) &&
 					![
 						'Goose',
 						'Eggy',
 						'Neighbor',
-						"Umphrey's McGee",
+						// "Umphrey's McGee",
 						'Phish',
 						"Taper's Choice",
 						'Trey Anastasio, TAB',
+						'King Gizzard & the Lizard Wizard',
 					].includes(artist.artist) && (
 						<InfoAlert
 							title={'Thanks for your patience!'}
@@ -1890,7 +2000,6 @@ export default function AddJam() {
 							}
 						/>
 					)}
-				{/* <p>{`artist ${artist.artist}, songSelected: ${songSelected}, date ${date} + location ${location} + jam ${JSON.stringify(jam)} + show: ${JSON.stringify(show)} + setlist ${JSON.stringify(setlist)}`}</p> */}
 				{artist &&
 					songSelected &&
 					date &&
@@ -1918,7 +2027,7 @@ export default function AddJam() {
 									</legend>
 									<div className='mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll max-w-fit'>
 										{sounds &&
-											sounds?.map((sound, soundIdx) => {
+											sounds?.map((sound: Sound, soundIdx: number) => {
 												return (
 													<div
 														key={soundIdx}
@@ -1940,11 +2049,11 @@ export default function AddJam() {
 																type='checkbox'
 																className='h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2'
 																checked={
-																	jam?.sounds?.includes(sound.label) ||
+																	(typeof jam !== 'string' && jam?.sounds?.includes(sound.label)) ||
 																	soundsSelected?.includes(sound.label)
 																}
 																onChange={handleSoundsChange}
-																disabled={jam?.sounds?.includes(sound.label)}
+																disabled={typeof jam !== 'string' && jam?.sounds?.includes(sound.label)}
 															/>
 														</div>
 													</div>
@@ -1962,14 +2071,14 @@ export default function AddJam() {
 					date &&
 					location &&
 					soundsSelected &&
-					soundsSelected !== [] && <p>Sounds: {soundsSelected.join(', ')}</p>}
+					soundsSelected.length > 0 && <p>Sounds: {soundsSelected.join(', ')}</p>}
 				{/* listen link */}
 				{artist &&
 					songSelected &&
 					date &&
 					location &&
 					profile &&
-					(!jam || (jam && !jam?.listen_link)) && (
+					(!jam || (typeof jam !== 'string' && !jam?.listen_link)) && (
 						<div className='mt-6'>
 							<label
 								htmlFor='listen-link'
@@ -2085,7 +2194,6 @@ export default function AddJam() {
 							</label>
 							<div className='mt-1 mb-10'>
 								<textarea
-									type='text'
 									name='comment'
 									id='comment'
 									cols={30}
@@ -2137,7 +2245,7 @@ export default function AddJam() {
 					{/* not logged in, jam exists, update sounds*/}
 					{!profile &&
 						jam &&
-						jam !== 'not on jf' &&
+						typeof jam !== 'string' &&
 						jam?.sounds?.length !== soundsSelected?.length && (
 							<button
 								type='submit'
@@ -2171,7 +2279,7 @@ export default function AddJam() {
 					{/*logged in, existing jam, no rating*/}
 					{profile &&
 						jam &&
-						jam !== 'not on jf' &&
+						typeof jam !== 'string' &&
 						(jam?.sounds?.length !== soundsSelected?.length ||
 							(!jam?.listen_link && listenLink)) &&
 						!rating &&
@@ -2201,7 +2309,7 @@ export default function AddJam() {
 					{/*logged in, jam exists, add rating/comment, no new sounds, no link*/}
 					{profile &&
 						jam &&
-						jam !== 'not on jf' &&
+						typeof jam !== 'string' &&
 						(rating || comment) &&
 						jam?.sounds?.length === soundsSelected?.length &&
 						(jam.listen_link || !listenLink) && (
@@ -2218,7 +2326,7 @@ export default function AddJam() {
 					{/*logged in, jam exists, add rating/comment and sounds*/}
 					{profile &&
 						jam &&
-						jam !== 'not on jf' &&
+						typeof jam !== 'string' &&
 						(rating || comment) &&
 						(jam?.sounds?.length !== soundsSelected?.length ||
 							(!jam?.listen_link && listenLink)) && (
@@ -2245,10 +2353,10 @@ export default function AddJam() {
 				)}
 				{actionData && actionData?.status !== 200 && (
 					<div className='pb-20'>
-						<ErrorAlert
+						<InfoAlert
 							title={'Error :('}
 							description={
-								'Something went wrong. Please try again and/or let me know on twitter'
+								'Something went wrong. Please try again and/or let me know'
 							}
 						/>
 						<a href='https://twitter.com/jeffphox'>@jeffphox</a>
