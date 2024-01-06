@@ -36,7 +36,7 @@ export default function JamCard({
   let songEmojis = jam.song_emoji?.split(',')
   let artistEmojis = jam.artist_emoji?.split(',')
 
-	const link = `/add/jam?jamid=${jam?.id}&song=${jam.song_name}&artist=${jam.artist}`;
+	const link = `/add/jam?jamid=${jam?.id}&song=${jam.song_name}&artist=${jam.artist}&location=${jam.location}&date=${jam.date}`;
 	return (
 		<div className='p-6 bg-gray-50 border border-gray-200 rounded-lg shadow m-6 w-96 flex flex-col justify-between'>
 			<div>

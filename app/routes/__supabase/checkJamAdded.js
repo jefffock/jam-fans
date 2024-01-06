@@ -11,7 +11,7 @@ export const loader = async ({ request, params }) => {
 	const url = new URL(request.url);
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(url.searchParams.entries());
-	const artist = queryParams?.artist;
+	const artist = queryParams?.artist.trim();
 	console.log('queryParams in checkJamAdded', queryParams);
 	let song = queryParams?.song;
 	let date = queryParams?.date;
@@ -23,7 +23,7 @@ export const loader = async ({ request, params }) => {
 		(artist.artist === 'Goose' ||
 			artist.artist === 'Eggy' ||
 			artist.artist === 'Neighbor' ||
-			artist.artist === "Umphrey's McGee" ||
+			// artist.artist === "Umphrey's McGee" ||
 			artist.artist === 'Phish' ||
 			artist.artist === "Taper's Choice" ||
 			artist.artist === 'Trey Anastasio, TAB');
@@ -32,7 +32,7 @@ export const loader = async ({ request, params }) => {
   if (!(artist.artist === 'Goose' ||
   artist.artist === 'Eggy' ||
   artist.artist === 'Neighbor' ||
-  artist.artist === "Umphrey's McGee" ||
+//   artist.artist === "Umphrey's McGee" ||
   artist.artist === 'Phish' ||
   artist.artist === "Taper's Choice" ||
   artist.artist === 'Trey Anastasio, TAB')) {
@@ -44,12 +44,13 @@ export const loader = async ({ request, params }) => {
 	let shows;
 	let setlist = [];
 	const baseUrls = {
-		eggyBaseUrl: 'https://thecarton.net/api/v1',
-		gooseBaseUrl: 'https://elgoose.net/api/v1',
-		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v1',
-		neighborBaseUrl: 'https://neighbortunes.net/api/v1',
+		eggyBaseUrl: 'https://thecarton.net/api/v2',
+		gooseBaseUrl: 'https://elgoose.net/api/v2',
+		umphreysBaseUrl: 'https://allthings.umphreys.com/api/v2',
+		neighborBaseUrl: 'https://neighbortunes.net/api/v2',
 		phishBaseUrl: 'https://api.phish.net/v5',
-		tapersChoiceBaseUrl: 'https://taperschoice.net/api/v1',
+		tapersChoiceBaseUrl: 'https://taperschoice.net/api/v2',
+		kglwBaseUrl: 'https://kglw.net/api/v2',
 	};
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
@@ -68,7 +69,7 @@ export const loader = async ({ request, params }) => {
 		'Greensky Bluegrass': '199596a3-a1af-49f8-8795-259eff8461fb',
 		'Jerry Garcia Band, Legion of Mary': '3f7a73e5-cb7f-4488-bd7e-f5e26c87fe1b',
 		"Joe Russo's Almost Dead": '84a69823-3d4f-4ede-b43f-17f85513181a',
-		'King Gizzard & the Lizard Wizard': 'f58384a4-2ad2-4f24-89c5-c7b74ae1cce7',
+		'King Gizzard': 'f58384a4-2ad2-4f24-89c5-c7b74ae1cce7',
 		Lettuce: 'e88313e2-22f6-4f6d-9656-6d2ad20ea415',
 		Lotus: 'b4681cdc-4002-4521-8458-ac812f1b6d28',
 		'Medeski Martin & Wood': '6eed1ed9-ab02-45cd-a306-828bc1b98671',
@@ -85,6 +86,7 @@ export const loader = async ({ request, params }) => {
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
 		'String Cheese Incident': 'cff95140-6d57-498a-8834-10eb72865b29',
 		'Tedeschi Trucks Band': 'e33e1ccf-a3b9-4449-a66a-0091e8f55a60',
+		"Umphrey's McGee": '3826a6e0-9ea5-4007-941c-25b9dd943981',
 		Twiddle: '5cf454bc-3be0-47ba-9d0b-1e53da631a4e',
 		'Widespread Panic': '3797a6d0-7700-44bf-96fb-f44386bc9ab2',
 	};
@@ -149,8 +151,9 @@ export const loader = async ({ request, params }) => {
 			artist === 'Goose' ||
 			artist === 'Eggy' ||
 			artist === 'Neighbor' ||
-			artist === "Umphrey's McGee" ||
-			artist === "Taper's Choice"
+			// artist === "Umphrey's McGee" ||
+			artist === "Taper's Choice" ||
+			artist === 'King Gizzard'
 		) {
 			console.log('getting songfish setlist');
 			//use songfish api
@@ -169,6 +172,8 @@ export const loader = async ({ request, params }) => {
 					baseUrl = baseUrls.neighborBaseUrl;
 				case "Taper's Choice":
 					baseUrl = baseUrls.tapersChoiceBaseUrl;
+				case 'King Gizzard':
+					baseUrl = baseUrls.kglwBaseUrl;
 			}
 			const url = `${baseUrl}/setlists/showdate/${date}`;
 			console.log('songfish url', url);
@@ -312,6 +317,9 @@ export const loader = async ({ request, params }) => {
 			case "Taper's Choice":
 				dbName = 'tapers_choice_songs';
 				baseUrl = baseUrls.tapersChoiceBaseUrl;
+			case 'King Gizzard':
+				dbName = 'kglw_songs';
+				baseUrl = baseUrls.kglwBaseUrl;
 		}
 		//get song id from supabase
 		console.log('dbName', dbName);

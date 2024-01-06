@@ -89,10 +89,7 @@ interface Data {
 	initialJam: Jam;
 };
 
-import { Request } from '@remix-run/node';
-//types for request and params
-
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
 	const response = new Response();
 
 	if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
@@ -104,9 +101,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
-	const url = new URL(request.url);
-	const searchParams = new URLSearchParams(url.search);
+	const { searchParams } = new URL(request.url);
+
 	const queryParams = Object.fromEntries(searchParams);
+	console.log('queryParams', queryParams);
 	let initialArtist;
 	let initialSong;
 	let initialDate;
@@ -305,9 +303,10 @@ export async function action({ request, params }: ActionArgs) {
 		profile = JSON.parse(String(values.profile));
 	}
 	let songObj;
+	console.log('values', values, 'typeof values', typeof values)
 	if (values.songObj) {
 		songObj = JSON.parse(String(values.songObj));
-	} else if (!values.songObj || values.songObj === '"') {
+	} else if (!values.songObj || values.songObj === '') {
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.select('*')
@@ -315,9 +314,6 @@ export async function action({ request, params }: ActionArgs) {
 			.single();
 		songObj = data;
 	}
-	console.log('songObj', songObj);
-	console.log('song_id', songObj?.id);
-	console.log('profile', profile);
 	if (_action === 'clear') {
 		return {
 			status: 200,
@@ -556,8 +552,6 @@ export default function AddJam() {
 	const navigate = useNavigate();
 	const submit = useSubmit();
 
-	console.log('songObj', songObj);
-
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
 			navigate('/welcome');
@@ -608,6 +602,7 @@ export default function AddJam() {
 		) {
 			//fetch shows
 			let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
+			console.log('going to get shows', urlToFetch);
 			fetcher.load(urlToFetch);
 		}
 		setArtist(artist);
@@ -637,10 +632,11 @@ export default function AddJam() {
 					'Goose',
 					'Eggy',
 					'Neighbor',
-					"Umphrey's McGee",
+					// "Umphrey's McGee",
 					'Phish',
 					"Taper's Choice",
 					'Trey Anastasio, TAB',
+					'King Gizzard & the Lizard Wizard',
 				].includes(artist.artist)
 			) {
 				setShows([]);
@@ -810,12 +806,13 @@ export default function AddJam() {
 			useApis &&
 			[
 				'Phish',
-				"Umphrey's McGee",
+				// "Umphrey's McGee",
 				'Trey Anastasio, TAB',
 				'Goose',
 				'Eggy',
 				'Neighbor',
 				"Taper's Choice",
+				'King Gizzard & the Lizard Wizard',
 			].includes(artist.artist)
 		) {
 			setYear(null);
@@ -851,6 +848,7 @@ export default function AddJam() {
 				artist.artist !== 'Houseplant'
 			) {
 				let urlToFetch = '/getShows?artist=' + artist.artist + '&year=' + year;
+				console.log('going to get shows year change', urlToFetch);
 				fetcher.load(urlToFetch);
 			}
 			if (artist &&
@@ -858,10 +856,11 @@ export default function AddJam() {
 					'Goose',
 					'Eggy',
 					'Neighbor',
-					"Umphrey's McGee",
+					// "Umphrey's McGee",
 					'Phish',
 					"Taper's Choice",
 					'Trey Anastasio, TAB',
+					'King Gizzard & the Lizard Wizard',
 				].includes(artist.artist)
 				) {
 					setShowLoadingInfo(true);
@@ -1179,19 +1178,21 @@ export default function AddJam() {
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist)) ||
 						(![
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist) &&
 							date) ||
 						!useApis) && (
@@ -1295,10 +1296,11 @@ export default function AddJam() {
 						'Goose',
 						'Eggy',
 						'Neighbor',
-						"Umphrey's McGee",
+						// "Umphrey's McGee",
 						'Phish',
 						"Taper's Choice",
 						'Trey Anastasio, TAB',
+						'King Gizzard & the Lizard Wizard',
 					].includes(artist.artist) && (
 						<div className='max-h-40'>
 							<Listbox
@@ -1396,7 +1398,7 @@ export default function AddJam() {
 						</div>
 					)}
 				{/* Add Song if doesnt exist*/}
-				{(query || songSelected) && filteredSongs?.length === 0 && (
+				{showAddSong && (
 					<div>
 						<InfoAlert
 							title={`No songs containing "${
@@ -1836,14 +1838,16 @@ export default function AddJam() {
 									? 'https://phish.net'
 									: artist.artist === 'Goose'
 									? 'https://elgoose.net'
-									: artist.artist === "Umphrey's McGee"
-									? 'https://allthings.umphreys.com'
+									// : artist.artist === "Umphrey's McGee"
+									// ? 'https://allthings.umphreys.com'
 									: artist.artist === 'Neighbor'
 									? 'https://neighbortunes.net'
 									: artist.artist === 'Eggy'
 									? 'https://thecarton.net'
 									: artist.artist === "Taper's Choice"
 									? 'https://taperschoice.net'
+									: artist.artist === 'King Gizzard & the Lizard Wizard' ?
+									'https://kglw.net'
 									: 'https://www.setlist.fm'
 							}
 							className='underline'
@@ -1853,14 +1857,16 @@ export default function AddJam() {
 								? 'phish.net'
 								: artist.artist === 'Goose'
 								? 'elgoose.net'
-								: artist.artist === "Umphrey's McGee"
-								? 'allthings.umphreys.com'
+								// : artist.artist === "Umphrey's McGee"
+								// ? 'allthings.umphreys.com'
 								: artist.artist === 'Neighbor'
 								? 'neighbortunes.net'
 								: artist.artist === 'Eggy'
 								? 'thecarton.net'
 								: artist.artist === "Taper's Choice"
 								? 'taperschoice.net'
+								: artist.artist === 'King Gizzard & the Lizard Wizard'
+								? 'kglw.net'
 								: 'setlist.fm'}
 						</a>
 						.{' '}
@@ -1868,10 +1874,11 @@ export default function AddJam() {
 							'Goose',
 							'Eggy',
 							'Neighbor',
-							"Umphrey's McGee",
+							// "Umphrey's McGee",
 							'Phish',
 							"Taper's Choice",
 							'Trey Anastasio, TAB',
+							'King Gizzard & the Lizard Wizard',
 						].includes(artist.artist) ? (
 							<p>
 								Thanks{' '}
@@ -1898,10 +1905,11 @@ export default function AddJam() {
 						'Goose',
 						'Eggy',
 						'Neighbor',
-						"Umphrey's McGee",
+						// "Umphrey's McGee",
 						'Phish',
 						"Taper's Choice",
 						'Trey Anastasio, TAB',
+						'King Gizzard & the Lizard Wizard',
 					].includes(artist.artist) && (
 						<InfoAlert
 							title={'Thanks for your patience!'}
@@ -1910,7 +1918,6 @@ export default function AddJam() {
 							}
 						/>
 					)}
-				{/* <p>{`artist ${artist.artist}, songSelected: ${songSelected}, date ${date} + location ${location} + jam ${JSON.stringify(jam)} + show: ${JSON.stringify(show)} + setlist ${JSON.stringify(setlist)}`}</p> */}
 				{artist &&
 					songSelected &&
 					date &&
