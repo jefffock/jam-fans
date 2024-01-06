@@ -348,8 +348,10 @@ export const loader = async ({ request, params }) => {
 			return new Date(b.showdate) - new Date(a.showdate);
 		});
 	}
+	console.log('shows.length', shows?.length)
+	console.log(shows[0])
 	return json(
-		{ shows: shows || [] },
+		{ shows: shows ?? [] },
 		{
 			headers: response.headers,
 		}

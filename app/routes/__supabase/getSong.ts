@@ -14,14 +14,15 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
-	console.log('params in getSong', params)
-	const initialSong = params.song;
-	console.log('initialSong in getSong', initialSong)
+	//get search params from url
+	const url = new URL(request.url);
+	const searchParams = new URLSearchParams(url.search);
+	const song = searchParams.get('song');
 			
 	const { data , error } = await supabaseClient
 		.from('songs')
 		.select('*')
-		.eq('song', initialSong)
+		.eq('song', song)
 		.single();
 	if (error) {
 		console.log('error in getsong', error);

@@ -8,6 +8,10 @@ export const loader = async ({ request, params }) => {
 		process.env.SUPABASE_ANON_KEY,
 		{ request, response }
 	);
+	const { data: songs } = await supabaseClient
+	.from('songs')
+	.select('song, artist')
+	.order('song', { ascending: true });
 	const url = new URL(request.url);
 	const searchParams = new URLSearchParams(url.search);
 	const queryParams = Object.fromEntries(url.searchParams.entries());
@@ -496,6 +500,7 @@ export const loader = async ({ request, params }) => {
 			location,
 			shows,
 			year,
+			songs	
 		},
 		{
 			headers: response.headers,

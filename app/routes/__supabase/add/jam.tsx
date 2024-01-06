@@ -16,7 +16,7 @@ import InfoAlert from '../../../components/alerts/InfoAlert';
 import SuccessAlert from '../../../components/alerts/successAlert';
 import type { ActionArgs, LoaderArgs } from '@remix-run/node';
 
-interface Song {
+interface SongInSonglist {
 	song: string;
 	artist: string;
 };
@@ -33,6 +33,13 @@ interface Artist {
 	url: string;
 	start_year: number;
 	end_year: number;
+};
+
+interface SongObj {
+	id: number;
+	song: string;
+	artist: string;
+	submitter_name: string;
 };
 
 interface Sound {
@@ -76,7 +83,7 @@ interface Show {
 };
 interface Data {
 	artists: Artist[];
-	songs: Song[];
+	songs: SongInSonglist[];
 	sounds: Sound[];
 	user: any;
 	profile: Profile;
@@ -85,7 +92,7 @@ interface Data {
 	initialDate: string;
 	initialLocation: string;
 	initialSounds: string[];
-	initialSongObj: Song;
+	initialSongObj: SongObj;
 	initialJam: Jam;
 };
 
@@ -185,7 +192,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 	return json(
 		{
 			artists,
-			songs,
+			initialSongs: songs,
 			sounds,
 			user,
 			profile,
@@ -516,7 +523,7 @@ export default function AddJam() {
 	const actionData = useActionData();
 	const {
 		artists,
-		songs,
+		initialSongs,
 		sounds,
 		initialArtist,
 		initialSong,
@@ -529,10 +536,11 @@ export default function AddJam() {
 		initialJam,
 	} = useLoaderData();
 	const [songSelected, setSongSelected] = useState<string | null>(initialSong ?? null);
+	const [songs, setSongs] = useState<SongInSonglist[] | null>(initialSongs ?? null);
 	const [soundsSelected, setSoundsSelected] = useState<string[] | null>(initialSounds ?? null);
 	const [query, setQuery] = useState<string>('');
 	const [artist, setArtist] = useState<Artist | null>(initialArtist ?? null);
-	const [songObj, setSongObj] = useState<Song | null>(initialSongObj ?? null);
+	const [songObj, setSongObj] = useState<SongObj | null>(initialSongObj ?? null);
 	const [showLoadingInfo, setShowLoadingInfo] = useState(false);
 	const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 	const [setlist, setSetlist] = useState<SongInSetlist[] | null>(null);
@@ -552,6 +560,8 @@ export default function AddJam() {
 	const [ratingId, setRatingId] = useState('');
 	const navigate = useNavigate();
 	const submit = useSubmit();
+	// const [showAddSong, setShowAddSong] = useState(false);
+	// const [filteredSongs, setFilteredSongs] = useState<SongInSonglist[] | null>(null);
 
 	useEffect(() => {
 		if (user && !profile && typeof document !== 'undefined') {
@@ -560,28 +570,53 @@ export default function AddJam() {
 	}, []);
 
 	const sortedSongs = useMemo(() => {
-		return artist ? songs.sort((a: Song, b: Song) => {
+		return artist ? songs?.sort((a: SongInSonglist, b: SongInSonglist) => {
 				if (a.artist === artist.artist) return -1;
 				if (b.artist === artist.artist) return 1;
 				if (a.song < b.song) return -1;
 				if (a.song > b.song) return 1;
 				return 0;
 		  })
-		: songs}, [artist]);
+		: songs}, [artist, songs]);
 
-	const filteredSongs =
-		query === ''
-			? songSelected
-				? sortedSongs?.filter((song: Song) => {
-						return (
-							song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
-							song.song.length === songSelected.length
-						);
-				  })
-				: sortedSongs
-			: sortedSongs?.filter((song: Song) => {
-					return song.song.toLowerCase().includes(query.toLowerCase());
-			  });
+		// useEffect(()=> {
+		// 	let newlyFilteredSongs: SongInSonglist[] | null = null
+		// 	if (sortedSongs && query && query !== '') {
+		// 		newlyFilteredSongs = sortedSongs.filter((song: SongInSonglist) => {
+		// 			return song.song.toLowerCase().includes(query.toLowerCase());
+		// 	  });
+		// 	} else if (songSelected && query === '' && sortedSongs) {
+		// 		newlyFilteredSongs = sortedSongs.filter((song: SongInSonglist) => {
+		// 			return (
+		// 				song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
+		// 				song.song.length === songSelected.length
+		// 			);
+		// 	  });
+		// 	} else if (sortedSongs) {
+		// 		newlyFilteredSongs = sortedSongs;
+		// 	}
+		// 	setFilteredSongs(newlyFilteredSongs);
+		// }, [sortedSongs, query, songSelected])
+	const filteredSongs = useMemo(() => {
+		if (query === '') {
+			if (songSelected) {
+				return sortedSongs?.filter((song: SongInSonglist) => {
+					return (
+						song.song.toLowerCase().includes(songSelected.toLowerCase()) &&
+						song.song.length === songSelected.length
+					);
+				});
+			} else {
+				return sortedSongs;
+			}
+		} else {
+			return sortedSongs?.filter((song: SongInSonglist) => {
+				return song.song.toLowerCase().includes(query.toLowerCase());
+			});
+		}
+	}, [sortedSongs, query, songSelected]);
+
+	console.log('filteredSongs', filteredSongs?.length);
 
 	function handleArtistChange(artist: Artist) {
 		submit({ _action: 'clear' });
@@ -620,6 +655,7 @@ export default function AddJam() {
 
 	//get shows by song for select artists
 	useEffect(() => {
+		console.log('actionData?.body', actionData?.body)
 		if (!actionData?.body?.includes('action complete') && artist) {
 			setJam(null);
 			setQuery('');
@@ -644,13 +680,31 @@ export default function AddJam() {
 				let urlToFetch =
 					'/getShows?artist=' + artist.artist + '&song=' + songSelected;
 				fetcher.load(urlToFetch);
-			}
-			if (filteredSongs?.length !== 0 && songSelected) {
+			} else if (filteredSongs?.length !== 0 && songSelected) {
+				console.log('fetcher.state before get song not songfish', fetcher.state)
 				const urlToFetch = '/getSong?song=' + songSelected;
 				fetcher.load(urlToFetch);
 			}
 		}
 	}, [songSelected, actionData?.body]);
+
+	useEffect(() => {
+		if (shows && shows.length > 0 && filteredSongs?.length !== 0 && songSelected && useApis && artist &&
+			[
+				'Goose',
+				'Eggy',
+				'Neighbor',
+				// "Umphrey's McGee",
+				'Phish',
+				"Taper's Choice",
+				'Trey Anastasio, TAB',
+				'King Gizzard & the Lizard Wizard',
+			].includes(artist.artist)) {
+			console.log('fetcher.state before get song songfish', fetcher.state)
+				const urlToFetch = '/getSong?song=' + songSelected;
+				fetcher.load(urlToFetch);
+		}
+	}, [shows])
 
 	function handleShowChange(show: Show) {
 		if (show) {
@@ -709,7 +763,9 @@ export default function AddJam() {
 	useEffect(() => {
 		const { data } = fetcher || {};
 	
+		console.log('data', data);
 		if (data?.shows?.[0] && (!shows || data.shows[0].showdate.normalize() !== shows[0]?.showdate.normalize())) {
+			console.log('should set shows')
 			setShows(data.shows);
 		}
 	
@@ -740,8 +796,14 @@ export default function AddJam() {
 		if (data?.song && !songObj) {
 			setSongObj(data.song);
 		}
+
+		if (data?.songs && data?.songs.length !== songs?.length) {
+			console.log('should set songs', data.songs.length, songs?.length)
+			setSongs(data.songs)
+		}
+		console.log('songs.length', songs?.length)
 	
-	}, [fetcher, shows, setlist, artist, location, showLocationInput, date, jam, soundsSelected, rating, comment]);
+	}, [fetcher, shows, setlist, artist, location, showLocationInput, date, jam, soundsSelected, rating, comment, songs]);
 
 	useEffect(() => {
 		if (actionData?.status === 200 && !jam && !showSuccessAlert) {
@@ -819,9 +881,10 @@ export default function AddJam() {
 			setYear(null);
 			let urlToFetch =
 				'/getShows?artist=' + artist.artist + '&song=' + songSelected;
-
+			console.log('going to get shows by song', urlToFetch);
 			fetcher.load(urlToFetch);
 		} else {
+			console.log('clearing song')
 			clearSong();
 		}
 	}
@@ -959,7 +1022,25 @@ export default function AddJam() {
 		}
 	}, [artist]);
 
-	const showAddSong: boolean = Boolean((query || songSelected) && filteredSongs?.length === 0) && !initialSongObj;
+	// useEffect(() => {
+	// 	//console.log all dependencies
+	// 	console.log('artist', artist);
+	// 	console.log('songSelected', songSelected);
+	// 	console.log('query', query);
+	// 	console.log('filteredSongs', filteredSongs);
+	// 	console.log('initialSongObj', initialSongObj);
+	// 	console.log('initialSong', initialSong);
+	// 	console.log('showAddSong', showAddSong);
+	// 	console.log('songObj', songObj);
+	// 	if ((query || songSelected) && filteredSongs?.length === 0 && !initialSongObj && !initialSong && !showAddSong && !songObj) {
+	// 		setShowAddSong(true);
+	// 	} if (songObj || initialSongObj || initialSong && showAddSong) {
+	// 		setShowAddSong(false);
+	// 	}
+	// }, [query, songSelected, filteredSongs, initialSongObj, initialSong, showAddSong, songObj]);
+	console.log('query', query, songSelected, filteredSongs?.length)
+	const showAddSong: boolean = Boolean((query || songSelected) && filteredSongs?.length === 0)
+
 
 	interface AddingMethod {
 		id: 'auto' | 'manual';
@@ -970,8 +1051,7 @@ export default function AddJam() {
 		{ id: 'auto', title: 'Easiest way' },
 		{ id: 'manual', title: 'Still pretty easy way' }
 		];
-	
-	
+
 	return (
 		<Form
 			method='post'
@@ -1225,10 +1305,10 @@ export default function AddJam() {
 										/>
 									</Combobox.Button>
 
-									{filteredSongs?.length > 0 && (
+									{filteredSongs && filteredSongs?.length > 0 && (
 										<Combobox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
 											{filteredSongs &&
-												filteredSongs?.map((song: Song, songIdx: number) => (
+												filteredSongs?.map((song: SongInSonglist, songIdx: number) => (
 													<Combobox.Option
 														key={songIdx}
 														value={song.song}
@@ -1293,6 +1373,7 @@ export default function AddJam() {
 					artist &&
 					!date &&
 					!year &&
+					shows &&
 					[
 						'Goose',
 						'Eggy',
