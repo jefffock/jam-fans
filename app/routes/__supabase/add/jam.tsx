@@ -321,6 +321,7 @@ export async function action({ request, params }: ActionArgs) {
 		};
 	}
 	if (_action === 'new-song') {
+		console.log('in new song')
 		const { data, error } = await supabaseClient
 			.from('songs')
 			.insert({ song: values['new-song'], artist: values.artist });
@@ -334,7 +335,7 @@ export async function action({ request, params }: ActionArgs) {
 		if (values?.date) searchParams.append('date', String(values.date));
 		if (values?.location) searchParams.append('location', String(values.location));
 		console.log('searchParams', searchParams.toString());
-		console.log('params', searchParams.toString());
+		console.log('params in new song', searchParams.toString());
 		return redirect(`/add/jam?${searchParams.toString()}`);
 	}
 	if (_action === 'add-not-logged-in') {
@@ -958,7 +959,7 @@ export default function AddJam() {
 		}
 	}, [artist]);
 
-	const showAddSong: boolean = Boolean((query || songSelected) && filteredSongs?.length === 0);
+	const showAddSong: boolean = Boolean((query || songSelected) && filteredSongs?.length === 0) && !initialSongObj;
 
 	interface AddingMethod {
 		id: 'auto' | 'manual';
