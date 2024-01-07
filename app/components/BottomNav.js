@@ -1,11 +1,8 @@
 import { Link } from '@remix-run/react';
 
-export default function BottomNav({ supabase, session }) {
+export default function BottomNav() {
 	return (
-		<section
-			id='bottom-navigation'
-			className='block fixed inset-x-0 bottom-0 z-10 bg-white shadow h-14 border-t'
-		>
+		<section id='bottom-navigation' className='block fixed inset-x-0 bottom-0 z-10 bg-white shadow h-14 border-t'>
 			<nav className='flex justify-around max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
 				<div className='-mb-px flex space-x-8 justify-center align-middle pt-1'>
 					<div className='text-center text-sm text-neutral-700 hover:text-neutral-900 flex flex-col'>

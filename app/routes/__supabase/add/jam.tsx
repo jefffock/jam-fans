@@ -2346,7 +2346,7 @@ export default function AddJam() {
 						<SuccessAlert
 							title={'Success!'}
 							description={
-								"Thanks for contributing! You're a great person making a positive impact in the world."
+								"Thanks for contributing and helping other fans find this jam"
 							}
 						/>
 					</div>
