@@ -7,6 +7,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
+	isRouteErrorResponse,
 } from "@remix-run/react";
 
 import type { LinksFunction } from "@remix-run/node";
@@ -30,14 +32,12 @@ export function ErrorBoundary({ error }:{ error: Error }) {
   return (
     <html>
       <head>
-        <title>Oh no!</title>
+        <title>What's goin on?</title>
         <Meta />
         <Links />
       </head>
       <body>
-
-        {/* add the UI you want your users <to see */}
-        <p>Something went wrong :&#40; Please let me know on twitter <a href='https://twitter.com/jeffphox'>@jeffphox</a> so I can work on fixing it.</p>
+        <p className="mx-auto p-10">Something went wrong :&#40; Please let me know on <a className="color-blue underline" href='https://www.instagram.com/jefffocks/'>insta</a> or <a className="color-blue underline" href='https://twitter.com/jeffphox'>twatter</a></p>
         <Scripts />
       </body>
     </html>

@@ -3,6 +3,9 @@ import { json } from '@remix-run/node';
 
 export const loader = async ({ request, params }) => {
 	const response = new Response();
+	const url = new URL(request.url);
+	const searchParams = new URLSearchParams(url.search);
+	const queryParams = Object.fromEntries(url.searchParams.entries());
 	const supabaseClient = createServerClient(
 		process.env.SUPABASE_URL,
 		process.env.SUPABASE_ANON_KEY,
@@ -12,16 +15,21 @@ export const loader = async ({ request, params }) => {
 	.from('songs')
 	.select('song, artist')
 	.order('song', { ascending: true });
-	const url = new URL(request.url);
-	const searchParams = new URLSearchParams(url.search);
-	const queryParams = Object.fromEntries(url.searchParams.entries());
+	let song = queryParams?.song;
+	console.log('song in checkjamadded before fetch', song);
+	const { data: songObj } = await supabaseClient
+	.from('songs')
+	.select('*')
+	.eq('song', song)
+	.single();
+	console.log('songObj in checkjamadded', songObj);
 	const artist = queryParams?.artist.trim();
 	console.log('queryParams in checkJamAdded', queryParams);
-	let song = queryParams?.song;
 	let date = queryParams?.date;
-	let shouldGetShowsByYear =
-		queryParams?.fetchShowsByYear === 'false' ? false : true;
-	const shouldGetSetlist = queryParams?.fetchSetlist === 'false' ? false : true;
+	let shouldGetShowsByYear = queryParams?.fetchShowsByYear &&
+		queryParams?.fetchShowsByYear !== 'false';
+	const shouldGetSetlist = queryParams?.fetchSetlist && queryParams?.fetchSetlist !== 'false';
+	console.log('shouldGetSetlist', shouldGetSetlist);
 	shouldGetShowsByYear =
 		shouldGetShowsByYear &&
 		(artist.artist === 'Goose' ||
@@ -30,7 +38,8 @@ export const loader = async ({ request, params }) => {
 			// artist.artist === "Umphrey's McGee" ||
 			artist.artist === 'Phish' ||
 			artist.artist === "Taper's Choice" ||
-			artist.artist === 'Trey Anastasio, TAB');
+			artist.artist === 'Trey Anastasio, TAB'
+	|| artist.artist === 'King Gizzard');
 	//get year from date
 	let year = date.split('-')[0];
   if (!(artist.artist === 'Goose' ||
@@ -39,7 +48,8 @@ export const loader = async ({ request, params }) => {
 //   artist.artist === "Umphrey's McGee" ||
   artist.artist === 'Phish' ||
   artist.artist === "Taper's Choice" ||
-  artist.artist === 'Trey Anastasio, TAB')) {
+  artist.artist === 'Trey Anastasio, TAB' ||
+  artist.artist === 'King Gizzard')) {
     year = null
   }
 	console.log('year', year);
@@ -169,9 +179,9 @@ export const loader = async ({ request, params }) => {
 				case 'Goose':
 					baseUrl = baseUrls.gooseBaseUrl;
 					break;
-				case "Umphrey's McGee":
-					baseUrl = baseUrls.umphreysBaseUrl;
-					break;
+				// case "Umphrey's McGee":
+				// 	baseUrl = baseUrls.umphreysBaseUrl;
+				// 	break;
 				case 'Neighbor':
 					baseUrl = baseUrls.neighborBaseUrl;
 				case "Taper's Choice":
@@ -311,10 +321,10 @@ export const loader = async ({ request, params }) => {
 				dbName = 'goose_songs';
 				baseUrl = baseUrls.gooseBaseUrl;
 				break;
-			case "Umphrey's McGee":
-				dbName = 'um_songs';
-				baseUrl = baseUrls.umphreysBaseUrl;
-				break;
+			// case "Umphrey's McGee":
+			// 	dbName = 'um_songs';
+			// 	baseUrl = baseUrls.umphreysBaseUrl;
+			// 	break;
 			case 'Neighbor':
 				dbName = 'neighbor_songs';
 				baseUrl = baseUrls.neighborBaseUrl;
@@ -404,8 +414,9 @@ export const loader = async ({ request, params }) => {
 			artist === 'Goose' ||
 			artist === 'Eggy' ||
 			artist === 'Neighbor' ||
-			artist === "Umphrey's McGee" ||
-			artist === "Taper's Choice"
+			// artist === "Umphrey's McGee" ||
+			artist === "Taper's Choice" || 
+			artist === 'King Gizzard'
 		) {
 			let baseUrl;
 			switch (artist) {
@@ -423,6 +434,8 @@ export const loader = async ({ request, params }) => {
 					break;
 				case "Taper's Choice":
 					baseUrl = baseUrls.tapersChoiceBaseUrl;
+				case 'King Gizzard':
+					baseUrl = baseUrls.kglwBaseUrl;
 			}
 			// const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`
 			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`;
@@ -493,6 +506,7 @@ export const loader = async ({ request, params }) => {
 			}
 		}
 	}
+	console.log('song in checkjamadded', songObj)
 	return json(
 		{
 			jam: jam || 'not on jf',
@@ -500,7 +514,8 @@ export const loader = async ({ request, params }) => {
 			location,
 			shows,
 			year,
-			songs	
+			songs,
+			song: songObj
 		},
 		{
 			headers: response.headers,
