@@ -200,13 +200,13 @@ export const loader = async ({ request, params }) => {
 			url: null,
 			artist: 'All Bands',
 		},
-		{ nickname: 'Phish', emoji_code: '0x1F41F', url: 'phish', artist: 'Phish' },
-		{
-			nickname: 'Grateful Dead',
-			emoji_code: '0x1F480',
-			url: 'grateful-dead',
-			artist: 'Grateful Dead',
-		},
+		// { nickname: 'Phish', emoji_code: '0x2b55', url: 'phish', artist: 'Phish' },
+		// {
+		// 	nickname: 'Grateful Dead',
+		// 	emoji_code: '0x1F480',
+		// 	url: 'grateful-dead',
+		// 	artist: 'Grateful Dead',
+		// },
 	].concat(artists);
 
 	let title = '🔥 ';
