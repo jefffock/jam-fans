@@ -205,6 +205,9 @@ export const loader = async ({ request, params }) => {
 						const alreadyAdded = jfVersions.find(
 							({ song_name }) => song_name === name
 						);
+						if (name === '2 x 2') {
+							name = '2x2';
+						}
 						return {
 							label: alreadyAdded ? '(Added) ' + name : name,
 							value: name,

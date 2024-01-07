@@ -373,6 +373,7 @@ export async function action({ request, params }: ActionArgs) {
 		console.log('error (update-not-logged-in)', error);
 	}
 	if (_action === 'add-logged-in') {
+		console.log('values in add logged in', values)
 		const { data, error } = await supabaseClient.from('versions').insert({
 			artist: values.artist,
 			song_name: values.song,
@@ -383,10 +384,14 @@ export async function action({ request, params }: ActionArgs) {
 			submitter_name: profile?.name,
 			song_id: songObj?.id,
 			song_submitter_name: songObj?.submitter_name,
+			listen_link: values['listen-link'] || null,
 		});
-		console.log('data', data);
-		console.log('error', error);
+		console.log('data in add-logged-in', data);
+		console.log('error in add-logged-in', error);
 		addTenPoints(profile?.name);
+		if (values['listen-link']) {
+			addTenPoints(profile?.name);
+		}
 		addOnePoint(songObj?.submitter_name);
 	}
 	if (_action === 'update-logged-in') {
@@ -495,6 +500,7 @@ export async function action({ request, params }: ActionArgs) {
 				})
 				.eq('id', jam?.id)
 				.select();
+			console.log('data in listen-link', data)
 			console.log('error', error);
 		} else {
 			const { data, error } = await supabaseClient
