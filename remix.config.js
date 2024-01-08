@@ -16,14 +16,14 @@ module.exports = {
   // so we default back to the standard build output.
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   ignoredRouteFiles: ["**/.*"],
-  future: {
-    v2_dev: true,
-	v2_errorBoundary: true,
-	v2_normalizeFormMethod: true,
-	v2_meta: true,
-	v2_headers: true,
-	// v2_routeConvention: true,
-  },
+//   future: {
+//     v2_dev: true,
+// 	v2_errorBoundary: true,
+// 	v2_normalizeFormMethod: true,
+// 	v2_meta: true,
+// 	v2_headers: true,
+// 	// v2_routeConvention: true,
+//   },
 //   routes(defineRoutes) {
 //     // uses the v1 convention, works in v1.15+ and v2
 //     return createRoutesFromFolders(defineRoutes);
