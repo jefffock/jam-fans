@@ -1,4 +1,8 @@
-/** @type {import('@remix-run/dev').AppConfig} */
+// const {
+// 	createRoutesFromFolders,
+//   } = require("@remix-run/v1-route-convention");
+  
+  /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
 	serverBuildTarget: "vercel",
 //   publicPath: "/build/",
@@ -13,10 +17,15 @@ module.exports = {
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   ignoredRouteFiles: ["**/.*"],
 //   future: {
-//     v2_dev: true
-//   }
+//     v2_dev: true,
+// 	// v2_routeConvention: true,
+//   },
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "api/index.js",
   // publicPath: "/build/",
+//   routes(defineRoutes) {
+//     // uses the v1 convention, works in v1.15+ and v2
+//     return createRoutesFromFolders(defineRoutes);
+//   },
 };
