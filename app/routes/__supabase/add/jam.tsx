@@ -510,16 +510,17 @@ export async function action({ request, params }: ActionArgs) {
 				})
 				.eq('id', jam?.id)
 				.select();
-			console.log('dataFromUpdate', data);
-			console.log('errorFromUpdate', error);
-			addTenPoints(profile?.name);
-			addOnePoint(songObj?.submitter_name);
-			addOnePoint(jam?.submitter_name);
-			addRatingCountToArtist(String(values.artist));
-			addRatingCountToSong(String(values.song));
-			addRatingCountToVersion(jam?.id);
-			calcAverageForVersion(jam?.id);
-		}
+			}
+		console.log('dataFromUpdate', data);
+		console.log('errorFromUpdate', error);
+		addTenPoints(profile?.name);
+		addOnePoint(songObj?.submitter_name);
+		addOnePoint(jam?.submitter_name);
+		addRatingCountToArtist(String(values.artist));
+		addRatingCountToSong(String(values.song));
+		addRatingCountToVersion(jam?.id);
+		calcAverageForVersion(jam?.id);
+	
 	}
 	return { status: 200, body: 'action complete' };
 }
@@ -2210,13 +2211,13 @@ export default function AddJam() {
 									className='block w-full rounded-md border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm'
 									aria-describedby='comment'
 								></textarea>
-								<InfoAlert
+								{/* <InfoAlert
 									title={'Rating and comment can be updated'}
 									description={
 										'You can add or change your comment and rating later'
 									}
-								></InfoAlert>
-							</div>
+								></InfoAlert> */}
+							</div> 
 						</div>
 					</div>
 				)}
@@ -2365,7 +2366,7 @@ export default function AddJam() {
 								'Something went wrong. Please try again and/or let me know'
 							}
 						/>
-						<a href='https://twitter.com/jeffphox'>@jeffphox</a>
+						on <a className="color-blue underline" href='https://www.instagram.com/jefffocks/'>insta</a> or <a className="color-blue underline" href='https://twitter.com/jeffphox'>on twatter</a>
 					</div>
 				)}
 			</div>
