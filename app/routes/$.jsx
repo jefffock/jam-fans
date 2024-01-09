@@ -10,8 +10,11 @@ import { useState, useEffect } from 'react';
 import FiltersButton from '../components/FiltersButton';
 import JamsHome from '../components/JamsHome';
 import Hero from '../components/Hero';
+import TopNav from '~/components/TopNav';
+import BottomNav from '~/components/BottomNav';
 
-export const loader = async ({ request, params }) => {
+export const loader = async () => {
+	console.log('in catchall $');
 	return redirect('/jams');
 	const response = new Response();
 	const supabaseClient = createServerClient(
@@ -47,6 +50,7 @@ export const loader = async ({ request, params }) => {
 	}
 
 	//get artists
+	
 	let { data: artists } = await supabaseClient
 		.from('artists')
 		.select('nickname, emoji_code, url, artist')
@@ -175,26 +179,32 @@ export default function Index({ supabase, session }) {
 	}, [fetcher.data]);
 
 	return (
-		<>
-			<Hero
-				open={open}
-				setOpen={setOpen}
-			/>
-			<JamsHome
-				supabase={supabase}
-				session={session}
-				artists={artists}
-				songs={songs}
-				jams={jams}
-				sounds={sounds}
-				open={open}
-				setOpen={setOpen}
-				count={count}
-				user={user}
-				profile={profile}
-				title={title}
-				setHeight={setHeight}
-			/>
-		</>
+		 <div className='w-full h-full overflow-x-hidden'>
+    {/* <Login supabase={supabase} session={session} />
+      <Nav /> */}
+
+      <TopNav supabase={supabase} session={session}/>
+      {/* <Outlet context={{ supabase, session }} /> */}
+	  <Hero
+		  open={open}
+		  setOpen={setOpen}
+	  />
+	  <JamsHome
+		  supabase={supabase}
+		  session={session}
+		  artists={artists}
+		  songs={songs}
+		  jams={jams}
+		  sounds={sounds}
+		  open={open}
+		  setOpen={setOpen}
+		  count={count}
+		  user={user}
+		  profile={profile}
+		  title={title}
+		  setHeight={setHeight}
+	  />
+      <BottomNav supabase={supabase} session={session}/>
+      </div>
 	);
 }

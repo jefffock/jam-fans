@@ -1,17 +1,63 @@
+
+import {
+	Links,
+	LiveReload,
+	Meta,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
+	useRouteError,
+	isRouteErrorResponse,
+	useFetcher,
+	useLoaderData
+} from "@remix-run/react";
 import { json, redirect } from '@remix-run/node';
-import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { useEffect, useState } from 'react';
 import { createServerClient } from 'utils/supabase.server';
 import TopNav from 'app/components/TopNav';
 import BottomNav from 'app/components/BottomNav';
 
-// this uses Pathless Layout Routes [1] to wrap up all our Supabase logic
+// import type { MetaFunction } from "@remix-run/node";
+// import type { LinksFunction } from "@remix-run/node";
 
-// [1] https://remix.run/docs/en/v1/guides/routing#pathless-layout-routes
+import styles from "./tailwind.css";
+
+export const links = () => [
+  { rel: "stylesheet", href: styles },
+  {rel: "stylesheet", href: "https://rsms.me/inter/inter.css"},
+];
+
+//tslint:disable-next-line
+export const meta = () => {
+	 	return [
+  { charset: "utf-8"},
+  { title: "Jam Fans | Find and add great jams by Grateful Dead, Phish, SCI, UM, moe. WSMFP, BMFS, Goose, and more"},
+  { description: "Find and add great jams by Grateful Dead, Phish, SCI, UM, moe., WSMFP, BMFS, Goose, and more"},
+  { viewport: "width=device-width,initial-scale=1"},
+]};
+
+export function ErrorBoundary() {
+	const error = useRouteError();
+
+  console.error(error);
+  return (
+    <html>
+      <head>
+        <title>What's goin on?</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <p className="mx-auto p-10">Something went wrong :&#40; Please let me know on <a className="color-blue underline" href='https://www.instagram.com/jefffocks/'>insta</a> or <a className="color-blue underline" href='https://twitter.com/jeffphox'>twatter</a></p>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
 
 export const loader = async ({ request, params }) => {
-	// console.log('params in __supabase', params)
+	console.log('params in root.tsx', params)
 	// if (Object.keys(params).length === 0) {
 	// 	return redirect('/jams');
 	// }
@@ -46,12 +92,10 @@ export const loader = async ({ request, params }) => {
   );
 };
 
-export default function Supabase() {
-  const { env, session } = useLoaderData();
+export default function Root() {
+	const { env, session } = useLoaderData();
   const fetcher = useFetcher();
 
-  // it is important to create a single instance of Supabase
-  // to use across client components - outlet context 👇
   const [supabase] = useState(() =>
     createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
   );
@@ -78,14 +122,21 @@ export default function Supabase() {
   }, [serverAccessToken, supabase, fetcher]);
 
   return (
-    <div className='w-full h-full overflow-x-hidden'>
-    {/* <Login supabase={supabase} session={session} />
-      <Nav /> */}
-
+    <html lang="en">
+      <head>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+	  <div className='w-full h-full'>
       <TopNav supabase={supabase} session={session}/>
-      <Outlet context={{ supabase, session }} />
+      <Outlet supabase={supabase} session={session}/>
       <BottomNav supabase={supabase} session={session}/>
       </div>
+        <ScrollRestoration />
+        <Scripts />
+        <LiveReload />
+      </body>
+    </html>
   );
 }
-
