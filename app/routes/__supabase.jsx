@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import { createBrowserClient } from '@supabase/auth-helpers-remix';
 import { useEffect, useState } from 'react';
@@ -10,7 +10,11 @@ import BottomNav from 'app/components/BottomNav';
 
 // [1] https://remix.run/docs/en/v1/guides/routing#pathless-layout-routes
 
-export const loader = async ({ request }) => {
+export const loader = async ({ request, params }) => {
+	// console.log('params in __supabase', params)
+	// if (Object.keys(params).length === 0) {
+	// 	return redirect('/jams');
+	// }
   // environment variables may be stored somewhere other than
   // `process.env` in runtimes other than node
   // we need to pipe these Supabase environment variables to the browser

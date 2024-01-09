@@ -2,14 +2,14 @@ import { Link, Outlet, useNavigate } from '@remix-run/react';
 import { createServerClient } from '@supabase/auth-helpers-remix';
 import { useLoaderData, useFetcher } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
-import ArtistBar from '../../components/ArtistBar';
-import JamList from '../../components/JamList';
-import JamFilters from '../../components/JamFilters';
-import JamFiltersSlideout from '../../components/JamFilters';
+import ArtistBar from '../components/ArtistBar';
+import JamList from '../components/JamList';
+import JamFilters from '../components/JamFilters';
+import JamFiltersSlideout from '../components/JamFilters';
 import { useState, useEffect } from 'react';
-import FiltersButton from '../../components/FiltersButton';
-import JamsHome from '../../components/JamsHome';
-import Hero from '../../components/Hero';
+import FiltersButton from '../components/FiltersButton';
+import JamsHome from '../components/JamsHome';
+import Hero from '../components/Hero';
 
 export const loader = async ({ request, params }) => {
 	return redirect('/jams');

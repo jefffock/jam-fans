@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { V2_MetaFunction } from "@remix-run/node";
 
 import {
   Links,
@@ -20,12 +20,14 @@ export const links: LinksFunction = () => [
   {rel: "stylesheet", href: "https://rsms.me/inter/inter.css"},
 ];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Jam Fans | Find and add great jams by Phish, The Grateful Dead, SCI, UM, moe. WSMFP, BMFS, Goose, and more",
-  description: "Find and add great jams by Phish, The Grateful Dead, SCI, UM, moe., WSMFP, BMFS, Goose, and more",
-  viewport: "width=device-width,initial-scale=1",
-});
+//tslint:disable-next-line
+export const meta: V2_MetaFunction = () => {
+	 	return [
+  { charset: "utf-8"},
+  { title: "Jam Fans | Find and add great jams by Grateful Dead, Phish, SCI, UM, moe. WSMFP, BMFS, Goose, and more"},
+  { description: "Find and add great jams by Grateful Dead, Phish, SCI, UM, moe., WSMFP, BMFS, Goose, and more"},
+  { viewport: "width=device-width,initial-scale=1"},
+]};
 
 export function ErrorBoundary() {
 	const error = useRouteError();
