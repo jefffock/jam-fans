@@ -27,7 +27,6 @@
     "upgrade-remix": "^0.6.2"
   },
   "devDependencies": {
-    "@esbuild/darwin-arm64": "^0.19.11",
     "@remix-run/dev": "1.19.3",
     "@remix-run/eslint-config": "1.19.3",
     "@remix-run/serve": "1.19.3",
