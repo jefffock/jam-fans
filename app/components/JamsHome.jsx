@@ -7,8 +7,6 @@ import { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 
 export default function JamsHome({
-	supabase,
-	session,
 	artists,
 	songs,
 	jams,

@@ -1,8 +1,7 @@
 import { json, redirect } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
-import { createBrowserClient } from '@supabase/auth-helpers-remix';
+import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { useEffect, useState } from 'react';
-import { createServerClient } from 'utils/supabase.server';
 import TopNav from 'app/components/TopNav';
 import BottomNav from 'app/components/BottomNav';
 

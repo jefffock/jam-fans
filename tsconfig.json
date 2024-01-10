@@ -4,7 +4,7 @@
     "**/*.ts",
     "**/*.tsx",
     "app/routes/__supabase/jams/lists.jsx",
-    "app/root.jsx",
+    "app/root.tsx",
     "app/routes/$.jsx"
   ],
   "compilerOptions": {

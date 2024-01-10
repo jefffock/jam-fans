@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from '@remix-run/react';
-import { createServerClient } from '@supabase/auth-helpers-remix';
+import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { useLoaderData, useFetcher } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import ArtistBar from '../components/ArtistBar';
@@ -17,11 +17,22 @@ export const loader = async () => {
 	console.log('in catchall $');
 	return redirect('/jams');
 	const response = new Response();
-	const supabaseClient = createServerClient(
-		process.env.SUPABASE_URL,
-		process.env.SUPABASE_ANON_KEY,
-		{ request, response }
-	);
+	const cookies = parse(request.headers.get('Cookie') ?? '')
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    cookies: {
+      get(key) {
+        return cookies[key]
+      },
+      set(key, value, options) {
+        headers.append('Set-Cookie', serialize(key, value, options))
+      },
+      remove(key, options) {
+        headers.append('Set-Cookie', serialize(key, '', options))
+      },
+    },
+  })
 	//get url search param page
 	const url = new URL(request.url);
 	const searchParams = new URLSearchParams(url.search);
@@ -31,11 +42,11 @@ export const loader = async () => {
 
 	const {
 		data: { user },
-	} = await supabaseClient.auth.getUser();
+	} = await supabase.auth.getUser();
 
 	let profile;
 	if (user && user?.id && user != null) {
-		const { data } = await supabaseClient
+		const { data } = await supabase
 			.from('profiles')
 			.select('*')
 			.eq('id', user.id)
@@ -51,12 +62,12 @@ export const loader = async () => {
 
 	//get artists
 	
-	let { data: artists } = await supabaseClient
+	let { data: artists } = await supabase
 		.from('artists')
 		.select('nickname, emoji_code, url, artist')
 		.order('name_for_order', { ascending: true });
 	//get base versions
-	// let { data: versions } = await supabaseClient
+	// let { data: versions } = await supabase
 	// 	.from('versions')
 	//   .select('*')
 	//   // .select('*,ratings(*), ')
@@ -65,22 +76,22 @@ export const loader = async () => {
 	// 	.order('song_name', { ascending: true })
 	// 	.limit(100);
 	//get songs
-	const { data: songs } = await supabaseClient
+	const { data: songs } = await supabase
 		.from('songs')
 		.select('song, artist')
 		.order('song', { ascending: true });
-	const { data: sounds } = await supabaseClient
+	const { data: sounds } = await supabase
 		.from('sounds')
 		.select('label, text')
 		.order('label', { ascending: true });
-	const { data: profiles } = await supabaseClient
+	const { data: profiles } = await supabase
 		.from('profiles')
 		.select('name, points')
 		.order('points', { ascending: false });
 
 	const startRange = page ? (page - 1) * 15 : 0;
 	const endRange = page ? page * 15 : 15;
-	const { data: jams } = await supabaseClient
+	const { data: jams } = await supabase
 		.from('jams')
 		.select('*')
 		.order('avg_rating', { ascending: false })
@@ -106,7 +117,7 @@ export const loader = async () => {
 	].concat(artists);
 	//make title
 	let title = '🔥 Jams by All Bands';
-	let count = await supabaseClient
+	let count = await supabase
 		.from('versions')
 		.select('*', { count: 'exact', head: true });
 	count = count.count;

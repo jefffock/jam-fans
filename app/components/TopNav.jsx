@@ -25,7 +25,7 @@ const activeClassName =
 const inactiveClassName =
 	'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium';
 
-export default function TopNav({ title, supabase, session }) {
+export default function TopNav({ supabase, session }) {
 	const user = session?.user;
   //if user add login and signup to userNavigation and remove sign out
   if (!user && userNavigation.length === 5) {
