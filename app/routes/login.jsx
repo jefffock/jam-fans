@@ -1,12 +1,21 @@
 import { Link } from '@remix-run/react';
 import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { useOutletContext, useNavigate } from '@remix-run/react';
+import { createBrowserClient } from '@supabase/ssr';
+import { useLoaderData, useNavigate } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { json } from '@remix-run/node';
 import SuccessAlert from '../components/alerts/successAlert';
 
+export const loader = async({request}) => {
+	return {
+		env: {
+		  SUPABASE_URL: process.env.SUPABASE_URL,
+		  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+		},
+	  };
+}
+
 export default function SignIn() {
-	const { supabase, session } = useOutletContext();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -14,6 +23,8 @@ export default function SignIn() {
 	const [magicLinkSuccessText, setMagicLinkSuccessText] = useState('');
 	const [passwordResetSuccessText, setPasswordResetSuccessText] = useState('');
 	const navigate = useNavigate();
+	const { env } = useLoaderData();
+	const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
 	async function signInWithEmail(event) {
 		setLoading(true);
@@ -95,8 +106,7 @@ export default function SignIn() {
 							to='/join'
 							className='underline'
 						>
-							make an account:
-							<p className='text-6xl text-center align-middle'>🛳️</p>
+							make an account
 						</Link>
 					</p>
 				</div>

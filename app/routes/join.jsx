@@ -1,12 +1,20 @@
 import { Link } from '@remix-run/react';
-import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { useOutletContext, useNavigate } from '@remix-run/react';
+import { createServerClient, parse, serialize, createBrowserClient } from '@supabase/ssr'
+import { useOutletContext, useNavigate, useLoaderData } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { json } from '@remix-run/node';
 import SuccessAlert from 'app/components/alerts/successAlert';
 
+export async function loader({}) {
+	return {
+		env: {
+		  SUPABASE_URL: process.env.SUPABASE_URL,
+		  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+		},
+	  };
+};
+
 export default function SignUp() {
-	const { supabase, session } = useOutletContext();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -14,6 +22,9 @@ export default function SignUp() {
 	const [passwordSignupSuccess, setPasswordSignupSuccess] = useState(false);
 	const [magicLinkSuccessText, setMagicLinkSuccessText] = useState('');
 	const [passwordResetSuccessText, setPasswordResetSuccessText] = useState('');
+	const { env } = useLoaderData();
+
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
 	async function signUpWithEmail(event) {
 		setLoading(true);
