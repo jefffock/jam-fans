@@ -14,6 +14,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@heroicons/react": "^2.0.13",
+    "@prisma/client": "^5.8.0",
     "@remix-run/node": "2.4.1",
     "@remix-run/react": "2.4.1",
     "@remix-run/v1-route-convention": "^0.1.4",
@@ -31,9 +32,11 @@
     "isbot": "^3.6.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-zorm": "^0.9.0",
     "remix-i18next": "^5.5.0",
     "supabase": "^1.131.3",
-    "upgrade-remix": "^0.6.2"
+    "upgrade-remix": "^0.6.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@remix-run/dev": "2.4.1",
@@ -46,10 +49,14 @@
     "eslint": "^8.56.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.8",
+    "prisma": "^5.8.0",
     "tailwindcss": "^3.2.4",
     "typescript": "5.3.3"
   },
   "engines": {
     "node": "^18"
+  },
+  "prisma": {
+    "schema": "app/database/schema.prisma"
   }
 }
