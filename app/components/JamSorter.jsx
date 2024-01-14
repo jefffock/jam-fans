@@ -1,74 +1,66 @@
-import { Fragment, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Fragment, useState } from 'react'
+import { Listbox, Transition } from '@headlessui/react'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 const values = [
-  {
-    value: {
-      order: 'avg_rating',
-      asc: false,
-    },
-    label: 'Highest Rated',
-  },
+	{
+		value: {
+			order: 'avg_rating',
+			asc: false,
+		},
+		label: 'Highest Rated',
+	},
 	{
 		value: {
 			order: 'id',
-      asc: false,
+			asc: false,
 		},
-    label: 'Recently Added',
+		label: 'Recently Added',
 	},
-  {
+	{
 		value: {
 			order: 'date',
-      asc: false,
+			asc: false,
 		},
-    label: 'Newest',
+		label: 'Newest',
 	},
-  {
+	{
 		value: {
 			order: 'date',
-      asc: true,
+			asc: true,
 		},
-    label: 'Oldest',
+		label: 'Oldest',
 	},
-];
+]
 
 function classNames(...classes) {
-	return classes.filter(Boolean).join(' ');
+	return classes.filter(Boolean).join(' ')
 }
 
 export default function Example() {
-	const [selected, setSelected] = useState(values[1]);
+	const [selected, setSelected] = useState(values[1])
 
 	return (
-		<Listbox
-			value={selected}
-			onChange={setSelected}
-		>
+		<Listbox value={selected} onChange={setSelected}>
 			{({ open }) => (
-				<div className='max-w-sm'>
-					<Listbox.Label className='block text-sm font-medium text-gray-700'>
-						How many to show?
-					</Listbox.Label>
-					<div className='relative mt-1'>
-						<Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm'>
-							<span className='block truncate'>{selected.label}</span>
-							<span className='pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2'>
-								<ChevronUpDownIcon
-									className='h-5 w-5 text-gray-400'
-									aria-hidden='true'
-								/>
+				<div className="max-w-sm">
+					<Listbox.Label className="block text-sm font-medium text-gray-700">How many to show?</Listbox.Label>
+					<div className="relative mt-1">
+						<Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm">
+							<span className="block truncate">{selected.label}</span>
+							<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+								<ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
 							</span>
 						</Listbox.Button>
 
 						<Transition
 							show={open}
 							as={Fragment}
-							leave='transition ease-in duration-100'
-							leaveFrom='opacity-100'
-							leaveTo='opacity-0'
+							leave="transition ease-in duration-100"
+							leaveFrom="opacity-100"
+							leaveTo="opacity-0"
 						>
-							<Listbox.Options className='absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm'>
+							<Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
 								{values.map((limit, limitIndex) => (
 									<Listbox.Option
 										key={limitIndex}
@@ -98,10 +90,7 @@ export default function Example() {
 															'absolute inset-y-0 right-0 flex items-center pr-4'
 														)}
 													>
-														<CheckIcon
-															className='h-5 w-5'
-															aria-hidden='true'
-														/>
+														<CheckIcon className="h-5 w-5" aria-hidden="true" />
 													</span>
 												) : null}
 											</>
@@ -114,5 +103,5 @@ export default function Example() {
 				</div>
 			)}
 		</Listbox>
-	);
+	)
 }

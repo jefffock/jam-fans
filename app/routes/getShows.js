@@ -1,24 +1,24 @@
 import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { json } from '@remix-run/node';
+import { json } from '@remix-run/node'
 
 export const loader = async ({ request, params }) => {
-	const response = new Response();
+	const response = new Response()
 	const cookies = parse(request.headers.get('Cookie') ?? '')
-  const headers = new Headers()
+	const headers = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-    cookies: {
-      get(key) {
-        return cookies[key]
-      },
-      set(key, value, options) {
-        headers.append('Set-Cookie', serialize(key, value, options))
-      },
-      remove(key, options) {
-        headers.append('Set-Cookie', serialize(key, '', options))
-      },
-    },
-  })
+	const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+		cookies: {
+			get(key) {
+				return cookies[key]
+			},
+			set(key, value, options) {
+				headers.append('Set-Cookie', serialize(key, value, options))
+			},
+			remove(key, options) {
+				headers.append('Set-Cookie', serialize(key, '', options))
+			},
+		},
+	})
 
 	const baseUrls = {
 		eggyBaseUrl: 'https://thecarton.net/api/v2',
@@ -27,8 +27,8 @@ export const loader = async ({ request, params }) => {
 		neighborBaseUrl: 'https://neighbortunes.net/api/v2',
 		phishBaseUrl: 'https://api.phish.net/v5',
 		tapersChoiceBaseUrl: 'https://taperschoice.net/api/v2',
-		kglwBaseUrl: 'https://kglw.net/api/v2'
-	};
+		kglwBaseUrl: 'https://kglw.net/api/v2',
+	}
 	const mbids = {
 		'The Allman Brothers Band': '72359492-22be-4ed9-aaa0-efa434fb2b01',
 		Aqueous: '5df34416-d6dd-4692-b92d-86f81d724b9d',
@@ -57,7 +57,7 @@ export const loader = async ({ request, params }) => {
 		Osees: '194272cc-dcc8-4640-a4a6-66da7d250d5c',
 		'Phil Lesh & Friends': 'ffb7c323-5113-4bb0-a5f7-5b657eec4083',
 		'Pigeons Playing Ping Pong': 'ec8e3cea-69f0-4ff3-b42c-74937d336334',
-    'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
+		'The Radiators': '4bd3fb40-1c6f-4056-a0ee-8427685586fc',
 		'Railroad Earth': 'b2e2abfa-fb1e-4be0-b500-56c4584f41cd',
 		'Sound Tribe Sector 9 (STS9)': '8d07ac81-0b49-4ec3-9402-2b8b479649a2',
 		Spafford: 'a4ad4581-721e-4123-aa3e-15b36490cf0f',
@@ -66,66 +66,57 @@ export const loader = async ({ request, params }) => {
 		"Umphrey's McGee": '3826a6e0-9ea5-4007-941c-25b9dd943981',
 		Twiddle: '5cf454bc-3be0-47ba-9d0b-1e53da631a4e',
 		'Widespread Panic': '3797a6d0-7700-44bf-96fb-f44386bc9ab2',
-	};
-	const url = new URL(request.url);
-	const queryParams = Object.fromEntries(url.searchParams.entries());
-	console.log('queryParams', queryParams);
+	}
+	const url = new URL(request.url)
+	const queryParams = Object.fromEntries(url.searchParams.entries())
+	console.log('queryParams', queryParams)
 
-	const artist = queryParams?.artist.trim();
-	let song = queryParams?.song || null;
-	const year = queryParams?.year || null;
-	let shows;
-	let songId;
-	let jfVersions = [];
+	const artist = queryParams?.artist.trim()
+	let song = queryParams?.song || null
+	const year = queryParams?.year || null
+	let shows
+	let songId
+	let jfVersions = []
 	//get all versions of a song (for select artists)
-	let artistId;
-	let tableName;
+	let artistId
+	let tableName
 	if (artist && song && !year) {
-    console.log('artist and song', artist, song)
-		const { data, error } = await supabase
-			.from('versions')
-			.select('*')
-			.eq('artist', artist)
-			.eq('song_name', song);
-		jfVersions = data;
+		console.log('artist and song', artist, song)
+		const { data, error } = await supabase.from('versions').select('*').eq('artist', artist).eq('song_name', song)
+		jfVersions = data
 		//if artistis phish or tab, use phisnet api
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 			switch (artist) {
 				case 'Trey Anastasio, TAB':
-					artistId = '2';
-					tableName = 'tab_songs';
-          break;
-        default:
-          artistId = '1';
-					tableName = 'phishnet_songs';
+					artistId = '2'
+					tableName = 'tab_songs'
+					break
+				default:
+					artistId = '1'
+					tableName = 'phishnet_songs'
 			}
 			switch (song) {
 				case 'Also Sprach Zarathustra (2001)':
-					songId = 21;
-					break;
+					songId = 21
+					break
 				default:
-					const { data, error } = await supabase
-						.from(tableName)
-						.select('songid')
-						.eq('song', song);
+					const { data, error } = await supabase.from(tableName).select('songid').eq('song', song)
 					if (error || data.length === 0) {
-						console.error('error getting phishnet songs from supabase', error);
-						return json({ shows: [] }, { status: 500 });
+						console.error('error getting phishnet songs from supabase', error)
+						return json({ shows: [] }, { status: 500 })
 					}
-					songId = data[0]?.songid;
+					songId = data[0]?.songid
 			}
 			if (songId) {
-        console.log('songId in getshows', songId)
-				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`;
-				shows = await fetch(url);
-				shows = await shows.json();
+				console.log('songId in getshows', songId)
+				const url = `https://api.phish.net/v5/setlists/songid/${songId}.json?apikey=${process.env.PHISHNET_API_KEY}`
+				shows = await fetch(url)
+				shows = await shows.json()
 				shows = shows?.data
 					.filter((show) => show.artistid === artistId)
 					.map((show) => {
-						const date = new Date(show.showdate + 'T18:00:00Z');
-						const alreadyAdded = jfVersions.find(
-							(version) => version.date === show.showdate
-						);
+						const date = new Date(show.showdate + 'T18:00:00Z')
+						const alreadyAdded = jfVersions.find((version) => version.date === show.showdate)
 						return {
 							showdate: show.showdate,
 							location: `${show.venue}, ${show.city}, ${
@@ -138,62 +129,57 @@ export const loader = async ({ request, params }) => {
 								show.country === 'USA' ? show.state : show.country
 							}`,
 							existingJam: alreadyAdded ?? null,
-						};
-					});
-				shows = shows.reverse();
+						}
+					})
+				shows = shows.reverse()
 			}
 		} else {
 			//artist & song & not Phish or TAB = use songfish api
-			if (song === 'Echo of a Rose') song = 'Echo Of A Rose';
-			let dbName;
-			let baseUrl;
-			console.log('artist', artist);
+			if (song === 'Echo of a Rose') song = 'Echo Of A Rose'
+			let dbName
+			let baseUrl
+			console.log('artist', artist)
 			switch (artist) {
 				case 'Eggy':
-					dbName = 'eggy_songs';
-					baseUrl = baseUrls.eggyBaseUrl;
-					break;
+					dbName = 'eggy_songs'
+					baseUrl = baseUrls.eggyBaseUrl
+					break
 				case 'Goose':
-					dbName = 'goose_songs';
-					baseUrl = baseUrls.gooseBaseUrl;
-					break;
+					dbName = 'goose_songs'
+					baseUrl = baseUrls.gooseBaseUrl
+					break
 				case "Umphrey's McGee":
-					dbName = 'um_songs';
-					baseUrl = baseUrls.umphreysBaseUrl;
-					break;
+					dbName = 'um_songs'
+					baseUrl = baseUrls.umphreysBaseUrl
+					break
 				case 'Neighbor':
-					dbName = 'neighbor_songs';
-					baseUrl = baseUrls.neighborBaseUrl;
+					dbName = 'neighbor_songs'
+					baseUrl = baseUrls.neighborBaseUrl
 				case "Taper's Choice":
-					dbName = 'tapers_choice_songs';
-					baseUrl = baseUrls.tapersChoiceBaseUrl;
+					dbName = 'tapers_choice_songs'
+					baseUrl = baseUrls.tapersChoiceBaseUrl
 				case 'King Gizzard':
-					dbName = 'kglw_songs';
-					baseUrl = baseUrls.kglwBaseUrl;
+					dbName = 'kglw_songs'
+					baseUrl = baseUrls.kglwBaseUrl
 			}
-			let songId;
+			let songId
 			//get song id from supabase
-			console.log('dbName', dbName);
-			console.log('song', song);
-			const { data, error } = await supabase
-				.from(dbName)
-				.select('id')
-				.eq('name', song);
+			console.log('dbName', dbName)
+			console.log('song', song)
+			const { data, error } = await supabase.from(dbName).select('id').eq('name', song)
 			if (error || data.length === 0) {
-				console.error('error getting songfish songid from supabase', error);
+				console.error('error getting songfish songid from supabase', error)
 				//todo: handle error
 			} else {
-				songId = data[0]?.id;
-				const url = `${baseUrl}/setlists/song_id/${songId}`;
-				shows = await fetch(url);
-				shows = await shows.json();
+				songId = data[0]?.id
+				const url = `${baseUrl}/setlists/song_id/${songId}`
+				shows = await fetch(url)
+				shows = await shows.json()
 				shows = shows?.data
 					.filter((show) => show.artist_id === 1)
 					.map((show) => {
-						const date = new Date(show.showdate + 'T18:00:00Z');
-						const alreadyAdded = jfVersions.find(
-							(version) => version.date === show.showdate
-						);
+						const date = new Date(show.showdate + 'T18:00:00Z')
+						const alreadyAdded = jfVersions.find((version) => version.date === show.showdate)
 						return {
 							showdate: show.showdate,
 							location: `${show.venuename}, ${show.city}, ${
@@ -201,31 +187,29 @@ export const loader = async ({ request, params }) => {
 							}`,
 							label: `${alreadyAdded ? '(Added) ' : ''}${show.showdate} - ${
 								show.venuename
-							}, ${show.city}, ${
-								show.country === 'USA' ? show.state : show.country
-							}`,
+							}, ${show.city}, ${show.country === 'USA' ? show.state : show.country}`,
 							existingJam: alreadyAdded ?? null,
-						};
-					});
+						}
+					})
 				// shows = shows.reverse();
 			}
 		}
 	} else if (artist && year) {
 		console.log('artist and year', artist, year)
 		//get shows by year
-		let artistId;
+		let artistId
 		if (artist === 'Phish' || artist === 'Trey Anastasio, TAB') {
 			switch (artist) {
 				case 'Phish':
-					artistId = '1';
-					break;
+					artistId = '1'
+					break
 				case 'Trey Anastasio, TAB':
-					artistId = '2';
-					break;
+					artistId = '2'
+					break
 				default:
-					artistId = '1';
+					artistId = '1'
 			}
-			const url = `https://api.phish.net/v5/shows/showyear/${year}.json?apikey=${process.env.PHISHNET_API_KEY}`;
+			const url = `https://api.phish.net/v5/shows/showyear/${year}.json?apikey=${process.env.PHISHNET_API_KEY}`
 			await fetch(url)
 				.then((data) => data.json())
 				.then((showsData) => {
@@ -235,17 +219,17 @@ export const loader = async ({ request, params }) => {
 							.map((show) => {
 								const location = `${show.venue}, ${show.city}, ${
 									show.country === 'USA' ? show.state : show.country
-								}`;
-								const date = new Date(show.showdate + 'T18:00:00Z');
+								}`
+								const date = new Date(show.showdate + 'T18:00:00Z')
 								return {
 									location,
 									showdate: show.showdate,
 									label: `${date.toLocaleDateString()} - ${location}`,
-								};
-							});
-						shows = showsRes;
+								}
+							})
+						shows = showsRes
 					}
-				});
+				})
 		} else if (
 			artist === 'Goose' ||
 			artist === 'Eggy' ||
@@ -254,33 +238,33 @@ export const loader = async ({ request, params }) => {
 			artist === "Taper's Choice" ||
 			artist === 'King Gizzard'
 		) {
-			let baseUrl;
+			let baseUrl
 			switch (artist) {
 				case 'Goose':
-					baseUrl = baseUrls.gooseBaseUrl;
-					break;
+					baseUrl = baseUrls.gooseBaseUrl
+					break
 				case 'Eggy':
-					baseUrl = baseUrls.eggyBaseUrl;
-					break;
+					baseUrl = baseUrls.eggyBaseUrl
+					break
 				case "Umphrey's McGee":
-					baseUrl = baseUrls.umphreysBaseUrl;
-					break;
+					baseUrl = baseUrls.umphreysBaseUrl
+					break
 				case 'Neighbor':
-					baseUrl = baseUrls.neighborBaseUrl;
-					break;
+					baseUrl = baseUrls.neighborBaseUrl
+					break
 				case "Taper's Choice":
-					baseUrl = baseUrls.tapersChoiceBaseUrl;
-					break;
+					baseUrl = baseUrls.tapersChoiceBaseUrl
+					break
 				case 'King Gizzard':
-					baseUrl = baseUrls.kglwBaseUrl;
-					break;
+					baseUrl = baseUrls.kglwBaseUrl
+					break
 			}
-			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`;
+			const url = `${baseUrl}/shows/show_year/${year}.json?order_by=showdate`
 			console.log('url in getshows', url)
-			const showsData = await fetch(url);
+			const showsData = await fetch(url)
 			console.log('showsData', showsData)
-			console.log(' typeof showsData',  typeof showsData)
-			const showsRes = await showsData.json();
+			console.log(' typeof showsData', typeof showsData)
+			const showsRes = await showsData.json()
 			console.log('showsRes', showsRes)
 			if (showsRes && showsRes.data && showsRes.data.length > 0) {
 				shows = showsRes.data
@@ -288,23 +272,23 @@ export const loader = async ({ request, params }) => {
 					.map((show) => {
 						const location = `${show.venuename}, ${show.city}, ${
 							show.country === 'USA' ? show.state : show.country
-						}`;
-						const date = new Date(show.showdate + 'T18:00:00Z');
+						}`
+						const date = new Date(show.showdate + 'T18:00:00Z')
 						return {
 							location,
 							showdate: show.showdate,
 							label: `${date.toLocaleDateString()} - ${location}`,
-						};
-					});
+						}
+					})
 			}
 		} else {
 			//get shows from setlistfm for all other artists
-			const mbid = mbids[artist];
-			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`;
-			let apiKey = process.env.SETLISTFM_API_KEY;
+			const mbid = mbids[artist]
+			const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=${mbid}&year=${year}`
+			let apiKey = process.env.SETLISTFM_API_KEY
 			async function paginatedFetch(url, page = 1, previousResponse = []) {
-				console.log('in paginated fetch', url, page, previousResponse);
-				await new Promise((resolve) => setTimeout(resolve, 600));
+				console.log('in paginated fetch', url, page, previousResponse)
+				await new Promise((resolve) => setTimeout(resolve, 600))
 				return fetch(`${url}&p=${page}`, {
 					headers: {
 						'x-api-key': `${apiKey}`,
@@ -313,51 +297,47 @@ export const loader = async ({ request, params }) => {
 				}) // Append the page number to the base URL
 					.then((response) => response.json())
 					.then((newResponse) => {
-						const setlist = newResponse?.setlist || [];
+						const setlist = newResponse?.setlist || []
 
-						const response = [...setlist, ...previousResponse]; // Combine the two arrays
+						const response = [...setlist, ...previousResponse] // Combine the two arrays
 
 						if (setlist?.length !== 0) {
-							page++;
+							page++
 
-							return paginatedFetch(url, page, response);
+							return paginatedFetch(url, page, response)
 						}
 
-						return response;
-					});
+						return response
+					})
 			}
 			if (mbid && year) {
-				const data = await paginatedFetch(url);
+				const data = await paginatedFetch(url)
 				shows = data.map((show) => {
-					const location = `${show?.venue?.name ? show.venue.name + ', ' : ''}${
-						show.venue.city.name
-					}, ${
-						show.venue.city.country.code === 'US'
-							? show.venue.city.state
-							: show.venue.city.country.name
-					}`;
+					const location = `${show?.venue?.name ? show.venue.name + ', ' : ''}${show.venue.city.name}, ${
+						show.venue.city.country.code === 'US' ? show.venue.city.state : show.venue.city.country.name
+					}`
 					//convert date to yyyy-mm-dd from dd-mm-yyyy
-					const formattedDate = show.eventDate.split('-').reverse().join('-');
-					const date = new Date(formattedDate + 'T12:00:00Z');
+					const formattedDate = show.eventDate.split('-').reverse().join('-')
+					const date = new Date(formattedDate + 'T12:00:00Z')
 					return {
 						location,
 						showdate: formattedDate,
 						label: `${date.toLocaleDateString()} - ${location}`,
-					};
-				});
+					}
+				})
 			}
 		}
 	}
 	if (artist && year && shows) {
 		console.log('about to sort shows')
 		shows.sort((a, b) => {
-			return new Date(a.showdate) - new Date(b.showdate);
-		});
+			return new Date(a.showdate) - new Date(b.showdate)
+		})
 	}
 	if (artist && song && shows) {
 		shows.sort((a, b) => {
-			return new Date(b.showdate) - new Date(a.showdate);
-		});
+			return new Date(b.showdate) - new Date(a.showdate)
+		})
 	}
 	console.log('shows.length', shows?.length)
 	console.log(shows[0])
@@ -366,5 +346,5 @@ export const loader = async ({ request, params }) => {
 		{
 			headers: response.headers,
 		}
-	);
-};
+	)
+}

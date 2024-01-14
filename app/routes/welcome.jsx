@@ -1,119 +1,113 @@
-import { Form, useLoaderData, useNavigate, useOutletContext, Link } from '@remix-run/react';
+import { Form, useLoaderData, useNavigate, useOutletContext, Link } from '@remix-run/react'
 import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { json, redirect } from '@remix-run/node';
-import { useState } from 'react';
-import SuccessAlert from '../components/alerts/successAlert';
+import { json, redirect } from '@remix-run/node'
+import { useState } from 'react'
+import SuccessAlert from '../components/alerts/successAlert'
 
 export const loader = async ({ request, params }) => {
-	const response = new Response();
+	const response = new Response()
 	const cookies = parse(request.headers.get('Cookie') ?? '')
-  const headers = new Headers()
+	const headers = new Headers()
 
-  const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-    cookies: {
-      get(key) {
-        return cookies[key]
-      },
-      set(key, value, options) {
-        headers.append('Set-Cookie', serialize(key, value, options))
-      },
-      remove(key, options) {
-        headers.append('Set-Cookie', serialize(key, '', options))
-      },
-    },
-  })
+	const supabase = createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+		cookies: {
+			get(key) {
+				return cookies[key]
+			},
+			set(key, value, options) {
+				headers.append('Set-Cookie', serialize(key, value, options))
+			},
+			remove(key, options) {
+				headers.append('Set-Cookie', serialize(key, '', options))
+			},
+		},
+	})
 	const {
 		data: { user },
-	} = await supabase.auth.getUser();
-	let profile;
+	} = await supabase.auth.getUser()
+	let profile
 	if (user && user?.id && user != null) {
-		const { data } = await supabase
-			.from('profiles')
-			.select('*')
-			.eq('id', user.id)
-			.single();
-		profile = data;
+		const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+		profile = data
 	}
-  if (profile) {
-    return redirect('/');
-  }
-  return json({ user, profile });
+	if (profile) {
+		return redirect('/')
+	}
+	return json({ user, profile })
 }
 
 export default function Welcome() {
-  const { user, profile } = useLoaderData()
-  const navigate = useNavigate()
-  const { supabase, session } = useOutletContext();
-  console.log('user', user, 'profile', profile)
-  const [username, setUsername] = useState('');
-  const [success, setSuccess] = useState(false);
+	const { user, profile } = useLoaderData()
+	const navigate = useNavigate()
+	const { supabase, session } = useOutletContext()
+	console.log('user', user, 'profile', profile)
+	const [username, setUsername] = useState('')
+	const [success, setSuccess] = useState(false)
 
-  async function handleSubmit(e) {  
-    e.preventDefault()
-    const { data, error } = await supabase
-      .from('profiles')
-      .insert([
-        {
-          id: user?.id,
-          name: username,
-        },
-      ]);
-    if (error) {
-      console.error(error)
-    } else {
-      setSuccess(true)
-    }
-  }
+	async function handleSubmit(e) {
+		e.preventDefault()
+		const { data, error } = await supabase.from('profiles').insert([
+			{
+				id: user?.id,
+				name: username,
+			},
+		])
+		if (error) {
+			console.error(error)
+		} else {
+			setSuccess(true)
+		}
+	}
 
 	return (
-		<div className='flex flex-col max-w-xs justify-center mx-auto text-center my-20'>
-			<img
-				src='/icon-circle.png'
-				className='mx-auto h-12 my-4 w-auto'
-				alt='Jam Fans'
-			/>
-			<p className='my-4'>
-				Choose a name to start rating, commenting, and adding links! What shall
-				ye go by &apos;round these parts?
+		<div className="flex flex-col max-w-xs justify-center mx-auto text-center my-20">
+			<img src="/icon-circle.png" className="mx-auto h-12 my-4 w-auto" alt="Jam Fans" />
+			<p className="my-4">
+				Choose a name to start rating, commenting, and adding links! What shall ye go by &apos;round these
+				parts?
 				<br />
 			</p>
-			<div className='my-4'>
-				<label
-					htmlFor='username'
-					className='block text-sm font-medium text-gray-700 text-left'
-				>
+			<div className="my-4">
+				<label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left">
 					Username
 				</label>
-				<div className='mt-1'>
+				<div className="mt-1">
 					<input
-						type='username'
-						name='username'
-						id='username'
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-						className='block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm h-10 px-2'
-						placeholder=''
+						type="username"
+						name="username"
+						id="username"
+						value={username}
+						onChange={(e) => setUsername(e.target.value)}
+						className="block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm h-10 px-2"
+						placeholder=""
 					/>
 				</div>
-        {success &&
-        <>
-          <SuccessAlert title={'Success!'} description={'Your profile has been created. Thank you for helping the music you love get into more ears!'} />
-          <Link className='underline' to='/add/jam'>Add or Rate Jams</Link>
-        </>
-        }
-        {!success &&
-				<button
-					type='button'
-					className='inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4'
-          onClick={handleSubmit}
-          disable={!username}
-				>
-					Choose this name
-				</button>
-        }
+				{success && (
+					<>
+						<SuccessAlert
+							title={'Success!'}
+							description={
+								'Your profile has been created. Thank you for helping the music you love get into more ears!'
+							}
+						/>
+						<Link className="underline" to="/add/jam">
+							Add or Rate Jams
+						</Link>
+					</>
+				)}
+				{!success && (
+					<button
+						type="button"
+						className="inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4"
+						onClick={handleSubmit}
+						disable={!username}
+					>
+						Choose this name
+					</button>
+				)}
 			</div>
 		</div>
-	);
+	)
 }
 
 /*
