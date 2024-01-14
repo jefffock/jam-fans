@@ -1,1 +1,1 @@
-export * from "./db.server";
+export * from './db.server'

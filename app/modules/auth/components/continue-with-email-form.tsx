@@ -1,33 +1,27 @@
-import React from "react";
+import React from 'react'
 
-import { useFetcher } from "@remix-run/react";
-import { useTranslation } from "react-i18next";
+import { useFetcher } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
 
-import type { action } from "~/routes/send-magic-link";
+import type { action } from '~/routes/send-magic-link'
 
 export function ContinueWithEmailForm() {
-	const ref = React.useRef<HTMLFormElement>(null);
-	const sendMagicLink = useFetcher<typeof action>();
-	const { data, state } = sendMagicLink;
-	const isSuccessFull = state === "idle" && data != null && !data.error;
-	const isLoading = state === "submitting" || state === "loading";
-	const { t } = useTranslation("auth");
-	const buttonLabel = isLoading
-		? t("register.sendingLink")
-		: t("register.continueWithEmail");
+	const ref = React.useRef<HTMLFormElement>(null)
+	const sendMagicLink = useFetcher<typeof action>()
+	const { data, state } = sendMagicLink
+	const isSuccessFull = state === 'idle' && data != null && !data.error
+	const isLoading = state === 'submitting' || state === 'loading'
+	const { t } = useTranslation('auth')
+	const buttonLabel = isLoading ? t('register.sendingLink') : t('register.continueWithEmail')
 
 	React.useEffect(() => {
 		if (isSuccessFull) {
-			ref.current?.reset();
+			ref.current?.reset()
 		}
-	}, [isSuccessFull]);
+	}, [isSuccessFull])
 
 	return (
-		<sendMagicLink.Form
-			method="post"
-			action="/send-magic-link"
-			ref={ref}
-		>
+		<sendMagicLink.Form method="post" action="/send-magic-link" ref={ref}>
 			<input
 				type="email"
 				name="email"
@@ -37,10 +31,10 @@ export function ContinueWithEmailForm() {
 			/>
 			<div
 				className={`mb-2 h-6 text-center ${
-					data?.error ? "text-red-600" : ""
-				} ${isSuccessFull ? "text-green-600" : ""}`}
+					data?.error ? 'text-red-600' : ''
+				} ${isSuccessFull ? 'text-green-600' : ''}`}
 			>
-				{!isSuccessFull ? data?.error : t("register.checkEmail")}
+				{!isSuccessFull ? data?.error : t('register.checkEmail')}
 			</div>
 			<button
 				type="submit"
@@ -50,5 +44,5 @@ export function ContinueWithEmailForm() {
 				{buttonLabel}
 			</button>
 		</sendMagicLink.Form>
-	);
+	)
 }

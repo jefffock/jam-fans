@@ -1,1 +1,1 @@
-export const action = () => null;
+export const action = () => null

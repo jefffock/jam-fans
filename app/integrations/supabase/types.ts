@@ -1,1 +1,1 @@
-export type { AuthSession as SupabaseAuthSession } from "@supabase/supabase-js";
+export type { AuthSession as SupabaseAuthSession } from '@supabase/supabase-js'

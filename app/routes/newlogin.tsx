@@ -1,101 +1,86 @@
-import * as React from "react";
+import * as React from 'react'
 
-import type {
-	ActionFunctionArgs,
-	LoaderFunctionArgs,
-	MetaFunction,
-} from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, Link, useNavigation, useSearchParams } from "@remix-run/react";
-import { useTranslation } from "react-i18next";
-import { parseFormAny, useZorm } from "react-zorm";
-import { z } from "zod";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
+import { Form, Link, useNavigation, useSearchParams } from '@remix-run/react'
+import { useTranslation } from 'react-i18next'
+import { parseFormAny, useZorm } from 'react-zorm'
+import { z } from 'zod'
 
-import { i18nextServer } from "~/integrations/i18n";
-import {
-	createAuthSession,
-	getAuthSession,
-	signInWithEmail,
-	ContinueWithEmailForm,
-} from "~/modules/auth";
-import { assertIsPost, isFormProcessing } from "~/utils";
+import { i18nextServer } from '~/integrations/i18n'
+import { createAuthSession, getAuthSession, signInWithEmail, ContinueWithEmailForm } from '~/modules/auth'
+import { assertIsPost, isFormProcessing } from '~/utils'
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const authSession = await getAuthSession(request);
-	const t = await i18nextServer.getFixedT(request, "auth");
-	const title = t("login.title");
+	const authSession = await getAuthSession(request)
+	const t = await i18nextServer.getFixedT(request, 'auth')
+	const title = t('login.title')
 
-	if (authSession) return redirect("/notes");
+	if (authSession) return redirect('/notes')
 
-	return json({ title });
+	return json({ title })
 }
 
 const LoginFormSchema = z.object({
 	email: z
 		.string()
-		.email("invalid-email")
+		.email('invalid-email')
 		.transform((email) => email.toLowerCase()),
-	password: z.string().min(8, "password-too-short"),
+	password: z.string().min(8, 'password-too-short'),
 	redirectTo: z.string().optional(),
-});
+})
 
 export async function action({ request }: ActionFunctionArgs) {
-	assertIsPost(request);
-	const formData = await request.formData();
-	const result = await LoginFormSchema.safeParseAsync(parseFormAny(formData));
+	assertIsPost(request)
+	const formData = await request.formData()
+	const result = await LoginFormSchema.safeParseAsync(parseFormAny(formData))
 
 	if (!result.success) {
 		return json(
 			{
 				errors: result.error,
 			},
-			{ status: 400 },
-		);
+			{ status: 400 }
+		)
 	}
 
-	const { email, password, redirectTo } = result.data;
+	const { email, password, redirectTo } = result.data
 
-	const authSession = await signInWithEmail(email, password);
+	const authSession = await signInWithEmail(email, password)
 
 	if (!authSession) {
-		return json(
-			{ errors: { email: "invalid-email-password", password: null } },
-			{ status: 400 },
-		);
+		return json({ errors: { email: 'invalid-email-password', password: null } }, { status: 400 })
 	}
 
 	return createAuthSession({
 		request,
 		authSession,
-		redirectTo: redirectTo || "/notes",
-	});
+		redirectTo: redirectTo || '/notes',
+	})
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
 	{
 		title: data?.title,
 	},
-];
+]
 
 export default function LoginPage() {
-	const zo = useZorm("NewQuestionWizardScreen", LoginFormSchema);
-	const [searchParams] = useSearchParams();
-	const redirectTo = searchParams.get("redirectTo") ?? undefined;
+	const zo = useZorm('NewQuestionWizardScreen', LoginFormSchema)
+	const [searchParams] = useSearchParams()
+	const redirectTo = searchParams.get('redirectTo') ?? undefined
 
-	const navigation = useNavigation();
-	const disabled = isFormProcessing(navigation.state);
-	const { t } = useTranslation("auth");
+	const navigation = useNavigation()
+	const disabled = isFormProcessing(navigation.state)
+	const { t } = useTranslation('auth')
 
 	return (
 		<div className="flex min-h-full flex-col justify-center">
 			<div className="mx-auto w-full max-w-md px-8">
 				<Form ref={zo.ref} method="post" className="space-y-6" replace>
 					<div>
-						<label
-							htmlFor={zo.fields.email()}
-							className="block text-sm font-medium text-gray-700"
-						>
-							{t("login.email")}
+						<label htmlFor={zo.fields.email()} className="block text-sm font-medium text-gray-700">
+							{t('login.email')}
 						</label>
 
 						<div className="mt-1">
@@ -110,10 +95,7 @@ export default function LoginPage() {
 								disabled={disabled}
 							/>
 							{zo.errors.email()?.message && (
-								<div
-									className="pt-1 text-red-700"
-									id="email-error"
-								>
+								<div className="pt-1 text-red-700" id="email-error">
 									{zo.errors.email()?.message}
 								</div>
 							)}
@@ -121,11 +103,8 @@ export default function LoginPage() {
 					</div>
 
 					<div>
-						<label
-							htmlFor={zo.fields.password()}
-							className="block text-sm font-medium text-gray-700"
-						>
-							{t("register.password")}
+						<label htmlFor={zo.fields.password()} className="block text-sm font-medium text-gray-700">
+							{t('register.password')}
 						</label>
 						<div className="mt-1">
 							<input
@@ -137,50 +116,40 @@ export default function LoginPage() {
 								disabled={disabled}
 							/>
 							{zo.errors.password()?.message && (
-								<div
-									className="pt-1 text-red-700"
-									id="password-error"
-								>
+								<div className="pt-1 text-red-700" id="password-error">
 									{zo.errors.password()?.message}
 								</div>
 							)}
 						</div>
 					</div>
 
-					<input
-						type="hidden"
-						name={zo.fields.redirectTo()}
-						value={redirectTo}
-					/>
+					<input type="hidden" name={zo.fields.redirectTo()} value={redirectTo} />
 					<button
 						data-test-id="login"
 						type="submit"
 						className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400"
 						disabled={disabled}
 					>
-						{t("login.action")}
+						{t('login.action')}
 					</button>
 					<div className="flex items-center justify-center">
 						<div className="text-center text-sm text-gray-500">
-							<Link
-								className="text-blue-500 underline"
-								to="/forgot-password"
-							>
-								{t("login.forgotPassword")}?
+							<Link className="text-blue-500 underline" to="/forgot-password">
+								{t('login.forgotPassword')}?
 							</Link>
 						</div>
 					</div>
 					<div className="flex items-center justify-center">
 						<div className="text-center text-sm text-gray-500">
-							{t("login.dontHaveAccount")}{" "}
+							{t('login.dontHaveAccount')}{' '}
 							<Link
 								className="text-blue-500 underline"
 								to={{
-									pathname: "/join",
+									pathname: '/join',
 									search: searchParams.toString(),
 								}}
 							>
-								{t("login.signUp")}
+								{t('login.signUp')}
 							</Link>
 						</div>
 					</div>
@@ -191,9 +160,7 @@ export default function LoginPage() {
 							<div className="w-full border-t border-gray-300" />
 						</div>
 						<div className="relative flex justify-center text-sm">
-							<span className="bg-white px-2 text-gray-500">
-								{t("login.orContinueWith")}
-							</span>
+							<span className="bg-white px-2 text-gray-500">{t('login.orContinueWith')}</span>
 						</div>
 					</div>
 					<div className="mt-6">
@@ -202,5 +169,5 @@ export default function LoginPage() {
 				</div>
 			</div>
 		</div>
-	);
+	)
 }

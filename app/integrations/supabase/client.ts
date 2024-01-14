@@ -1,11 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js'
 
-import {
-	SUPABASE_SERVICE_ROLE,
-	SUPABASE_URL,
-	SUPABASE_ANON_PUBLIC,
-} from "~/utils/env";
-import { isBrowser } from "~/utils/is-browser";
+import { SUPABASE_SERVICE_ROLE, SUPABASE_URL, SUPABASE_ANON_PUBLIC } from '~/utils/env'
+import { isBrowser } from '~/utils/is-browser'
 
 // ⚠️ cloudflare needs you define fetch option : https://github.com/supabase/supabase-js#custom-fetch-implementation
 // Use Remix fetch polyfill for node (See https://remix.run/docs/en/v1/other-api/node)
@@ -17,8 +13,8 @@ function getSupabaseClient(supabaseKey: string, accessToken?: string) {
 						Authorization: `Bearer ${accessToken}`,
 					},
 				},
-		  }
-		: {};
+			}
+		: {}
 
 	return createClient(SUPABASE_URL, supabaseKey, {
 		auth: {
@@ -26,7 +22,7 @@ function getSupabaseClient(supabaseKey: string, accessToken?: string) {
 			persistSession: false,
 		},
 		...global,
-	});
+	})
 }
 
 /**
@@ -38,13 +34,11 @@ function getSupabaseClient(supabaseKey: string, accessToken?: string) {
  */
 function getSupabaseAdmin() {
 	if (isBrowser)
-		throw new Error(
-			"getSupabaseAdmin is not available in browser and should NOT be used in insecure environments",
-		);
+		throw new Error('getSupabaseAdmin is not available in browser and should NOT be used in insecure environments')
 
-	return getSupabaseClient(SUPABASE_SERVICE_ROLE);
+	return getSupabaseClient(SUPABASE_SERVICE_ROLE)
 }
 
-const supabaseClient = getSupabaseClient(SUPABASE_ANON_PUBLIC);
+const supabaseClient = getSupabaseClient(SUPABASE_ANON_PUBLIC)
 
-export { getSupabaseAdmin, supabaseClient };
+export { getSupabaseAdmin, supabaseClient }

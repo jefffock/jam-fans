@@ -240,47 +240,48 @@ model sso_providers {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model users {
-  instance_id                 String?              @db.Uuid
-  id                          String               @id @db.Uuid
-  aud                         String?              @db.VarChar(255)
-  role                        String?              @db.VarChar(255)
-  email                       String?              @db.VarChar(255)
-  encrypted_password          String?              @db.VarChar(255)
-  email_confirmed_at          DateTime?            @db.Timestamptz(6)
-  invited_at                  DateTime?            @db.Timestamptz(6)
-  confirmation_token          String?              @db.VarChar(255)
-  confirmation_sent_at        DateTime?            @db.Timestamptz(6)
-  recovery_token              String?              @db.VarChar(255)
-  recovery_sent_at            DateTime?            @db.Timestamptz(6)
-  email_change_token_new      String?              @db.VarChar(255)
-  email_change                String?              @db.VarChar(255)
-  email_change_sent_at        DateTime?            @db.Timestamptz(6)
-  last_sign_in_at             DateTime?            @db.Timestamptz(6)
-  raw_app_meta_data           Json?
-  raw_user_meta_data          Json?
-  is_super_admin              Boolean?
-  created_at                  DateTime?            @db.Timestamptz(6)
-  updated_at                  DateTime?            @db.Timestamptz(6)
-  phone                       String?              @unique
-  phone_confirmed_at          DateTime?            @db.Timestamptz(6)
-  phone_change                String?              @default("")
-  phone_change_token          String?              @default("") @db.VarChar(255)
-  phone_change_sent_at        DateTime?            @db.Timestamptz(6)
-  confirmed_at                DateTime?            @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
-  email_change_token_current  String?              @default("") @db.VarChar(255)
-  email_change_confirm_status Int?                 @default(0) @db.SmallInt
-  banned_until                DateTime?            @db.Timestamptz(6)
-  reauthentication_token      String?              @default("") @db.VarChar(255)
-  reauthentication_sent_at    DateTime?            @db.Timestamptz(6)
-  is_sso_user                 Boolean              @default(false)
-  deleted_at                  DateTime?            @db.Timestamptz(6)
-  identities                  identities[]
-  mfa_factors                 mfa_factors[]
-  sessions                    sessions[]
-  profiles                    profiles?
-  ratings                     ratings[]
-  ratings_duplicate           ratings_duplicate[]
-  versions_duplicate          versions_duplicate[]
+  instance_id                   String?                         @db.Uuid
+  id                            String                          @id @db.Uuid
+  aud                           String?                         @db.VarChar(255)
+  role                          String?                         @db.VarChar(255)
+  email                         String?                         @db.VarChar(255)
+  encrypted_password            String?                         @db.VarChar(255)
+  email_confirmed_at            DateTime?                       @db.Timestamptz(6)
+  invited_at                    DateTime?                       @db.Timestamptz(6)
+  confirmation_token            String?                         @db.VarChar(255)
+  confirmation_sent_at          DateTime?                       @db.Timestamptz(6)
+  recovery_token                String?                         @db.VarChar(255)
+  recovery_sent_at              DateTime?                       @db.Timestamptz(6)
+  email_change_token_new        String?                         @db.VarChar(255)
+  email_change                  String?                         @db.VarChar(255)
+  email_change_sent_at          DateTime?                       @db.Timestamptz(6)
+  last_sign_in_at               DateTime?                       @db.Timestamptz(6)
+  raw_app_meta_data             Json?
+  raw_user_meta_data            Json?
+  is_super_admin                Boolean?
+  created_at                    DateTime?                       @db.Timestamptz(6)
+  updated_at                    DateTime?                       @db.Timestamptz(6)
+  phone                         String?                         @unique
+  phone_confirmed_at            DateTime?                       @db.Timestamptz(6)
+  phone_change                  String?                         @default("")
+  phone_change_token            String?                         @default("") @db.VarChar(255)
+  phone_change_sent_at          DateTime?                       @db.Timestamptz(6)
+  confirmed_at                  DateTime?                       @default(dbgenerated("LEAST(email_confirmed_at, phone_confirmed_at)")) @db.Timestamptz(6)
+  email_change_token_current    String?                         @default("") @db.VarChar(255)
+  email_change_confirm_status   Int?                            @default(0) @db.SmallInt
+  banned_until                  DateTime?                       @db.Timestamptz(6)
+  reauthentication_token        String?                         @default("") @db.VarChar(255)
+  reauthentication_sent_at      DateTime?                       @db.Timestamptz(6)
+  is_sso_user                   Boolean                         @default(false)
+  deleted_at                    DateTime?                       @db.Timestamptz(6)
+  identities                    identities[]
+  mfa_factors                   mfa_factors[]
+  sessions                      sessions[]
+  helpful_votes_ideas_duplicate helpful_votes_ideas_duplicate[]
+  profiles                      profiles?
+  profiles_duplicate            profiles_duplicate?
+  ratings_duplicate             ratings_duplicate[]
+  versions_duplicate            versions_duplicate[]
 
   @@index([instance_id])
   @@schema("auth")
@@ -312,6 +313,7 @@ model artists {
   name_for_order String? @default("")
   sets           sets[]
   shows          shows[]
+  tours          tours[]
 
   @@schema("public")
 }
@@ -348,7 +350,9 @@ model helpful_votes_ideas {
   user_name  String
   counter    Int?      @default(1) @db.SmallInt
   vote       Int       @default(1) @db.SmallInt
+  profile_id String?   @db.Uuid
   ideas      ideas     @relation(fields: [idea_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles? @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -361,6 +365,8 @@ model helpful_votes_ratings {
   user_name  String
   counter    Int?      @default(1) @db.SmallInt
   vote       Int       @default(1) @db.SmallInt
+  profile_id String?   @db.Uuid
+  profiles   profiles? @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   ratings    ratings?  @relation(fields: [rating_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "helpful_votes_reviews_rating_id_fkey")
 
   @@schema("public")
@@ -369,17 +375,17 @@ model helpful_votes_ratings {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ideas {
-  id                  Int                   @id @default(autoincrement())
-  created_at          DateTime?             @default(now()) @db.Timestamptz(6)
-  user_name           String?
-  idea_body           String?
-  votes               Int                   @default(1)
-  artist_idea         Boolean               @default(false)
-  tag_idea            Boolean               @default(false)
-  feature_idea        Boolean               @default(false)
-  other_idea          Boolean               @default(false)
-  done                Boolean?              @default(false)
-  helpful_votes_ideas helpful_votes_ideas[]
+  id                            Int                             @id @default(autoincrement())
+  created_at                    DateTime?                       @default(now()) @db.Timestamptz(6)
+  user_name                     String?
+  body                          String?
+  votes                         Int                             @default(1)
+  done                          Boolean?                        @default(false)
+  profile_id                    String?                         @db.Uuid
+  type                          idea?
+  helpful_votes_ideas           helpful_votes_ideas[]
+  helpful_votes_ideas_duplicate helpful_votes_ideas_duplicate[]
+  profiles                      profiles?                       @relation(fields: [profile_id], references: [id], onDelete: Cascade)
 
   @@schema("public")
 }
@@ -484,16 +490,21 @@ model phishnet_songs {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profiles {
-  id         String    @id @db.Uuid
-  updated_at DateTime? @db.Timestamptz(6)
-  name       String    @unique(map: "profiles_username_key")
-  avatar_url String?
-  can_write  Boolean   @default(true)
-  points     Int       @default(10)
-  users      users     @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sets       sets[]
-  shows      shows[]
-  songs      songs[]
+  id                    String                  @id @db.Uuid
+  updated_at            DateTime?               @db.Timestamptz(6)
+  name                  String                  @unique(map: "profiles_username_key")
+  avatar_url            String?
+  can_write             Boolean                 @default(true)
+  points                Int                     @default(10)
+  created_at            DateTime?               @default(now()) @db.Timestamptz(6)
+  helpful_votes_ideas   helpful_votes_ideas[]
+  helpful_votes_ratings helpful_votes_ratings[]
+  ideas                 ideas[]
+  users                 users                   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ratings               ratings[]
+  sets                  sets[]
+  shows                 shows[]
+  songs                 songs[]
 
   @@schema("public")
 }
@@ -506,12 +517,11 @@ model ratings {
   rating                Int?                    @db.SmallInt
   comment               String?
   helpful               Int                     @default(0)
-  funny                 Int                     @default(0)
   version_id            Int
-  submitter_name        String
-  user_id               String?                 @db.Uuid
+  submitter_name        String?
+  profile_id            String?                 @db.Uuid
   helpful_votes_ratings helpful_votes_ratings[]
-  users                 users?                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles              profiles?               @relation(fields: [profile_id], references: [id], onDelete: Cascade)
   versions              versions                @relation(fields: [version_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
@@ -537,31 +547,45 @@ model ratings_duplicate {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sets {
-  id           BigInt    @id @default(autoincrement())
-  created_at   DateTime? @default(now()) @db.Timestamptz(6)
-  date         DateTime? @db.Date
-  artist_id    Int?
-  setlist      String?
-  vibes        String[]
-  submitter_id String?   @db.Uuid
-  set_number   String?
-  artists      artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profiles     profiles? @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         BigInt     @id @default(autoincrement())
+  created_at DateTime?  @default(now()) @db.Timestamptz(6)
+  artist_id  Int?
+  setlist    String[]
+  vibes      String[]
+  profile_id String?    @db.Uuid
+  type       Set?
+  show_id    BigInt?
+  multi_song String[]
+  song_ids   Int[]
+  sound_ids  BigInt?
+  artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles?  @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shows      shows?     @relation(fields: [show_id], references: [id], onDelete: NoAction)
+  versions   versions[]
 
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model shows {
-  id           BigInt    @id @default(autoincrement())
-  created_at   DateTime? @default(now()) @db.Timestamptz(6)
-  date         DateTime? @db.Date
-  artist_id    Int?
-  setlist      String?
-  vibes        String[]
-  submitter_id String?   @db.Uuid
-  artists      artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profiles     profiles? @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         BigInt     @id @default(autoincrement())
+  created_at DateTime?  @default(now()) @db.Timestamptz(6)
+  date       DateTime?  @db.Date
+  artist_id  Int?
+  song_ids   Int[]
+  vibes      String[]
+  profile_id String?    @db.Uuid
+  venue_id   BigInt?
+  tour_id    BigInt?
+  day        Int?       @db.SmallInt
+  month      Int?       @db.SmallInt
+  year       Int?       @db.SmallInt
+  sets       sets[]
+  artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profiles   profiles?  @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tours      tours?     @relation(fields: [tour_id], references: [id], onDelete: NoAction)
+  venues     venues?    @relation(fields: [venue_id], references: [id], onDelete: NoAction)
+  versions   versions[]
 
   @@schema("public")
 }
@@ -690,10 +714,17 @@ model versions {
   num_ratings         Int?          @default(0)
   song_submitter_name String?
   sounds              String[]
+  set_id              BigInt?
+  show_id             BigInt?
+  sound_ids           BigInt?
+  venue_id            BigInt?
   add_link            add_link[]
   ratings             ratings[]
   update_tags         update_tags[]
+  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction)
+  shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction)
   songs               songs         @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?       @relation(fields: [venue_id], references: [id], onDelete: NoAction)
 
   @@schema("public")
 }
@@ -717,6 +748,119 @@ model versions_duplicate {
   ratings_duplicate   ratings_duplicate[]
   songs               songs               @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users               users?              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model artist_suggestions {
+  id           BigInt   @id @unique @default(autoincrement())
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  submitter_id String?  @default(dbgenerated("auth.uid()")) @db.Uuid
+  name         String?
+  votes        Int?     @default(1) @db.SmallInt
+
+  @@schema("public")
+}
+
+model helpful_votes_ideas_duplicate {
+  id           Int       @id @default(autoincrement())
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  idea_id      Int
+  user_name    String
+  counter      Int?      @default(1) @db.SmallInt
+  vote         Int       @default(1) @db.SmallInt
+  submitter_id String?   @db.Uuid
+  ideas        ideas     @relation(fields: [idea_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users?    @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model profiles_duplicate {
+  id         String    @id @db.Uuid
+  updated_at DateTime? @db.Timestamptz(6)
+  name       String    @unique(map: "profiles_duplicate_username_key")
+  avatar_url String?
+  can_write  Boolean   @default(true)
+  points     Int       @default(10)
+  users      users     @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model phishnet_jamcharts {
+  songid          BigInt  @id
+  song            String?
+  slug            String?
+  abbr            String?
+  artist          String?
+  debut           String?
+  last_played     String?
+  times_played    BigInt?
+  last_permalink  String?
+  debut_permalink String?
+  gap             BigInt?
+
+  @@schema("public")
+}
+
+model phishnet_songs_duplicate {
+  songid          BigInt  @id
+  song            String?
+  slug            String?
+  abbr            String?
+  artist          String?
+  debut           String?
+  last_played     String?
+  times_played    BigInt?
+  last_permalink  String?
+  debut_permalink String?
+  gap             BigInt?
+
+  @@schema("public")
+}
+
+model phishnet_venues {
+  venueid    BigInt  @id
+  venuename  String?
+  city       String?
+  state      String?
+  country    String?
+  venuenotes String?
+  alias      BigInt?
+  short_name String?
+
+  @@schema("public")
+}
+
+model tours {
+  id         BigInt     @id @default(autoincrement())
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  artist_id  Int?
+  year       String?
+  continent  Continent?
+  region     Region[]
+  season     Season?
+  shows      shows[]
+  artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction)
+
+  @@schema("public")
+}
+
+model venues {
+  id         BigInt                    @id @default(autoincrement())
+  created_at DateTime                  @default(now()) @db.Timestamptz(6)
+  name       String?
+  city       String?
+  state      String?
+  country    String?
+  notes      String?
+  nicknames  String[]
+  location   Unsupported("geography")?
+  type       Venue?
+  shows      shows[]
+  versions   versions[]
 
   @@schema("public")
 }
@@ -748,4 +892,76 @@ enum factor_type {
   webauthn
 
   @@schema("auth")
+}
+
+enum Continent {
+  North_America @map("North America")
+  Europe
+  South_America @map("South America")
+  Asia
+  Australia
+  Africa
+
+  @@schema("public")
+}
+
+enum Region {
+  Northeast
+  South
+  Midwest
+  East_Coast        @map("East Coast")
+  West
+  West_Coast        @map("West Coast")
+  Pacific_Northwest @map("Pacific Northwest")
+  Southeast
+  Southwest
+  Great_Lakes       @map("Great Lakes")
+
+  @@schema("public")
+}
+
+enum Season {
+  Spring
+  Summer
+  Fall
+  Winter
+
+  @@schema("public")
+}
+
+enum Set {
+  Set_1    @map("Set 1")
+  Set_2    @map("Set 2")
+  Set_3    @map("Set 3")
+  Encore
+  Festival
+  Late
+
+  @@schema("public")
+}
+
+enum Venue {
+  Stadium
+  Arena
+  Amphitheater
+  Theater
+  Club
+  Bar
+  House
+  Farm
+  Festival
+  Street
+  Other
+  Park
+
+  @@schema("public")
+}
+
+enum idea {
+  Artist
+  Feature
+  Tag
+  Other
+
+  @@schema("public")
 }

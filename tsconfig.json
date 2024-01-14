@@ -5,7 +5,8 @@
     "**/*.tsx",
     "app/routes/__supabase/jams/lists.jsx",
     "app/root.tsx",
-    "app/routes/$.jsx"
+    "app/routes/$.jsx",
+	// ".eslintrc.js"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
