@@ -28,7 +28,6 @@ export default function JamsHome({
 
 	return (
 		<div className="bg-gray-100">
-			<ArtistBar artists={artists} search={search} />
 			<div className="flex justify-center pt-3 pb-0 mb-0">
 				<FiltersButton open={open} setOpen={setOpen} />
 			</div>

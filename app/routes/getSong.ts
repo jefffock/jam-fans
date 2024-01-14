@@ -32,7 +32,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 	const { data, error } = await supabase.from('songs').select('*').eq('song', song).single()
 	if (error) {
-		console.log('error in getsong', error)
 		return json({ error })
 	}
 	return json({ data }, { headers: response.headers })

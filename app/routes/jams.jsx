@@ -8,50 +8,35 @@ import { getArtists } from '../modules/artist'
 import { getSongs } from '../modules/song'
 import { getSounds } from '../modules/sound'
 import { loadJams } from '../modules/jam'
+import { getProfile } from '../modules/profile'
+import { set } from 'zod'
 
-export const loader = async ({ request, params }) => {
-	console.log('in /jams loader')
+export const loader = async ({ request }) => {
 	const response = new Response()
-	const cookies = parse(request.headers.get('Cookie') ?? '')
-	const headers = new Headers()
-
-	// let profile
-	// if (user && user?.id && user != null) {
-	// 	const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-	// 	profile = data
-	// }
-	// const { data: sounds } = await supabase.from('sounds').select('label, text').order('label', { ascending: true })
-	// let { data: artists } = await supabase
-	// 	.from('artists')
-	// 	.select('nickname, emoji_code, url, artist')
-	// 	.order('name_for_order', { ascending: true })
 
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
 
-	const { data: jamsFetched } = await loadJams(queryParams)
-	const { data: artists } = await getArtists()
-	const { data: songs } = await getSongs()
-	const { data: sounds } = await getSounds()
-
-	// let count = await supabase.from('versions').select('*', { count: 'exact', head: true })
-	// count = count.count
-	const search = url.search
+	const jams = await loadJams(queryParams)
+	const artists = await getArtists()
+	const songs = await getSongs()
+	const sounds = await getSounds()
+	const profile = await getProfile()
+	const page = queryParams.page || 1
 
 	return json(
 		{
 			artists,
 			songs,
-			initialJams: jamsFetched,
+			jamsFromServer: jams,
 			sounds,
-			fullTitle,
-			title,
-			count,
-			search,
-			user,
+			fullTitle: 'Jams',
+			title: 'Jams',
+			count: 100,
 			profile,
-			initialPage: page,
+			pageFromServer: page,
+			search: url.search,
 		},
 		{
 			headers: response.headers,
@@ -60,76 +45,71 @@ export const loader = async ({ request, params }) => {
 }
 
 export default function Jams() {
-	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, initialJams, initialPage } =
+	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, jamsFromServer, pageFromServer } =
 		useLoaderData()
 	const [open, setOpen] = useState(false)
 	const [scrollPosition, setScrollPosition] = useState(0)
 	const [clientHeight, setClientHeight] = useState(null)
 	const [shouldFetch, setShouldFetch] = useState(true)
 	const [height, setHeight] = useState(null)
-	const [page, setPage] = useState(2)
+	const [page, setPage] = useState(pageFromServer)
 	const fetcher = useFetcher()
-	const [jams, setJams] = useState(initialJams)
 	const [urlToLoad, setUrlToLoad] = useState(null)
+	const [jams, setJams] = useState(jamsFromServer)
+	const [newSearch, setNewSearch] = useState(search)
+	const [isFetching, setIsFetching] = useState(false)
 
 	if (!artists) return <div>Loading...</div>
 
-	useEffect(() => {
-		const scrollListener = () => {
-			setClientHeight(window.innerHeight)
-			setScrollPosition(window.scrollY)
-		}
+	const fetchContent = () => {
+		let urlToFetch = `/jams?${newSearch}&page=${page}`
+		console.log('urlToFetch', urlToFetch)
+		fetcher.load(urlToFetch)
+	}
 
+	const isScrollNearBottom = () => {
+		const scrollPosition = window.innerHeight + document.documentElement.scrollTop
+		const threshold = document.documentElement.offsetHeight - 1500
+		if (scrollPosition >= threshold) {
+			setIsFetching(true)
+		}
+		return scrollPosition >= threshold
+	}
+
+	const handleScroll = () => {
+		if (isScrollNearBottom() && !isFetching) {
+			setPage((prevPage) => prevPage + 1)
+		}
+	}
+
+	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			window.addEventListener('scroll', scrollListener)
+			window.addEventListener('scroll', handleScroll)
 		}
 
 		return () => {
 			if (typeof window !== 'undefined') {
-				window.removeEventListener('scroll', scrollListener)
+				window.removeEventListener('scroll', handleScroll)
 			}
 		}
-	}, [])
+	}, [isFetching])
 
 	useEffect(() => {
-		if (typeof document !== 'undefined' && urlToLoad) {
-			console.log('loading', urlToLoad)
-			fetcher.load(urlToLoad)
-			setUrlToLoad(null)
+		fetchContent()
+	}, [page])
+
+	useEffect(() => {
+		if (!fetcher.data || fetcher.state === 'loading') {
+			return
 		}
-	}, [urlToLoad])
-
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			if (initialPage === 1) {
-				setJams(initialJams)
+		if (fetcher.data.jamsFromServer.length > 0) {
+			console.log('jams', jams)
+			console.log('fetcher.data.jamsFromServer', fetcher.data.jamsFromServer)
+			if (fetcher.data.jamsFromServer[fetcher.data.jamsFromServer.length - 1].id !== jams[jams.length - 1].id) {
+				console.log('appending jams')
+				setJams((jams) => [...jams, ...fetcher.data.jamsFromServer])
+				// setIsFetching(false)
 			}
-		}
-	}, [initialJams])
-
-	useEffect(() => {
-		if (!shouldFetch || !height) return
-		if (
-			(page !== 2 && clientHeight + scrollPosition + 2000 < height) ||
-			(page === 2 && clientHeight + scrollPosition + 1500 < height)
-		)
-			return
-		let newSearch = search.slice(1)
-		let urlToFetch = `/jams?index&${newSearch}&page=${page}`
-		fetcher.load(urlToFetch)
-		setShouldFetch(false)
-	}, [clientHeight, scrollPosition])
-
-	useEffect(() => {
-		if (fetcher.data && fetcher.data.initialJams.length === 0) {
-			setShouldFetch(false)
-			return
-		}
-
-		if (fetcher.data && fetcher.data.initialJams.length > 0) {
-			setJams((jams) => [...jams, ...fetcher.data.initialJams])
-			setPage((page) => page + 1)
-			setShouldFetch(true)
 		}
 	}, [fetcher.data])
 

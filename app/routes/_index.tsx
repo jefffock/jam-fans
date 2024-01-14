@@ -103,7 +103,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 			orderBy = value
 		}
 	}
-	console
 	//cnovert date from mmddyyyy with no hyphens to yyyy-mm-dd
 	if (date) {
 		let year = date.slice(4, 8)

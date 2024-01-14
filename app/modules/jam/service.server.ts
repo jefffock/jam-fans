@@ -178,13 +178,12 @@ export const loadJams = async (queryParams: QueryParams) => {
 	}
 
 	const page = parseInt(queryParams.page || '1')
-	const pageSize = 15
-
-	console.log('whereConditions:', whereConditions)
-
+	console.log('page', page)
+	const pageSize = page === 1 ? 30 : 15
+	console.log('pageSize', pageSize)
 	const jamsQuery = db.jams.findMany({
 		where: whereConditions,
-		orderBy: [{ song_name: 'asc' }, { id: 'desc' }],
+		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 		take: pageSize,
 		skip: (page - 1) * pageSize,
 	})
@@ -194,4 +193,9 @@ export const loadJams = async (queryParams: QueryParams) => {
 	} catch (error) {
 		console.error(error)
 	}
+}
+
+export async function getJamCount() {
+	const count = await db.jams.count()
+	return count
 }

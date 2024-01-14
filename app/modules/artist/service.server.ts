@@ -6,6 +6,5 @@ export async function getArtists() {
 			name_for_order: 'asc',
 		},
 	})
-
 	return artists
 }

@@ -9,22 +9,21 @@ export default function Hero({ open, setOpen }) {
 				<li className='my-2'>&#8226; Use the filters to find specific sounds</li>
 				<li className='my-2'>&#8226; Add your favorites, no account needed!</li>
 			</ul> */}
-			<h1 className="text-3xl font-bold my-2 p-4">
+			{/* <h1 className="text-3xl font-bold my-2 p-4">
 				<a href="/add/jam" className="underline">
 					Curate* jams
 				</a>
 			</h1>
-			<p className="text-cyan-600 text-xl">+</p>
+			<p className="text-cyan-600 text-xl">+</p> */}
 			<h1 className="text-3xl font-bold my-2 p-4 underline cursor-pointer" onClick={() => setOpen(!open)}>
-				Find jams
+				Find your next favorite jam
 			</h1>
 			<div className="max-w-4xl flex align-middle text-cyan-700 mt-6">
 				{/* <h2 className='font-bold text-2xl m-4 mb-0'>It's all subjective, that's part of the fun</h2> */}
 				<p className="text-xl mx-auto text-center">
-					*This is subjective, which is part of the fun! It's about love, gratitude, and sharing the music,
-					not competition. <br />
+					It&apos;s about love, gratitude, and sharing the music, not competition. <br />
 					<br />
-					"If you get confused, listen to the music play"
+					&quot;If you get confused, listen to the music play&quot;
 				</p>
 			</div>
 		</div>

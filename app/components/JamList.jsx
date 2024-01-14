@@ -22,7 +22,7 @@ export default function JamList({
 	const artistUrl = search?.substring(artistStartIndex, urlStartIndex)
 	const [iframeUrl, setIframeUrl] = useState('')
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('')
-	const [showRatings, setShowRatings] = useState(true)
+	const [showRatings, setShowRatings] = useState(false)
 	const [orderBy, setOrderBy] = useState('avg_rating')
 	const fetcher = useFetcher()
 

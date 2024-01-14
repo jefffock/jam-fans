@@ -26,7 +26,6 @@ export default function NewJamsPage() {
 		<div>
 			<h1>Get Jams</h1>
 			{/* <p>{JSON.parse(data).length || ''}</p> */}
-			<p>{JSON.stringify(data)}</p>
 		</div>
 	)
 }

@@ -614,7 +614,7 @@ model songs {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sounds {
-  id         BigInt    @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   label      String?
   text       String?
@@ -889,7 +889,7 @@ model jams {
   show_id             BigInt?
   venue_id            BigInt?
   artist_id           Int?
-  sound_ids           BigInt[]
+  sound_ids           String[]
   artists             artists? @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   sets                sets?    @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows               shows?   @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

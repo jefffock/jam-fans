@@ -27,3 +27,12 @@ export async function createProfile(user_id: string, name: string) {
 	})
 	return newProfile
 }
+
+export async function getProfile(user_id: string) {
+	const profile = await db.profiles.findUnique({
+		where: {
+			id: 'd154fade-4a07-470d-beb5-d4098c945111',
+		},
+	})
+	return profile
+}
