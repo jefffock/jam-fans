@@ -114,7 +114,7 @@ export default function SignUp() {
 								className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-cyan-500 sm:text-sm"
 								onChange={handleEmailChange}
 							/>
-							<p className="text-sm">We'll never share your email.</p>
+							<p className="text-sm">We&apos;ll never share your email.</p>
 						</div>
 					</div>
 					<div>
@@ -127,7 +127,7 @@ export default function SignUp() {
 						>
 							Sign up with a magic link
 						</button>
-						<p className="text-sm mb-4">We'll send you a link to sign in. No password needed!</p>
+						<p className="text-sm mb-4">We&apos;ll send you a link to sign in. No password needed!</p>
 					</div>
 					{magicLinkSuccessText && (
 						<SuccessAlert title={'Email sent!'} description={'Check your email to sign in'} />

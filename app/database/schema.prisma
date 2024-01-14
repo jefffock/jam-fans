@@ -311,6 +311,7 @@ model artists {
   emoji_code     String? @default("0x2764")
   nickname       String?
   name_for_order String? @default("")
+  jams           jams[]
   sets           sets[]
   shows          shows[]
   tours          tours[]
@@ -557,7 +558,8 @@ model sets {
   show_id    BigInt?
   multi_song String[]
   song_ids   Int[]
-  sound_ids  BigInt?
+  sound_ids  BigInt[]
+  jams       jams[]
   artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles   profiles?  @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows      shows?     @relation(fields: [show_id], references: [id], onDelete: NoAction)
@@ -580,6 +582,8 @@ model shows {
   day        Int?       @db.SmallInt
   month      Int?       @db.SmallInt
   year       Int?       @db.SmallInt
+  sound_ids  BigInt[]
+  jams       jams[]
   sets       sets[]
   artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles   profiles?  @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -600,6 +604,7 @@ model songs {
   artist             String?
   submitter_id       String?              @db.Uuid
   emoji_code         String?
+  jams               jams[]
   profiles           profiles?            @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   versions           versions[]
   versions_duplicate versions_duplicate[]
@@ -849,18 +854,47 @@ model tours {
 }
 
 model venues {
-  id         BigInt                    @id @default(autoincrement())
-  created_at DateTime                  @default(now()) @db.Timestamptz(6)
+  id         BigInt     @id @default(autoincrement())
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
   name       String?
   city       String?
   state      String?
   country    String?
   notes      String?
   nicknames  String[]
-  location   Unsupported("geography")?
   type       Venue?
+  jams       jams[]
   shows      shows[]
   versions   versions[]
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model jams {
+  id                  Int      @id @default(autoincrement())
+  date                String
+  avg_rating          Float    @default(0) @db.Real
+  location            String?
+  submitter_name      String?
+  artist              String
+  song_id             Int
+  user_id             String?  @db.Uuid
+  listen_link         String?
+  song_name           String?
+  num_ratings         Int?     @default(0)
+  song_submitter_name String?
+  sounds              String[]
+  set_id              BigInt?
+  show_id             BigInt?
+  venue_id            BigInt?
+  artist_id           Int?
+  sound_ids           BigInt[]
+  artists             artists? @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sets                sets?    @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shows               shows?   @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songs               songs    @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?  @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }

@@ -42,8 +42,8 @@ function getEnv(name: string, { isRequired, isSecret }: EnvOptions = { isSecret:
 /**
  * Server env
  */
-export const SERVER_URL = getEnv('SERVER_URL')
-export const SUPABASE_SERVICE_ROLE = getEnv('SUPABASE_SERVICE_ROLE')
+export const SERVER_URL = getEnv('SUPABASE_URL')
+export const SUPABASE_SERVICE_ROLE = getEnv('SUPABASE_SERVICE_ROLE_KEY')
 export const SESSION_SECRET = getEnv('SESSION_SECRET')
 
 /**
@@ -54,7 +54,7 @@ export const NODE_ENV = getEnv('NODE_ENV', {
 	isRequired: false,
 })
 export const SUPABASE_URL = getEnv('SUPABASE_URL', { isSecret: false })
-export const SUPABASE_ANON_PUBLIC = getEnv('SUPABASE_ANON_PUBLIC', {
+export const SUPABASE_ANON_PUBLIC = getEnv('SUPABASE_ANON_KEY', {
 	isSecret: false,
 })
 

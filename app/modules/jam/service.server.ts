@@ -1,5 +1,5 @@
+import type { Prisma } from '~/database'
 import { db } from '~/database'
-import type { add_link, profiles } from '@prisma/client'
 
 export async function addJam(data: {
 	date: string
@@ -119,4 +119,79 @@ export async function getJamsByShow(data: { show_id: number }) {
 	})
 
 	return versions
+}
+
+export async function getJams() {
+	const jams = await db.jams.findMany()
+	return jams
+}
+
+interface QueryParams {
+	[key: string]: unknown
+	page?: string // assuming 'page' is a string, you might need to adjust based on actual data
+}
+
+export const loadJams = async (queryParams: QueryParams) => {
+	console.log('Loading jams with queryParams:', queryParams)
+
+	function formatDateString(dateString: string) {
+		const year = dateString.slice(4, 8)
+		const month = dateString.slice(0, 2)
+		const day = dateString.slice(2, 4)
+		return `${year}-${month}-${day}`
+	}
+
+	const whereConditions: Prisma.jamsWhereInput = {}
+
+	for (const [key, value] of Object.entries(queryParams)) {
+		if (key.includes('sound') && value) {
+			if (typeof value === 'string') {
+				whereConditions.sounds = {
+					has: value,
+				}
+			}
+		}
+		// if (key.includes('artist') && value) {
+		// 	whereConditions.artist = value
+		// }
+		if (key.includes('song') && value) {
+			whereConditions.song_name = value
+		}
+		if (key.includes('date') && value && typeof value === 'string') {
+			whereConditions.date = formatDateString(value)
+		}
+		if (key.includes('before') && value) {
+			whereConditions.date = {
+				lte: `${value}-12-31`,
+			}
+		}
+		if (key.includes('after') && value) {
+			whereConditions.date = {
+				gte: `${value}-01-01`,
+			}
+		}
+		if (key.includes('show-links')) {
+			whereConditions.listen_link = {
+				not: null,
+			}
+		}
+	}
+
+	const page = parseInt(queryParams.page || '1')
+	const pageSize = 15
+
+	console.log('whereConditions:', whereConditions)
+
+	const jamsQuery = db.jams.findMany({
+		where: whereConditions,
+		orderBy: [{ song_name: 'asc' }, { id: 'desc' }],
+		take: pageSize,
+		skip: (page - 1) * pageSize,
+	})
+	try {
+		const jams = await jamsQuery
+		return jams
+	} catch (error) {
+		console.error(error)
+	}
 }

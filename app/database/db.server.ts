@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { NODE_ENV } from '../utils/env'
 export type {
 	users,
@@ -40,4 +40,4 @@ if (NODE_ENV === 'production') {
 	db.$connect()
 }
 
-export { db }
+export { db, Prisma }

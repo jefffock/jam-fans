@@ -26,7 +26,7 @@ export const loader = async ({ request, params }) => {
 		data: { user },
 	} = await supabase.auth.getUser()
 	let profile
-	if (user && user?.id && user != null) {
+	if (user && user?.id && user !== null) {
 		const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 		profile = data
 	}
@@ -100,7 +100,7 @@ export default function Welcome() {
 						type="button"
 						className="inline-flex items-center rounded-md border border-transparent bg-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 my-4"
 						onClick={handleSubmit}
-						disable={!username}
+						disabled={!username}
 					>
 						Choose this name
 					</button>

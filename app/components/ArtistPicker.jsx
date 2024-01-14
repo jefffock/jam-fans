@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/solid'
 
 export default function ArtistPicker() {
 	const [selectedArtist, setSelectedArtist] = useState(people[3])

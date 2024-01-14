@@ -38,13 +38,13 @@ export default function Credits() {
 						</a>
 					</li>
 					<li className="my-2">
-						Taper's Choice -{' '}
+						Taper&apos;s Choice -{' '}
 						<a href="https://taperschoice.net" className="underline text-blue-700 hover:text-blue-800">
 							taperschoice.net
 						</a>
 					</li>
 					<li className="my-2">
-						Umphrey's McGee -{' '}
+						Umphrey&apos;s McGee -{' '}
 						<a
 							href="https://allthings.umphreys.com"
 							className="underline text-blue-700 hover:text-blue-800"
@@ -62,8 +62,8 @@ export default function Credits() {
 						Songfish
 					</a>
 					, which means that when adding a jam to Jam Fans, you can choose a song name to see all
-					performances. Songfish is a setlist software that "allows a band or fans to preserve concert
-					setlists and data. The software allows users to search that data and generate statistics." Thanks{' '}
+					performances. Songfish is a setlist software that allows a band or fans to preserve concert setlists
+					and data. The software allows users to search that data and generate statistics. Thanks{' '}
 					<a href="https://adamscheinberg.com/" className="underline text-blue-700 hover:text-blue-800">
 						Adam Scheinberg
 					</a>

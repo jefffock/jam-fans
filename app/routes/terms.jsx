@@ -33,8 +33,8 @@ export default function Terms() {
 					service at any time without notice.
 				</p>
 				<p className="text-lg mb-4">
-					7. Love and Gratitude: We are all here because we love this music. Let's approach our use of the
-					website with love and gratitude.
+					7. Love and Gratitude: We are all here because we love this music. Let&apos;s approach our use of
+					the website with love and gratitude.
 				</p>
 				<p className="text-lg mb-4">
 					If you have any questions or concerns about these terms of service, please contact us at hi@jam.fans

@@ -5,7 +5,7 @@
     "**/*.tsx",
     "app/routes/__supabase/jams/lists.jsx",
     "app/root.tsx",
-    "app/routes/$.jsx",
+    "app/routes/$.jsx", "app/utils/title.js",
 	// ".eslintrc.js"
   ],
   "compilerOptions": {
