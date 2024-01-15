@@ -1008,12 +1008,8 @@ select {
   height: min-content;
 }
 
-.h-96 {
-  height: 24rem;
-}
-
-.h-84 {
-  height: 21rem;
+.h-72 {
+  height: 18rem;
 }
 
 .max-h-60 {
@@ -1083,10 +1079,6 @@ select {
 
 .w-80 {
   width: 20rem;
-}
-
-.w-96 {
-  width: 24rem;
 }
 
 .w-112 {
@@ -1353,6 +1345,10 @@ select {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
 }
 
 .overflow-x-hidden {

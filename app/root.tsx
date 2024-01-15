@@ -21,10 +21,12 @@ import BottomNav from 'app/components/BottomNav'
 // import type { LinksFunction } from "@remix-run/node";
 
 import styles from './tailwind.css'
+import otherStyles from './customStyles.css'
 
 export const links = () => [
 	{ rel: 'stylesheet', href: styles },
 	{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css' },
+	{ rel: 'stylesheet', href: otherStyles },
 ]
 
 //tslint:disable-next-line

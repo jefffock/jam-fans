@@ -560,3 +560,10 @@ video {
   background-color: #4caf50;
   transition: 'background-color' 2s ease;
 }
+
+.measure-div {
+	position: absolute;
+	left: -9999px;
+	top: -9999px;
+	visibility: hidden;
+  }

@@ -1,7 +1,8 @@
 import { Link } from '@remix-run/react'
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 
-export default function JamCard({ jam, sounds, user, profile, setShowIframe, setIframeUrl, showRatings }) {
+const JamCard = forwardRef((props, ref) => {
+	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
 
@@ -31,9 +32,10 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 	const link = `/add/jam?jamid=${jam?.id}&song=${jam.song_name}&artist=${jam.artist}&location=${jam.location}&date=${jam.date}`
 	return (
 		<div
-			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 m-6 flex flex-col justify-between h-80`}
+			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 m-6 flex flex-col justify-between h-80 ${ref ? 'measure-div' : ''}`}
+			ref={ref || null}
 		>
-			<div>
+			<div className="overflow-y-auto">
 				<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
 					{jam.song_name} {songEmojis && songEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 				</h5>
@@ -53,7 +55,7 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 								clipRule="evenodd"
 							/>
 						</svg>
-						<p className="mb-3 font-normal text-gray-700 ml-auto">{showRatings ? ratingToShow : ''}</p>
+						<p className="mb-2 font-normal text-gray-700 ml-auto">{showRatings ? ratingToShow : ''}</p>
 					</div>
 				</div>
 				{/* second row */}
@@ -66,8 +68,8 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 					</p>
 				</div>
 				{/* third row */}
-				<p className="mb-3 font-normal text-gray-700 mr-auto">{jam.location}</p>
-				{jam?.sounds && <p className="mb-3 font-normal text-gray-700">{jam?.sounds.join(', ')}</p>}
+				<p className="mb-2 font-normal text-gray-700 mr-auto">{jam.location}</p>
+				{jam?.sounds && <p className="mb-2 font-normal text-gray-700">{jam?.sounds.join(', ')}</p>}
 				{jam?.name && <p className="font-normal text-gray-700">{`Added by ${jam.name} (${jam?.points})`}</p>}
 				{comments && comments.length > 0 && (
 					<button
@@ -98,7 +100,7 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 					</button>
 				)}
 			</div>
-			<div className="flex justify-between mt-3">
+			<div className="flex justify-between">
 				{!user && (
 					<Link
 						to={link}
@@ -138,4 +140,6 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 			</div>
 		</div>
 	)
-}
+})
+
+export default JamCard

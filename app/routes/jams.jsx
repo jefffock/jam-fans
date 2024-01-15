@@ -17,6 +17,8 @@ import JamsTitle from '../components/JamsTitle'
 import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import { useWindowHeight, useWindowWidth } from '../utils'
+import { use } from 'i18next'
+import JamCard from '../components/cards/JamCard'
 
 export const loader = async ({ request }) => {
 	const response = new Response()
@@ -95,6 +97,16 @@ export default function Jams() {
 	const [appleFilter, setAppleFilter] = useState(false)
 	const [scrollTop, setScrollTop] = useState(0)
 	const jamListRef = useRef(null)
+	const jamCardRef = useRef(null)
+	const [jamCardHeight, setJamCardHeight] = useState(0)
+
+	if (jamCardRef.current) {
+		console.log('jamCardRef height', jamCardRef.current?.clientHeight)
+		console.log('jamCardHeight', jamCardHeight)
+		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
+			setJamCardHeight(jamCardRef.current?.clientHeight)
+		}
+	}
 
 	const windowHeight = useWindowHeight()
 	const windowWidth = useWindowWidth()
@@ -230,6 +242,15 @@ export default function Jams() {
 					scrollTop={scrollTop}
 					setScrollTop={setScrollTop}
 					scrollToTop={scrollToTop}
+					jamCardHeight={jamCardHeight}
+				/>
+
+				<JamCard
+					jam={filteredJams[0]}
+					user={user}
+					showRatings={showRatings}
+					className="measure-div"
+					ref={jamCardRef}
 				/>
 			</div>
 		</div>

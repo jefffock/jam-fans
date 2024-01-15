@@ -15,11 +15,12 @@ export default function VirtualJamList({
 	scrollTop,
 	setScrollTop,
 	jamListRef,
+	jamCardHeight,
 }) {
-	let cardHeight = 320
+	let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
 	const totalHeight = items.length * cardHeight
-	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
-	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 5, items.length - 1)
+	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 3 : 0
+	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 4, items.length - 1)
 
 	const visibleItems = items.slice(startIndex, endIndex)
 	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex)] : []
@@ -43,7 +44,7 @@ export default function VirtualJamList({
 	return (
 		<div
 			ref={jamListRef}
-			className=" overflow-y-scroll"
+			className=" overflow-y-scroll pb-20"
 			//`,
 			style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
 			onScroll={handleScroll}
