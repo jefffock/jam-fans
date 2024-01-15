@@ -699,6 +699,10 @@ select {
   pointer-events: auto;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .fixed {
   position: fixed;
 }
@@ -979,6 +983,10 @@ select {
   height: 2rem;
 }
 
+.h-80 {
+  height: 20rem;
+}
+
 .h-screen {
   height: 100vh;
 }
@@ -998,6 +1006,14 @@ select {
 .h-min {
   height: -moz-min-content;
   height: min-content;
+}
+
+.h-96 {
+  height: 24rem;
+}
+
+.h-84 {
+  height: 21rem;
 }
 
 .max-h-60 {
@@ -1071,6 +1087,10 @@ select {
 
 .w-96 {
   width: 24rem;
+}
+
+.w-112 {
+  width: 28rem;
 }
 
 .min-w-0 {

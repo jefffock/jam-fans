@@ -294,8 +294,8 @@ export default function JamFiltersClientside({
 																								onChange={
 																									handleSoundsChange
 																								}
-																								defaultChecked={search?.includes(
-																									sound.text
+																								defaultChecked={soundFilters.includes(
+																									sound.id.toString()
 																								)}
 																							/>
 																						</div>
@@ -341,8 +341,8 @@ export default function JamFiltersClientside({
 																							onChange={
 																								handleArtistsChange
 																							}
-																							defaultChecked={search?.includes(
-																								artist.url
+																							defaultChecked={artistFilters.includes(
+																								artist.id.toString()
 																							)}
 																						/>
 																					</div>
@@ -665,7 +665,7 @@ export default function JamFiltersClientside({
 																			type="checkbox"
 																			className="h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 border-2"
 																			onChange={handleLinkChange}
-																			defaultChecked={search?.includes('links')}
+																			defaultChecked={linkFilter}
 																		/>
 																	</div>
 																	<div className="ml-3 text-sm">

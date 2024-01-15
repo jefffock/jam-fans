@@ -1,5 +1,6 @@
 export function buildTitle({ artists, sounds, song, queryParams }) {
 	const { date, beforeDate, afterDate } = queryParams
+	console.log('buildTitle', { artists, sounds, song, queryParams })
 	let title = '🔥 '
 
 	if (sounds && sounds.length > 0) {

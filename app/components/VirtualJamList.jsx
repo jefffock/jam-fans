@@ -11,65 +11,68 @@ export default function VirtualJamList({
 	showRatings,
 	headerHeight,
 	windowHeight,
+	windowWidth,
+	scrollTop,
+	setScrollTop,
+	jamListRef,
 }) {
-	let height = 300
-	let containerHeight = 1000
-	const [scrollTop, setScrollTop] = useState(0)
-	const totalHeight = items.length * height
-	const startIndex = Math.floor(scrollTop / height)
-	const endIndex = Math.min(startIndex + Math.ceil(containerHeight / height), items.length - 1)
+	let cardHeight = 320
+	const totalHeight = items.length * cardHeight
+	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
+	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 5, items.length - 1)
 
-	const visibleItems = items.slice(startIndex, endIndex + 1)
-	const offsetTop = startIndex * height
+	const visibleItems = items.slice(startIndex, endIndex)
+	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex)] : []
+	const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items.length - endIndex)] : []
+	// combine placeholders and visible items into one array
+	const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
+	console.log('itemsToRender', itemsToRender.length, itemsToRender[0], itemsToRender[itemsToRender.length - 1])
+
+	console.log('placeholdersBefore', placeholdersBefore.length)
+	console.log('visibleItems', visibleItems.length)
+	console.log('placeholdersAfter', placeholdersAfter.length)
+
+	console.log('total num of items', items.length)
+	console.log('total num of divs', placeholdersBefore.length + visibleItems.length + placeholdersAfter.length)
+	const offsetTop = startIndex * cardHeight
 	const handleScroll = (event) => {
+		console.log('event.currentTarget.scrollTop', event.currentTarget.scrollTop)
 		setScrollTop(event.currentTarget.scrollTop)
 	}
 
-	const divRef = useRef(null)
-
-	// State to store the height
-	const [divHeight, setHeight] = useState(0)
-
-	useEffect(() => {
-		// Measure the height and update state
-		if (divRef.current) {
-			setHeight(divRef.current.clientHeight)
-		}
-
-		// Optional: Update height on window resize
-		const handleResize = () => {
-			if (divRef.current) {
-				setHeight(divRef.current.clientHeight)
-			}
-		}
-
-		window.addEventListener('resize', handleResize)
-
-		// Cleanup the event listener
-		return () => window.removeEventListener('resize', handleResize)
-	}, []) // Empty dependency array ensures this runs once on mount
-
 	return (
 		<div
-			ref={divRef}
+			ref={jamListRef}
 			className=" overflow-y-scroll"
 			//`,
 			style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
 			onScroll={handleScroll}
 		>
-			<div style={{ height: `${totalHeight}px`, position: 'relative' }}>
-				<div style={{ position: 'absolute', top: `${offsetTop}px` }}>
-					{visibleItems.map((item, index) => (
-						// <div key={index}>{JSON.stringify(item)}</div>
-						<JamCard
-							key={item.id}
-							jam={item}
-							user={user}
-							setShowIframe={setShowIframe}
-							setIframeUrl={setIframeUrl}
-							showRatings={showRatings}
-						/>
-					))}
+			<div>
+				{/* <div style={{ height: `${totalHeight}px`, position: 'relative' }}> */}
+				{/* <div style={{ position: 'absolute', top: `${offsetTop}px` }}> */}
+				<div className="max-w-100vw flex flex-col items-center justify-center">
+					{itemsToRender.map((item, index) => {
+						if (item) {
+							return (
+								<JamCard
+									key={`visibile-${index}`}
+									jam={item}
+									user={user}
+									setShowIframe={setShowIframe}
+									setIframeUrl={setIframeUrl}
+									showRatings={showRatings}
+								/>
+							)
+						}
+						return (
+							<div
+								key={`placeholder-${index}`}
+								// style={{ height: cardHeight, width: cardWidth }}
+								className="h-80 m-6"
+							></div>
+						)
+					})}
 				</div>
 			</div>
 		</div>

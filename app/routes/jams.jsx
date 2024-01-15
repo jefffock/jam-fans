@@ -16,6 +16,7 @@ import FiltersButton from '../components/FiltersButton'
 import JamsTitle from '../components/JamsTitle'
 import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
+import { useWindowHeight, useWindowWidth } from '../utils'
 
 export const loader = async ({ request }) => {
 	const response = new Response()
@@ -31,8 +32,8 @@ export const loader = async ({ request }) => {
 	const profile = await getProfile()
 	const filteredArtists = filterArtists({ artists, queryParams })
 	const filteredSounds = filterSounds({ sounds, queryParams })
-	let id = 12
-	const song = getSongById({ songs, id })
+	let song_id = queryParams.song
+	const song = getSongById({ songs, id: song_id })
 	const { title, fullTitle } = buildTitle({
 		queryParams,
 		artists: filteredArtists,
@@ -58,29 +59,6 @@ export const loader = async ({ request }) => {
 	)
 }
 
-const useWindowHeight = () => {
-	// Initialize state with a default value
-	const [height, setHeight] = useState(0)
-
-	useEffect(() => {
-		// Define a function to update the state with the current window height
-		const updateHeight = () => {
-			setHeight(window.innerHeight)
-		}
-
-		// Update the height once the component mounts
-		updateHeight()
-
-		// Optionally, listen for window resize events and update the height
-		window.addEventListener('resize', updateHeight)
-
-		// Cleanup function to remove the event listener
-		return () => window.removeEventListener('resize', updateHeight)
-	}, []) // Empty dependency array ensures this runs once on mount
-
-	return height
-}
-
 export default function Jams() {
 	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, jamsFromServer, pageFromServer } =
 		useLoaderData()
@@ -95,10 +73,12 @@ export default function Jams() {
 	// const [jams, setJams] = useState(jamsFromServer)
 	// const [newSearch, setNewSearch] = useState(search)
 	// const [isFetching, setIsFetching] = useState(false)
+	const [allJams, setAllJams] = useState(jamsFromServer)
 	const [showIframe, setShowIframe] = useState(false)
 	const [iframeUrl, setIframeUrl] = useState('')
 	const [showRatings, setShowRatings] = useState(false)
 	const headerRef = useRef(null)
+	const pageRef = useRef(null)
 	const [headerHeight, setHeaderHeight] = useState(0)
 	const [filteredJams, setFilteredJams] = useState(jamsFromServer)
 	const [artistFilters, setArtistFilters] = useState([])
@@ -113,17 +93,64 @@ export default function Jams() {
 	const [spotifyFilter, setSpotifyFilter] = useState(false)
 	const [youtubeFilter, setYoutubeFilter] = useState(false)
 	const [appleFilter, setAppleFilter] = useState(false)
+	const [scrollTop, setScrollTop] = useState(0)
+	const jamListRef = useRef(null)
 
 	const windowHeight = useWindowHeight()
+	const windowWidth = useWindowWidth()
+
 	useEffect(() => {
 		if (headerRef.current) {
 			setHeaderHeight(headerRef.current.clientHeight)
 		}
 	}, [])
 
+	const scrollToTop = (ref) => {
+		if (ref.current) {
+			// Use appropriate method based on the library
+			ref.current.scrollTop = 0 // For react-window
+			// listRef.current.scrollToRow(0); // For react-virtualized
+		}
+	}
+
+	// const scrollToBottom = (ref) => {
+	// 	if (ref.current) {
+	// 		// The maximum scrollable amount is scrollHeight - clientHeight
+	// 		const maxScrollTop = ref.current.scrollHeight - ref.current.clientHeight
+	// 		ref.current.scrollTop = maxScrollTop
+	// 	}
+	// }
+
+	const scrollToBottomOfWindow = () => {
+		window?.scrollTo({
+			top: document.body.scrollHeight,
+			behavior: 'smooth',
+		})
+	}
+
+	const scrollToTopOfWindow = () => {
+		window?.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		})
+	}
+
+	if (jamListRef.current && scrollTop > 100) {
+		console.log('scrolling to bottom of page')
+		if (window) {
+			scrollToBottomOfWindow()
+		}
+	}
+	if (jamListRef.current && scrollTop < 30) {
+		if (window) {
+			scrollToTopOfWindow()
+		}
+	}
+
 	useEffect(() => {
 		console.log('artistFilters', artistFilters)
-		let filtered = jamsFromServer
+		let filtered = allJams
+		console.log('filtered at start', filtered.length)
 		if (artistFilters.length > 0) {
 			filtered = filtered.filter((jam) => {
 				return artistFilters.includes(jam.artist_id.toString())
@@ -141,13 +168,18 @@ export default function Jams() {
 				return jam.listen_link
 			})
 		}
+		if (soundFilters.length > 0) {
+			filtered = filtered.filter((jam) => {
+				return soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))
+			})
+		}
+		console.log('filtered length after filtering', filtered.length)
 		setFilteredJams(filtered)
+		scrollToTop(jamListRef)
 	}, [artistFilters, songFilter, soundFilters, beforeDateFilter, afterDateFilter, dateFilter, linkFilter])
 
-	console.log('filteredJams', filteredJams[0])
-
 	return (
-		<>
+		<div ref={pageRef}>
 			{!search && <Hero open={open} setOpen={setOpen} />}
 			<div className="bg-gray-100">
 				<div className="flex-column justify-center items-center pt-3 pb-0 mb-0" ref={headerRef}>
@@ -186,6 +218,7 @@ export default function Jams() {
 					setLinkFilter={setLinkFilter}
 				/>
 				<VirtualJamList
+					jamListRef={jamListRef}
 					items={filteredJams}
 					user={user}
 					setShowIframe={setShowIframe}
@@ -193,18 +226,12 @@ export default function Jams() {
 					showRatings={showRatings}
 					headerHeight={headerHeight}
 					windowHeight={windowHeight}
+					windowWidth={windowWidth}
+					scrollTop={scrollTop}
+					setScrollTop={setScrollTop}
+					scrollToTop={scrollToTop}
 				/>
-				{/* <JamList
-					sounds={sounds}
-					title={title}
-					user={user}
-					profile={profile}
-					search={search}
-					jams={jamsFromServer}
-					showIframe={showIframe}
-					setShowIframe={setShowIframe}
-				/> */}
 			</div>
-		</>
+		</div>
 	)
 }
