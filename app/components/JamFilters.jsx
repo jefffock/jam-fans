@@ -3,6 +3,7 @@ import { Form, useSubmit, useFetcher, Link, useSearchParams } from '@remix-run/r
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { getJamsCount } from '~/modules/jam'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -30,6 +31,7 @@ export default function JamFiltersSlideout({ songs, artists, sounds, open, setOp
 	const [count, setCount] = useState(totalCount)
 	const [date, setDate] = useState('')
 	const [dateInput, setDateInput] = useState('')
+	const [searchParams, setSearchParams] = useSearchParams()
 
 	const dates = []
 	let currentYear = new Date().getFullYear()
@@ -52,50 +54,91 @@ export default function JamFiltersSlideout({ songs, artists, sounds, open, setOp
 		? `Played in ${afterYearSelected} or after`
 		: 'Played in 1965 or after'
 
-	function createQueryString(e, param, initialString) {
-		let queryString = '/jamscount?'
+	async function createQueryString(e, param, initialString) {
+		const baseUrl = '/jamscount'
 		const form = document.querySelector('#jam-filter-form')
 		const inputs = form?.querySelectorAll('input, select')
+		console.log('inputs', inputs)
+
+		// Initialize URLSearchParams with the base URL
+		const params = new URLSearchParams()
+
+		// Add form values to params
 		inputs.forEach((input) => {
 			if (
 				(input.type === 'checkbox' && input.checked) ||
 				(input.type !== 'checkbox' && input.value !== '' && input.name)
 			) {
-				queryString += `${input.name}=${input.value || input.id}&`
+				console.log('input.name', input.name)
+				console.log('input.value', input.value)
+				console.log('input.id', input.id)
+				if (input.name === 'artists') {
+					params.append(input.name, input.value || input.id)
+				} else if (input.name === 'sounds') {
+					params.append(input.name, input.value || input.id)
+				} else {
+					params.set(input.name, input.value || input.id)
+				}
 			}
 		})
-		if (param?.hasOwnProperty('song')) {
-			if (queryString.includes('song=')) {
-				let startIndex = queryString.indexOf('song=') + 5
-				let endIndex = queryString.indexOf(',', startIndex)
-				endIndex = endIndex === -1 ? queryString.length : endIndex
-				queryString = queryString.slice(0, startIndex) + param.song + queryString.slice(endIndex)
-			} else {
-				queryString += `song=${param.song},`
-			}
-		}
-		if (param?.hasOwnProperty('before')) {
-			if (queryString.includes('before=')) {
-				let startIndex = queryString.indexOf('before=') + 7
-				let endIndex = queryString.indexOf(',', startIndex)
-				endIndex = endIndex === -1 ? queryString.length : endIndex
-				queryString = queryString.slice(0, startIndex) + param.before + queryString.slice(endIndex)
-			} else {
-				queryString += `before=${param.before},`
-			}
-		}
-		if (param?.hasOwnProperty('after')) {
-			if (queryString.includes('after=')) {
-				let startIndex = queryString.indexOf('after=') + 6
-				let endIndex = queryString.indexOf(',', startIndex)
-				endIndex = endIndex === -1 ? queryString.length : endIndex
-				queryString = queryString.slice(0, startIndex) + param.after + queryString.slice(endIndex)
-			} else {
-				queryString += `after=${param.after},`
-			}
-		}
-		queryString = queryString?.slice(0, -1)
-		if (queryString) fetcher.load(queryString)
+
+		// Add or update additional parameters
+		// Object.entries(additionalParams).forEach(([key, value]) => {
+		// 	if (value !== undefined) {
+		// 		params.set(key, value)
+		// 	}
+		// })
+
+		// Construct the final URL
+		const finalUrl = `${baseUrl}?${params.toString()}`
+		console.log('finalUrl', finalUrl)
+		fetcher.load(finalUrl)
+
+		// let newCount = await getJamsCount(params)
+		// console.log('newCount', newCount)
+		// setCount(newCount)
+		// const form = document.querySelector('#jam-filter-form')
+		// const inputs = form?.querySelectorAll('input, select')
+		// inputs.forEach((input) => {
+		// 	if (
+		// 		(input.type === 'checkbox' && input.checked) ||
+		// 		(input.type !== 'checkbox' && input.value !== '' && input.name)
+		// 	) {
+		// 		queryString += `${input.name}=${input.value || input.id}&`
+		// 	}
+		// })
+		// if (param?.hasOwnProperty('song')) {
+		// 	if (queryString.includes('song=')) {
+		// 		let startIndex = queryString.indexOf('song=') + 5
+		// 		let endIndex = queryString.indexOf(',', startIndex)
+		// 		endIndex = endIndex === -1 ? queryString.length : endIndex
+		// 		queryString = queryString.slice(0, startIndex) + param.song + queryString.slice(endIndex)
+		// 	} else {
+		// 		queryString += `song=${param.song},`
+		// 	}
+		// }
+		// if (param?.hasOwnProperty('before')) {
+		// 	if (queryString.includes('before=')) {
+		// 		let startIndex = queryString.indexOf('before=') + 7
+		// 		let endIndex = queryString.indexOf(',', startIndex)
+		// 		endIndex = endIndex === -1 ? queryString.length : endIndex
+		// 		queryString = queryString.slice(0, startIndex) + param.before + queryString.slice(endIndex)
+		// 	} else {
+		// 		queryString += `before=${param.before},`
+		// 	}
+		// }
+		// if (param?.hasOwnProperty('after')) {
+		// 	if (queryString.includes('after=')) {
+		// 		let startIndex = queryString.indexOf('after=') + 6
+		// 		let endIndex = queryString.indexOf(',', startIndex)
+		// 		endIndex = endIndex === -1 ? queryString.length : endIndex
+		// 		queryString = queryString.slice(0, startIndex) + param.after + queryString.slice(endIndex)
+		// 	} else {
+		// 		queryString += `after=${param.after},`
+		// 	}
+		// }
+		// queryString = queryString?.slice(0, -1)
+		// if (queryString) fetcher.load(queryString)
 	}
 
 	function clearFilters() {
@@ -228,9 +271,9 @@ export default function JamFiltersSlideout({ songs, artists, sounds, open, setOp
 																						</div>
 																						<div className="ml-3 flex h-5 items-center">
 																							<input
-																								value={`${sound.text}`}
+																								value={`${sound.id}`}
 																								id={`${sound.text}`}
-																								name={`sounds-${sound.text}`}
+																								name="sounds"
 																								type="checkbox"
 																								className="h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500  border-2 mr-2"
 																								onChange={
@@ -273,8 +316,8 @@ export default function JamFiltersSlideout({ songs, artists, sounds, open, setOp
 																					<div className="ml-3 flex h-5 items-center">
 																						<input
 																							id={`${artist.url}`}
-																							value={`${artist.url}`}
-																							name={`artists-${artist.url}`}
+																							value={`${artist.id}`}
+																							name={`artists`}
 																							type="checkbox"
 																							className="h-6 w-6 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500 mr-2 border-2"
 																							onChange={createQueryString}

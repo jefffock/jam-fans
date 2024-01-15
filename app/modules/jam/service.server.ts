@@ -194,63 +194,68 @@ export const loadJams = async (queryParams: QueryParams) => {
 	}
 }
 
-export async function getJamCount() {
-	const count = await db.jams.count()
+export const getJamsCount = async (queryParams: QueryParams) => {
+	console.log('Getting jams count with queryParams:', queryParams)
+	// Initialize query parameters
+	let date,
+		beforeDate,
+		afterDate,
+		orderBy = 'avg_rating',
+		asc = false,
+		limit = 100,
+		showListenable
+	let artistsInQuery = [],
+		songsInQuery = [],
+		soundsInQuery = []
+
+	// Parse query parameters
+	for (const [key, value] of Object.entries(queryParams)) {
+		if (key.includes('sound')) soundsInQuery.push(value)
+		if (key.includes('artist')) artistsInQuery.push(parseInt(value))
+		if (key.includes('song')) songsInQuery.push(parseInt(value))
+		if (key.includes('before')) beforeDate = value
+		if (key.includes('after')) afterDate = value
+		if (key.includes('order')) orderBy = value
+		if (key.includes('asc')) asc = value === 'true'
+		if (key.includes('limit')) limit = parseInt(value)
+		if (key.includes('show-links')) showListenable = value === 'true'
+		if (key.includes('date')) date = value
+	}
+
+	// Build Prisma query
+	let query = {
+		where: {},
+		orderBy: {
+			[orderBy]: asc ? 'asc' : 'desc',
+		},
+		take: limit,
+	}
+
+	if (artistsInQuery.length) {
+		query.where.artist_id = { in: artistsInQuery }
+	}
+	if (songsInQuery.length) {
+		query.where.song_id = { in: songsInQuery }
+	}
+	if (afterDate) {
+		let after = afterDate + '-01-01'
+		query.where.date = { gte: after }
+	}
+	if (beforeDate) {
+		let before = beforeDate + '-12-31'
+		query.where.date = { lte: before }
+	}
+	if (soundsInQuery.length) {
+		query.where.OR = soundsInQuery.map((sound) => ({ sounds: { has: sound } }))
+	}
+	if (showListenable) {
+		query.where.listen_link = { not: null }
+	}
+	if (date) {
+		query.where.date = date
+	}
+
+	// Get count
+	const count = await db.jams.count(query)
 	return count
 }
-
-// export async function getJamsTitle({ queryParams }: { queryParams: QueryParams }) {
-// 	let title = '🔥 '
-
-// 	// Assume these functions exist to fetch sounds and artists by their IDs
-// 	const sounds = await fetchSoundsByIds(queryParams.soundsInQuery)
-// 	const artists = await fetchArtistsByIds(queryParams.artistsInQuery)
-
-// 	if (queryParams.soundsInQuery?.length > 0) {
-// 		queryParams.soundsInQuery.forEach((soundId, i) => {
-// 			const soundLabel = sounds.find((s) => s.id === soundId)?.label
-// 			title += soundLabel ? soundLabel : ''
-// 			if (i < queryParams.soundsInQuery.length - 2) title += ', '
-// 			if (i === queryParams.soundsInQuery.length - 2) title += ' and '
-// 		})
-// 	}
-
-// 	if (queryParams.song) {
-// 		title += ' ' + queryParams.song
-// 	}
-
-// 	title += ' Jams'
-
-// 	if (artists?.length > 0 && !queryParams.date) {
-// 		title += ' by '
-// 		artists.forEach((artist, j) => {
-// 			title += artist.name === 'Grateful Dead' ? 'The ' : ''
-// 			title += artist.name
-// 			if (j < artists.length - 2) title += ', '
-// 			if (j === artists.length - 2) title += ' and '
-// 		})
-// 	} else if (!artists || (artists.length === 0 && !queryParams.date)) {
-// 		title += ' by All Bands'
-// 	}
-
-// 	if (queryParams.date) {
-// 		title += ' from ' + new Date(queryParams.date + 'T16:00:00').toLocaleDateString()
-// 	}
-
-// 	if (queryParams.beforeDate && queryParams.afterDate && !queryParams.date) {
-// 		title +=
-// 			queryParams.beforeDate === queryParams.afterDate
-// 				? ' from ' + queryParams.beforeDate
-// 				: ' from ' + queryParams.afterDate + ' to ' + queryParams.beforeDate
-// 	}
-
-// 	if (queryParams.beforeDate && !queryParams.afterDate && !queryParams.date) {
-// 		title += ' from ' + queryParams.beforeDate + ' and before '
-// 	}
-
-// 	if (queryParams.afterDate && !queryParams.beforeDate && !queryParams.date) {
-// 		title += ' from ' + queryParams.afterDate + ' and after '
-// 	}
-
-// 	return title.trim() + ' on Jam Fans'
-// }

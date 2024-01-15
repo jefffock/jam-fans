@@ -48,7 +48,7 @@ export const loader = async ({ request }) => {
 			sounds,
 			fullTitle,
 			title,
-			count: 100,
+			count: jams.length,
 			profile,
 			search: url.search,
 		},
