@@ -6,14 +6,10 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useRouteError,
-	isRouteErrorResponse,
-	useFetcher,
 	useLoaderData,
 } from '@remix-run/react'
 import type { LoaderFunctionArgs } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
-import { createServerClient, parse, serialize, createBrowserClient } from '@supabase/ssr'
-import { useEffect, useState } from 'react'
+import { createBrowserClient } from '@supabase/ssr'
 import TopNav from 'app/components/TopNav'
 import BottomNav from 'app/components/BottomNav'
 
