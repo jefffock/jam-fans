@@ -55,13 +55,13 @@ export default function TopNav({ supabase, session }) {
 												<img
 													href="/"
 													className="block h-8 w-auto lg:hidden"
-													src="/icon-circle.png"
+													src="/icon-circle.webp"
 													alt="Jam Fans"
 												/>
 												<img
 													href="/"
 													className="hidden h-8 w-auto lg:block"
-													src="/icon-circle.png"
+													src="/icon-circle.webp"
 													alt="Jam Fans"
 												/>
 											</Link>

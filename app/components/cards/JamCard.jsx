@@ -76,9 +76,9 @@ export default function JamCard({ jam, sounds, user, profile, setShowIframe, set
 					</button>
 				)}
 				{showComments &&
-					comments.map((comment) => {
+					comments.map((comment, index) => {
 						return (
-							<div className="flex flex-col bg-white rounded-lg shadow-md p-6 my-4">
+							<div className="flex flex-col bg-white rounded-lg shadow-md p-6 my-4" key={index}>
 								<p className="mb-3 font-medium text-gray-700">{comment.comment}</p>
 								<p className="text-gray-600">
 									{comment.name} - {comment.rating}

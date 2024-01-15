@@ -41,6 +41,7 @@
     "react-window-infinite-loader": "^1.0.9",
     "react-zorm": "^0.9.0",
     "remix-i18next": "^5.5.0",
+    "ssr-window": "^4.0.2",
     "supabase": "^1.131.3",
     "upgrade-remix": "^0.6.2",
     "zod": "^3.22.4"

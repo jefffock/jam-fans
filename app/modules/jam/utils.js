@@ -1,7 +1,6 @@
 export function buildTitle({ artists, sounds, song, queryParams }) {
 	const { date, beforeDate, afterDate } = queryParams
 	let title = '🔥 '
-	console.log('song in title', song)
 
 	if (sounds && sounds.length > 0) {
 		sounds.forEach((sound, i) => {

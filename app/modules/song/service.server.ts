@@ -7,7 +7,6 @@ export async function getSongs() {
 
 export function getSongById({ songs, id }) {
 	//filter songs by id
-	console.log('songs', songs[0])
 	const filteredSongs = songs.filter((song) => song.id === 126)
 
 	// const song = await db.songs.findUnique({

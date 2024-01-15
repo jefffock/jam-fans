@@ -132,8 +132,6 @@ interface QueryParams {
 }
 
 export const loadJams = async (queryParams: QueryParams) => {
-	console.log('Loading jams with queryParams:', queryParams)
-
 	function formatDateString(dateString: string) {
 		const year = dateString.slice(4, 8)
 		const month = dateString.slice(0, 2)
@@ -178,7 +176,6 @@ export const loadJams = async (queryParams: QueryParams) => {
 	}
 
 	const page = parseInt(queryParams.page || '1')
-	console.log('page', page)
 	const pageSize = 20
 	const jamsQuery = db.jams.findMany({
 		where: whereConditions,
@@ -195,7 +192,6 @@ export const loadJams = async (queryParams: QueryParams) => {
 }
 
 export const getJamsCount = async (queryParams: QueryParams) => {
-	console.log('Getting jams count with queryParams:', queryParams)
 	// Initialize query parameters
 	let date,
 		beforeDate,

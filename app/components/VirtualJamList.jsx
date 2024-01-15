@@ -1,110 +1,77 @@
 import JamCard from './cards/JamCard'
-import React, { PureComponent } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { Iframe } from './IFrame'
 
-// These item sizes are arbitrary.
-// Yours should be based on the content of the item.
-const columnWidths = new Array(1000).fill(true).map(() => 75 + Math.round(Math.random() * 50))
-const rowHeights = new Array(1000).fill(true).map(() => 25 + Math.round(Math.random() * 50))
+export default function VirtualJamList({
+	items,
+	itemHeight,
+	user,
+	setShowIframe,
+	setIframeUrl,
+	showRatings,
+	headerHeight,
+	windowHeight,
+}) {
+	let height = 300
+	let containerHeight = 1000
+	const [scrollTop, setScrollTop] = useState(0)
+	const totalHeight = items.length * height
+	const startIndex = Math.floor(scrollTop / height)
+	const endIndex = Math.min(startIndex + Math.ceil(containerHeight / height), items.length - 1)
 
-export function VirtualJamList({ jams }) {
-	const isServerRender = typeof document === 'undefined'
-	// const useSSRLayoutEffect = isServerRender ? () => {} : useLayoutEffect;
-
-	// function useIsHydrating(queryString: string) {
-	//   const [isHydrating] = useState(
-	//     () => !isServerRender && Boolean(document.querySelector(queryString)),
-	//   );
-	//   return isHydrating;
-	// }
-	// 	return <div>{jams && jams.map((jam) => <JamCard jam={jam} />)}</div>
-	// }
-
-	// export const InfiniteJamList =
-	// 	() =>
-	// 	({
-	// 		// Are there more items to load?
-	// 		// (This information comes from the most recent API request.)
-	// 		hasNextPage,
-
-	// 		// Are we currently loading a page of items?
-	// 		// (This may be an in-flight flag in your Redux store for example.)
-	// 		isNextPageLoading,
-
-	// 		// Array of items loaded so far.
-	// 		items,
-
-	// 		// Callback function responsible for loading the next page of items.
-	// 		loadNextPage,
-	// 	}) => {
-	// 		// If there are more items to be loaded then add an extra row to hold a loading indicator.
-	// 		const itemCount = hasNextPage ? items.length + 1 : items.length
-
-	// 		// Only load 1 page of items at a time.
-	// 		// Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
-	// 		const loadMoreItems = isNextPageLoading ? () => {} : loadNextPage
-
-	// 		// Every row is loaded except for our loading indicator row.
-	// 		const isItemLoaded = (index) => !hasNextPage || index < items.length
-
-	// 		// Render an item or a loading indicator.
-	// 		// const Item = ({ index, style }) => {
-	// 		// 	let content
-	// 		// 	if (!isItemLoaded(index)) {
-	// 		// 		content = 'Loading...'
-	// 		// 	} else {
-	// 		// 		content = items[index].name
-	// 		// 	}
-
-	// 		// 	return <div style={style}>{content}</div>
-	// 		// }
-
-	function cellRenderer({ columnIndex, key, rowIndex, style }) {
-		return (
-			<div key={key} style={style}>
-				{list[rowIndex][columnIndex]}
-			</div>
-		)
+	const visibleItems = items.slice(startIndex, endIndex + 1)
+	const offsetTop = startIndex * height
+	const handleScroll = (event) => {
+		setScrollTop(event.currentTarget.scrollTop)
 	}
 
-	// if (isServerRender) {
-	return (
-		<div>
-			{jams?.map((jam, index) => (
-				<JamCard key={index} jam={jam} />
-			))}
-		</div>
-	)
-	return <div>loading...</div>
-	// }
+	const divRef = useRef(null)
 
-	const height = document.documentElement.clientHeight
-	const width = document.documentElement.clientWidth
-	const Cell = ({ index, style }) => {
-		let content
-		if (!isItemLoaded(index)) {
-			content = 'Loading...'
-		} else {
-			content = items[index]
+	// State to store the height
+	const [divHeight, setHeight] = useState(0)
+
+	useEffect(() => {
+		// Measure the height and update state
+		if (divRef.current) {
+			setHeight(divRef.current.clientHeight)
 		}
-		return (
-			<div>
-				<p style={style}>test{index}</p>
-			</div>
-		)
-	}
+
+		// Optional: Update height on window resize
+		const handleResize = () => {
+			if (divRef.current) {
+				setHeight(divRef.current.clientHeight)
+			}
+		}
+
+		window.addEventListener('resize', handleResize)
+
+		// Cleanup the event listener
+		return () => window.removeEventListener('resize', handleResize)
+	}, []) // Empty dependency array ensures this runs once on mount
 
 	return (
-		<Grid
-			cellRenderer={cellRenderer}
-			columnCount={() => 400 / 300}
-			columnWidth={300}
-			rowCount={() => 1000 / 600}
-			rowHeight={600}
-			itemData={jams}
-			height={height}
-			width={width}
+		<div
+			ref={divRef}
+			className=" overflow-y-scroll"
+			//`,
+			style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
+			onScroll={handleScroll}
 		>
-			{Cell}
-		</Grid>
+			<div style={{ height: `${totalHeight}px`, position: 'relative' }}>
+				<div style={{ position: 'absolute', top: `${offsetTop}px` }}>
+					{visibleItems.map((item, index) => (
+						// <div key={index}>{JSON.stringify(item)}</div>
+						<JamCard
+							key={item.id}
+							jam={item}
+							user={user}
+							setShowIframe={setShowIframe}
+							setIframeUrl={setIframeUrl}
+							showRatings={showRatings}
+						/>
+					))}
+				</div>
+			</div>
+		</div>
 	)
 }
