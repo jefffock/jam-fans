@@ -5,18 +5,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Switch } from '@headlessui/react'
 import Sorter from './Sorter'
 
-export default function JamList({
-	jams,
-	sounds,
-	title,
-	user,
-	profile,
-	search,
-	setHeight,
-	showIframe,
-	setShowIframe,
-	setUrlToLoad,
-}) {
+export default function JamList({ jams, sounds, title, user, profile, search, showIframe, setShowIframe }) {
 	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length
 	const urlStartIndex = search?.indexOf('=', artistStartIndex)
 	const artistUrl = search?.substring(artistStartIndex, urlStartIndex)
@@ -26,14 +15,14 @@ export default function JamList({
 	const [orderBy, setOrderBy] = useState('avg_rating')
 	const fetcher = useFetcher()
 
-	const divHeight = useCallback(
-		(node) => {
-			if (node !== null) {
-				setHeight(node.getBoundingClientRect().height)
-			}
-		},
-		[jams.length]
-	)
+	// const divHeight = useCallback(
+	// 	(node) => {
+	// 		if (node !== null) {
+	// 			setHeight(node.getBoundingClientRect().height)
+	// 		}
+	// 	},
+	// 	[jams.length]
+	// )
 	const isRelisten = iframeUrl.includes('relist')
 
 	useEffect(() => {
@@ -78,11 +67,11 @@ export default function JamList({
 	}, [])
 
 	return (
-		<div className="pb-60" ref={divHeight}>
+		<div className="pb-60">
 			{jams?.length > 0 && (
 				<>
-					<h1 className="my-3 mx-auto px-2 text-3xl tracking-tight text-gray-900 text-center">{title}</h1>
-					<div className="flex justify-center align-middle">
+					{/* <h1 className="my-3 mx-auto px-2 text-3xl tracking-tight text-gray-900 text-center">{title}</h1> */}
+					{/* <div className="flex justify-center align-middle">
 						<Switch
 							checked={showRatings}
 							onChange={handleShowRatingsClick}
@@ -117,7 +106,7 @@ export default function JamList({
 							<p className="self-center">s</p>
 						</div>
 						<Sorter orderBy={orderBy} setOrderBy={setOrderBy} search={search} />
-					</div>
+					</div> */}
 				</>
 			)}
 			<div className="flex flex-wrap max-w-100vw justify-center">

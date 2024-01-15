@@ -1044,6 +1044,11 @@ select {
   width: 1rem;
 }
 
+.w-min {
+  width: -moz-min-content;
+  width: min-content;
+}
+
 .w-11 {
   width: 2.75rem;
 }

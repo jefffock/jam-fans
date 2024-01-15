@@ -179,13 +179,12 @@ export const loadJams = async (queryParams: QueryParams) => {
 
 	const page = parseInt(queryParams.page || '1')
 	console.log('page', page)
-	const pageSize = page === 1 ? 30 : 15
-	console.log('pageSize', pageSize)
+	const pageSize = 20
 	const jamsQuery = db.jams.findMany({
 		where: whereConditions,
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
-		take: pageSize,
-		skip: (page - 1) * pageSize,
+		// take: pageSize,
+		// skip: (page - 1) * pageSize,
 	})
 	try {
 		const jams = await jamsQuery
@@ -199,3 +198,59 @@ export async function getJamCount() {
 	const count = await db.jams.count()
 	return count
 }
+
+// export async function getJamsTitle({ queryParams }: { queryParams: QueryParams }) {
+// 	let title = '🔥 '
+
+// 	// Assume these functions exist to fetch sounds and artists by their IDs
+// 	const sounds = await fetchSoundsByIds(queryParams.soundsInQuery)
+// 	const artists = await fetchArtistsByIds(queryParams.artistsInQuery)
+
+// 	if (queryParams.soundsInQuery?.length > 0) {
+// 		queryParams.soundsInQuery.forEach((soundId, i) => {
+// 			const soundLabel = sounds.find((s) => s.id === soundId)?.label
+// 			title += soundLabel ? soundLabel : ''
+// 			if (i < queryParams.soundsInQuery.length - 2) title += ', '
+// 			if (i === queryParams.soundsInQuery.length - 2) title += ' and '
+// 		})
+// 	}
+
+// 	if (queryParams.song) {
+// 		title += ' ' + queryParams.song
+// 	}
+
+// 	title += ' Jams'
+
+// 	if (artists?.length > 0 && !queryParams.date) {
+// 		title += ' by '
+// 		artists.forEach((artist, j) => {
+// 			title += artist.name === 'Grateful Dead' ? 'The ' : ''
+// 			title += artist.name
+// 			if (j < artists.length - 2) title += ', '
+// 			if (j === artists.length - 2) title += ' and '
+// 		})
+// 	} else if (!artists || (artists.length === 0 && !queryParams.date)) {
+// 		title += ' by All Bands'
+// 	}
+
+// 	if (queryParams.date) {
+// 		title += ' from ' + new Date(queryParams.date + 'T16:00:00').toLocaleDateString()
+// 	}
+
+// 	if (queryParams.beforeDate && queryParams.afterDate && !queryParams.date) {
+// 		title +=
+// 			queryParams.beforeDate === queryParams.afterDate
+// 				? ' from ' + queryParams.beforeDate
+// 				: ' from ' + queryParams.afterDate + ' to ' + queryParams.beforeDate
+// 	}
+
+// 	if (queryParams.beforeDate && !queryParams.afterDate && !queryParams.date) {
+// 		title += ' from ' + queryParams.beforeDate + ' and before '
+// 	}
+
+// 	if (queryParams.afterDate && !queryParams.beforeDate && !queryParams.date) {
+// 		title += ' from ' + queryParams.afterDate + ' and after '
+// 	}
+
+// 	return title.trim() + ' on Jam Fans'
+// }
