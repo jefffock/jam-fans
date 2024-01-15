@@ -16,7 +16,6 @@ import JamsTitle from '../components/JamsTitle'
 import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import { useWindowHeight, useWindowWidth } from '../utils'
-import { use } from 'i18next'
 import JamCard from '../components/cards/JamCard'
 
 export const loader = async ({ request }) => {
