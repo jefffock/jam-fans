@@ -5,7 +5,12 @@ module.exports = {
 	// serverBuildPath: 'api/index.js',
 	//   serverMainFields: ["main, module"],
 	serverModuleFormat: 'cjs',
+	appDirectory: 'app',
+	assetsBuildDirectory: 'public/build',
 	// serverPlatform: 'node',
+	publicPath: '/build/',
+	serverBuildPath: 'build/index.js',
+
 	// serverMinify: false,
 	// When running locally in development mode, we use the built in remix
 	// server. This does not understand the vercel lambda module format,
@@ -16,8 +21,4 @@ module.exports = {
 	// assetsBuildDirectory: "public/build",
 	// serverBuildPath: "api/index.js",
 	// publicPath: "/build/",
-	//   routes(defineRoutes) {
-	//     // uses the v1 convention, works in v1.15+ and v2
-	//     return createRoutesFromFolders(defineRoutes);
-	//   },
 }
