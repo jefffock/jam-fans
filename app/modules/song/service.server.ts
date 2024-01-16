@@ -1,7 +1,11 @@
 import { db } from '~/database'
 
 export async function getSongs() {
-	const songs = await db.songs.findMany()
+	const songs = await db.songs.findMany({
+		orderBy: {
+			song: 'asc',
+		},
+	})
 	return songs
 }
 

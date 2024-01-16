@@ -890,6 +890,9 @@ model jams {
   venue_id            BigInt?
   artist_id           Int?
   sound_ids           String[]
+  year                Int?     @db.SmallInt
+  month               Int?     @db.SmallInt
+  day                 Int?     @db.SmallInt
   artists             artists? @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   sets                sets?    @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows               shows?   @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

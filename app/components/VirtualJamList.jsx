@@ -27,12 +27,9 @@ export default function VirtualJamList({
 	// combine placeholders and visible items into one array
 	const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
 	const handleScroll = (event) => {
-		console.log('event.currentTarget.scrollTop', event.currentTarget.scrollTop)
 		prevJamListRef.current = scrollTop
 		setScrollTop(event.currentTarget.scrollTop)
 	}
-
-	console.log('visibleItems', visibleItems)
 
 	return (
 		<div

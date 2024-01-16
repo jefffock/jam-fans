@@ -1,24 +1,13 @@
-import { Fragment, useState, useEffect, useRef } from 'react'
-import { Form, useSubmit, useFetcher, Link, useSearchParams } from '@remix-run/react'
+import { Fragment, useState } from 'react'
+import { Form, useSubmit, useFetcher, Link } from '@remix-run/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { getJamsCount } from '~/modules/jam'
 import { set } from 'zod'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
 }
-
-const limits = [10, 20, 50, 100, 200, 500, 1000]
-// 	{ value: 10, label: 'Show 10' },
-// 	{ value: 20, label: 'Show 20' },
-// 	{ value: 50, label: 'Show 50' },
-// 	{ value: 100, label: 'Show 100' },
-// 	{ value: 200, label: 'Show 200' },
-// 	{ value: 500, label: 'Show 500' },
-// 	{ value: 1000, label: 'Show 1000' },
-// ];
 
 export default function JamFiltersClientside({
 	songs,
@@ -52,15 +41,10 @@ export default function JamFiltersClientside({
 	setLinkFilter,
 }) {
 	const [query, setQuery] = useState('')
-	const [beforeYearSelected, setBeforeYearSelected] = useState(null)
-	const [afterYearSelected, setAfterYearSelected] = useState(null)
-	const [limitSelected, setLimitSelected] = useState(limits[3])
 	const submit = useSubmit()
 	const fetcher = useFetcher()
-	const [params] = useSearchParams()
 	const [date, setDate] = useState('')
 	const [dateInput, setDateInput] = useState('')
-	const [searchParams, setSearchParams] = useSearchParams()
 	const [songSelected, setSongSelected] = useState(null)
 
 	const dates = []
@@ -80,13 +64,11 @@ export default function JamFiltersClientside({
 		setSongFilter(filteredSongs[0].id.toString())
 	}
 
-	const beforeYearDisplayValue = beforeYearSelected
-		? `Played in ${beforeYearSelected} or before`
+	const beforeYearDisplayValue = beforeDateFilter
+		? `Played in ${beforeDateFilter} or before`
 		: `Played in ${currentYear} or before`
 
-	const afterYearDisplayValue = afterYearSelected
-		? `Played in ${afterYearSelected} or after`
-		: 'Played in 1965 or after'
+	const afterYearDisplayValue = afterDateFilter ? `Played in ${afterDateFilter} or after` : 'Played in 1959 or after'
 
 	function clearFilters() {
 		setArtistFilters([])
@@ -103,8 +85,6 @@ export default function JamFiltersClientside({
 			else {
 				input.value = ''
 			}
-			setBeforeYearSelected(null)
-			setAfterYearSelected(null)
 			setSongFilter(null)
 		})
 	}
@@ -128,11 +108,8 @@ export default function JamFiltersClientside({
 	}
 
 	function handleSongChange(e) {
-		console.log('in handle song change')
-		console.log('e value in song change', e)
 		if (e.target.checked) {
 			let songId = e.target.value
-			console.log('songId', songId)
 			setSongFilter(songId)
 		} else {
 			setSongFilter('')
@@ -156,27 +133,11 @@ export default function JamFiltersClientside({
 		}
 	}
 
-	function handleBeforeChange(e) {
-		let beforeYear = e.target.value
-		//beforeYear is a string value in a select input, not a checkbox
-		if (beforeYear) {
-			setBeforeDateFilter(beforeYear)
-		}
-	}
-
 	function handleAfterChange(e) {
 		let afterYear = e.target.value
 		//afterYear is a string value in a select input, not a checkbox
 		if (afterYear) {
 			setAfterDateFilter(afterYear)
-		}
-	}
-
-	function handleOrderChange(e) {
-		let order = e.target.value
-		//order is a string value in a select input, not a checkbox
-		if (order) {
-			setOrderBy(order)
 		}
 	}
 
@@ -196,21 +157,15 @@ export default function JamFiltersClientside({
 		}
 	}
 
+	function handleCloseFilters(e) {
+		e.preventDefault()
+		setOpen(false)
+	}
+
 	function handleLinkChange(e) {
 		// this event is from a checkbox
 		setLinkFilter(e.target.checked)
 	}
-
-	function getOrder(search) {
-		let order = 'avg_rating'
-		let searchParams = new URLSearchParams(search)
-		if (searchParams.has('order')) {
-			order = searchParams.get('order')
-		}
-		return order
-	}
-
-	const order = getOrder(search)
 
 	return (
 		<Transition.Root show={open} as={Fragment}>
@@ -257,8 +212,8 @@ export default function JamFiltersClientside({
 												action="/jams"
 												className="space-y-8 divide-y divide-gray-200"
 												id="jam-filter-form"
+												onSubmit={() => e.preventDefault()}
 											>
-												<input type="hidden" name="order" value={order} />
 												<div className="relative mt-6 flex-1 px-4 sm:px-6">
 													<div className="space-y-8 divide-y divide-gray-200">
 														{/* sound picker*/}
@@ -356,7 +311,11 @@ export default function JamFiltersClientside({
 														<div className="max-w-sm p-4">
 															<Combobox
 																as="div"
-																value={songSelected}
+																value={
+																	filteredSongs.length === songs.length
+																		? 'All songs'
+																		: songSelected
+																}
 																onChange={(e) => {
 																	setSongFilter(e)
 																	handleSongChange(e)
@@ -465,10 +424,8 @@ export default function JamFiltersClientside({
 														{/* Before year picker */}
 														<div className="p-4">
 															<Listbox
-																value={beforeYearSelected}
-																onChange={(e) => {
-																	setBeforeYearSelected(e)
-																}}
+																value={beforeDateFilter || ''}
+																onChange={setBeforeDateFilter}
 																className="max-w-sm"
 																name="before"
 															>
@@ -515,13 +472,13 @@ export default function JamFiltersClientside({
 																								value={date}
 																							>
 																								{({
-																									beforeYearSelected,
+																									beforeDateFilter,
 																									active,
 																								}) => (
 																									<>
 																										<span
 																											className={classNames(
-																												beforeYearSelected
+																												beforeDateFilter
 																													? 'font-semibold'
 																													: 'font-normal',
 																												'block truncate'
@@ -531,7 +488,7 @@ export default function JamFiltersClientside({
 																											before
 																										</span>
 
-																										{beforeYearSelected ? (
+																										{beforeDateFilter ? (
 																											<span
 																												className={classNames(
 																													active
@@ -560,10 +517,8 @@ export default function JamFiltersClientside({
 														{/* After year */}
 														<div className="p-4">
 															<Listbox
-																value={afterYearSelected}
-																onChange={(e) => {
-																	setAfterYearSelected(e)
-																}}
+																value={afterDateFilter}
+																onChange={setAfterDateFilter}
 																className="max-w-sm"
 																name="after"
 															>
@@ -610,13 +565,13 @@ export default function JamFiltersClientside({
 																								value={date}
 																							>
 																								{({
-																									afterYearSelected,
+																									afterDateFilter,
 																									active,
 																								}) => (
 																									<>
 																										<span
 																											className={classNames(
-																												afterYearSelected
+																												afterDateFilter
 																													? 'font-semibold'
 																													: 'font-normal',
 																												'block truncate'
@@ -626,7 +581,7 @@ export default function JamFiltersClientside({
 																											after
 																										</span>
 
-																										{afterYearSelected ? (
+																										{afterDateFilter ? (
 																											<span
 																												className={classNames(
 																													active
@@ -731,7 +686,7 @@ export default function JamFiltersClientside({
 																? 'inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
 																: 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-not-allowed'
 														}
-														onClick={() => setOpen(false)}
+														onClick={(e) => handleCloseFilters(e)}
 														disabled={jamsLength === 0}
 													>
 														{jamsLength !== 0 ? `See ${jamsLength} jams` : `0 😢`}

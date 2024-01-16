@@ -1,11 +1,9 @@
-export function buildTitle({ artistNames, soundNames, song, queryParams }) {
-	const { date, beforeDate, afterDate } = queryParams
+export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, afterDateFilter, date }) {
 	console.log('buildTitle', {
 		artistNames,
 		soundNames,
 		song,
 		date,
-		queryParams,
 	})
 	let title = '🔥 '
 
@@ -40,16 +38,19 @@ export function buildTitle({ artistNames, soundNames, song, queryParams }) {
 		title += ' from ' + new Date(date + 'T16:00:00').toLocaleDateString()
 	}
 
-	if (beforeDate && afterDate && !date) {
-		title += beforeDate === afterDate ? ' from ' + beforeDate : ' from ' + afterDate + ' to ' + beforeDate
+	if (beforeDateFilter && afterDateFilter && !date) {
+		title +=
+			beforeDateFilter === afterDateFilter
+				? ' from ' + beforeDateFilter
+				: ' from ' + afterDateFilter + ' to ' + beforeDateFilter
 	}
 
-	if (beforeDate && !afterDate && !date) {
-		title += ' from ' + beforeDate + ' and before '
+	if (beforeDateFilter && !afterDateFilter && !date) {
+		title += ' from ' + beforeDateFilter + ' and before '
 	}
 
-	if (afterDate && !beforeDate && !date) {
-		title += ' from ' + afterDate + ' and after '
+	if (afterDateFilter && !beforeDateFilter && !date) {
+		title += ' from ' + afterDateFilter + ' and after '
 	}
 
 	return {
