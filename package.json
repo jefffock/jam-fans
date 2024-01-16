@@ -12,7 +12,8 @@
     "typecheck": "tsc",
     "db": "npx prisma db pull && npx prisma generate",
     "lint": "eslint --cache \"app/**/*.{js,jsx,ts,tsx}\"",
-    "lint:fix": "eslint --cache --fix \"app/**/*.{js,jsx,ts,tsx}\""
+    "lint:fix": "eslint --cache --fix \"app/**/*.{js,jsx,ts,tsx}\"",
+	"postinstall": "prisma generate"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
