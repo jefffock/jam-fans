@@ -19,10 +19,8 @@ export default function VirtualJamList({
 	jamCardHeight,
 }) {
 	let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
-	const totalHeight = items.length * cardHeight
 	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
-	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items.length - 1)
-
+	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items.length)
 	const visibleItems = items.slice(startIndex, endIndex)
 	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex + 1)] : []
 	const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items.length - endIndex)] : []
@@ -33,6 +31,8 @@ export default function VirtualJamList({
 		prevJamListRef.current = scrollTop
 		setScrollTop(event.currentTarget.scrollTop)
 	}
+
+	console.log('visibleItems', visibleItems)
 
 	return (
 		<div

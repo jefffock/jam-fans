@@ -4,6 +4,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { getJamsCount } from '~/modules/jam'
+import { set } from 'zod'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -88,6 +89,12 @@ export default function JamFiltersClientside({
 		: 'Played in 1965 or after'
 
 	function clearFilters() {
+		setArtistFilters([])
+		setSoundFilters([])
+		setSongFilter('')
+		setDateFilter('')
+		setBeforeDateFilter('')
+		setAfterDateFilter('')
 		const form = document.querySelector('#jam-filter-form')
 		const inputs = form?.querySelectorAll('input, select')
 
@@ -100,15 +107,6 @@ export default function JamFiltersClientside({
 			setAfterYearSelected(null)
 			setSongFilter(null)
 		})
-	}
-
-	function handleDateChange(e) {
-		let date = e.target.value
-		if (date) {
-			setDateFilter(date)
-		} else {
-			setDateFilter('')
-		}
 	}
 
 	function handleArtistsChange(e) {
@@ -131,8 +129,10 @@ export default function JamFiltersClientside({
 
 	function handleSongChange(e) {
 		console.log('in handle song change')
-		console.log('e value in song change', e.target)
+		console.log('e value in song change', e)
 		if (e.target.checked) {
+			let songId = e.target.value
+			console.log('songId', songId)
 			setSongFilter(songId)
 		} else {
 			setSongFilter('')
@@ -150,7 +150,8 @@ export default function JamFiltersClientside({
 			if (date.toString() === 'Invalid Date') {
 				//handleerror
 			} else {
-				setDate(date.toJSON().slice(0, 10))
+				// setDate(date.toJSON().slice(0, 10))
+				setDateFilter(date.toJSON().slice(0, 10))
 			}
 		}
 	}
@@ -215,7 +216,6 @@ export default function JamFiltersClientside({
 		<Transition.Root show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-10" onClose={setOpen}>
 				<div className="fixed inset-0" />
-
 				<div className="fixed inset-0 overflow-hidden">
 					<div className="absolute inset-0 overflow-hidden">
 						<div className="pointer-events-none fixed inset-y-0 right-0 flex align-bottom max-w-full">
@@ -359,7 +359,7 @@ export default function JamFiltersClientside({
 																value={songSelected}
 																onChange={(e) => {
 																	setSongFilter(e)
-																	// handleSongChange(e)
+																	handleSongChange(e)
 																}}
 																name="song"
 															>
