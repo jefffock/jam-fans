@@ -15,29 +15,22 @@ export default function VirtualJamList({
 	scrollTop,
 	setScrollTop,
 	jamListRef,
+	prevJamListRef,
 	jamCardHeight,
 }) {
 	let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
 	const totalHeight = items.length * cardHeight
-	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 3 : 0
-	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 4, items.length - 1)
+	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
+	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items.length - 1)
 
 	const visibleItems = items.slice(startIndex, endIndex)
-	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex)] : []
+	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex + 1)] : []
 	const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items.length - endIndex)] : []
 	// combine placeholders and visible items into one array
 	const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
-	console.log('itemsToRender', itemsToRender.length, itemsToRender[0], itemsToRender[itemsToRender.length - 1])
-
-	console.log('placeholdersBefore', placeholdersBefore.length)
-	console.log('visibleItems', visibleItems.length)
-	console.log('placeholdersAfter', placeholdersAfter.length)
-
-	console.log('total num of items', items.length)
-	console.log('total num of divs', placeholdersBefore.length + visibleItems.length + placeholdersAfter.length)
-	const offsetTop = startIndex * cardHeight
 	const handleScroll = (event) => {
 		console.log('event.currentTarget.scrollTop', event.currentTarget.scrollTop)
+		prevJamListRef.current = scrollTop
 		setScrollTop(event.currentTarget.scrollTop)
 	}
 

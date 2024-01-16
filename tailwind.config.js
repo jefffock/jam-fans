@@ -26,6 +26,13 @@ module.exports = {
 				128: '32rem',
 				144: '36rem',
 			},
+			maxWidth: {
+				'1/4': '25%',
+				'1/2': '50%',
+				'3/4': '75%',
+				'90p': '90%',
+				'95p': '95%',
+			},
 		},
 	},
 	plugins: [require('@tailwindcss/forms')],

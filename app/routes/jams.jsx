@@ -97,6 +97,7 @@ export default function Jams() {
 	const jamListRef = useRef(null)
 	const jamCardRef = useRef(null)
 	const [jamCardHeight, setJamCardHeight] = useState(0)
+	const prevJamListRef = useRef(null)
 
 	if (jamCardRef.current) {
 		console.log('jamCardRef height', jamCardRef.current?.clientHeight)
@@ -144,14 +145,17 @@ export default function Jams() {
 			behavior: 'smooth',
 		})
 	}
+	const scrollingDown = prevJamListRef.current < scrollTop
 
-	if (jamListRef.current && scrollTop > 100) {
+	if (jamListRef.current && scrollTop > 100 && scrollingDown) {
 		console.log('scrolling to bottom of page')
 		if (window) {
 			scrollToBottomOfWindow()
 		}
 	}
-	if (jamListRef.current && scrollTop < 30) {
+	console.log('scrollTop', scrollTop)
+	console.log('prevJamListRef', prevJamListRef.current)
+	if (jamListRef.current && scrollTop < 10 && !scrollingDown) {
 		if (window) {
 			scrollToTopOfWindow()
 		}
@@ -185,7 +189,7 @@ export default function Jams() {
 		}
 		console.log('filtered length after filtering', filtered.length)
 		setFilteredJams(filtered)
-		scrollToTop(jamListRef)
+		scrollToTopOfWindow()
 	}, [artistFilters, songFilter, soundFilters, beforeDateFilter, afterDateFilter, dateFilter, linkFilter])
 
 	return (
@@ -241,6 +245,7 @@ export default function Jams() {
 					setScrollTop={setScrollTop}
 					scrollToTop={scrollToTop}
 					jamCardHeight={jamCardHeight}
+					prevJamListRef={prevJamListRef}
 				/>
 
 				<JamCard

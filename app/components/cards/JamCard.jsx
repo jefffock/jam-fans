@@ -32,7 +32,7 @@ const JamCard = forwardRef((props, ref) => {
 	const link = `/add/jam?jamid=${jam?.id}&song=${jam.song_name}&artist=${jam.artist}&location=${jam.location}&date=${jam.date}`
 	return (
 		<div
-			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 m-6 flex flex-col justify-between h-80 ${ref ? 'measure-div' : ''}`}
+			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p m-6 flex flex-col justify-between h-80 ${ref ? 'measure-div' : ''}`}
 			ref={ref || null}
 		>
 			<div className="overflow-y-auto">
