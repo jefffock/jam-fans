@@ -1,19 +1,9 @@
-import {
-	Links,
-	LiveReload,
-	Meta,
-	Outlet,
-	Scripts,
-	ScrollRestoration,
-	useRouteError,
-	useLoaderData,
-} from '@remix-run/react'
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useRouteError, useLoaderData } from '@remix-run/react'
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import { createBrowserClient } from '@supabase/ssr'
 import TopNav from 'app/components/TopNav'
 import BottomNav from 'app/components/BottomNav'
 
-// import type { MetaFunction } from "@remix-run/node";
 // import type { LinksFunction } from "@remix-run/node";
 
 import styles from './tailwind.css'
@@ -25,15 +15,12 @@ export const links = () => [
 	{ rel: 'stylesheet', href: otherStyles },
 ]
 
-//tslint:disable-next-line
-export const meta = () => {
+export const meta: MetaFunction = () => {
 	return [
-		{ charset: 'utf-8' },
 		{
 			title: 'Jam Fans | Find and add great jams by Grateful Dead, Phish, SCI, UM, moe. WSMFP, BMFS, Goose, and more',
 		},
 		{ description: 'Find and add great jams by Grateful Dead, Phish, SCI, UM, moe., WSMFP, BMFS, Goose, and more' },
-		{ viewport: 'width=device-width,initial-scale=1' },
 	]
 }
 
@@ -44,8 +31,9 @@ export function ErrorBoundary() {
 	return (
 		<html>
 			<head>
-				<title>What's goin on?</title>
-				<Meta />
+				<title>My bad...</title>
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Links />
 			</head>
 			<body>
@@ -86,7 +74,8 @@ export default function Root() {
 	return (
 		<html lang="en">
 			<head>
-				<Meta />
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Links />
 			</head>
 			<body>
