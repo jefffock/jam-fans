@@ -122,8 +122,33 @@ export async function getJamsByShow(data: { show_id: number }) {
 }
 
 export async function getJams() {
-	const jams = await db.jams.findMany()
-	return jams
+	const allJams = await db.jams.findMany({
+		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
+	})
+
+	// Fetch all shows
+	const allShows = await db.shows.findMany()
+
+	// Create a map of jams with show_id added
+	const jamMap = new Map(allJams.map((jam) => [jam.id, { ...jam, show_id: null }]))
+
+	// Iterate over each show and update corresponding jams
+	allShows.forEach((show) => {
+		allJams.forEach((jam) => {
+			if (jam.artist_id === show.artist_id && jam.date === show.date_text && jam.show_id === null) {
+				const updatedJam = jamMap.get(jam.id)
+				if (updatedJam) {
+					updatedJam.show_id = show.id
+					jamMap.set(jam.id, updatedJam)
+				}
+			}
+		})
+	})
+
+	// Convert the map back to an array
+	const modifiedJams = Array.from(jamMap.values())
+	console.log('modified jams', modifiedJams?.slice(0, 2))
+	return modifiedJams
 }
 
 interface QueryParams {

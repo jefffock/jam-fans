@@ -586,6 +586,7 @@ model shows {
   month          Int?             @db.SmallInt
   year           Int?             @db.SmallInt
   sound_ids      BigInt[]
+  date_text      String?
   jams           jams[]
   jams_duplicate jams_duplicate[]
   sets           sets[]

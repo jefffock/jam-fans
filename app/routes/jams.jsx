@@ -1,4 +1,4 @@
-import { Outlet, useLoaderData, useFetcher } from '@remix-run/react'
+import { Outlet, useLoaderData, useFetcher, Link } from '@remix-run/react'
 import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { json } from '@remix-run/node'
 import { useState, useEffect, useRef, useMemo } from 'react'
@@ -7,7 +7,7 @@ import Hero from '../components/Hero'
 import { getArtists, filterArtists } from '../modules/artist'
 import { getSongById, getSongs } from '../modules/song'
 import { getSounds, filterSounds } from '../modules/sound'
-import { loadJams, buildTitle } from '../modules/jam'
+import { getJams, buildTitle } from '../modules/jam'
 import { getProfile } from '../modules/profile'
 import JamList from '../components/JamList'
 import JamFiltersSlideout from '../components/JamFilters'
@@ -21,9 +21,9 @@ import {
 	scrollToBottomOfWindow,
 	scrollToTopOfWindow,
 	scrollToTopOfRef,
+	createFilterURL,
 } from '../utils'
 import JamCard from '../components/cards/JamCard'
-import { date } from 'zod'
 
 export const loader = async ({ request }) => {
 	const response = new Response()
@@ -32,7 +32,7 @@ export const loader = async ({ request }) => {
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
 
-	const jams = await loadJams(queryParams)
+	const jams = await getJams()
 	const artists = await getArtists()
 	const songs = await getSongs()
 	const sounds = await getSounds()
@@ -97,6 +97,7 @@ export default function Jams() {
 	const windowHeight = useWindowHeight()
 	const windowWidth = useWindowWidth()
 	const scrollingDown = prevJamListRef.current < scrollTop
+	const [addJamLink, setAddJamLink] = useState('/add/jam')
 
 	if (jamCardRef.current) {
 		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
@@ -127,6 +128,9 @@ export default function Jams() {
 	}
 
 	const filteredJams = useMemo(() => {
+		if (!Array.isArray(allJams) || allJams.length === 0) {
+			return []
+		}
 		return allJams.filter((jam) => {
 			return (
 				(!dateFilter || jam.date === dateFilter) &&
@@ -142,24 +146,23 @@ export default function Jams() {
 	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, soundFilters, beforeDateFilter, afterDateFilter])
 
 	useEffect(() => {
-		scrollToTopOfRef(jamListRef)
-		const newTitle = buildTitle({
-			queryParams: search,
+		const filters = {
+			dateFilter: dateFilter,
 			beforeDateFilter,
 			afterDateFilter,
-			artistNames: artistFilters.map((id) => {
-				return artists.find((artist) => artist.id === parseInt(id))?.artist
-			}),
-			soundNames: soundFilters.map((id) => {
-				return sounds.find((sound) => sound.id === parseInt(id))?.label
-			}),
+			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
+			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
 			songName: songFilter,
-			artists,
-			songs,
-			sounds,
-			date: dateFilter,
-		})
+		}
+
+		const newTitle = buildTitle(filters)
 		setTitle(newTitle)
+
+		scrollToTopOfRef(jamListRef)
+
+		const filterURL = createFilterURL('/add/jam', filters)
+		console.log('filterURL', filterURL)
+		setAddJamLink(filterURL)
 	}, [filteredJams])
 
 	return (
@@ -168,7 +171,15 @@ export default function Jams() {
 			<div className="bg-gray-100">
 				<div className="flex-column justify-center items-center pt-3 pb-2 mb-0" ref={headerRef}>
 					<JamsTitle title={title} />
-					<FiltersButton open={open} setOpen={setOpen} />
+					<div className="flex justify-center gap-8 items-center">
+						<FiltersButton open={open} setOpen={setOpen} />
+						<Link
+							to={addJamLink}
+							className="text-center text-xl underline text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out"
+						>
+							Add a Jam
+						</Link>
+					</div>
 				</div>
 				<JamFiltersClientside
 					sounds={sounds}

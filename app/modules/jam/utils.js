@@ -1,57 +1,35 @@
-export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, afterDateFilter, date, songName }) {
-	console.log('buildTitle', {
-		artistNames,
-		soundNames,
-		song,
-		date,
-	})
+export function buildTitle({ artistNames, soundNames, songName, beforeDateFilter, afterDateFilter, dateFilter }) {
 	let title = '🔥 '
 
 	if (soundNames && soundNames.length > 0) {
-		soundNames.forEach((sound, i) => {
-			title += sound
-			if (i < soundNames.length - 2) title += ', '
-			if (i === soundNames.length - 2) title += ' and '
-		})
+		title += soundNames.join(', ').replace(/, ([^,]*)$/, ' and $1')
 	}
+
 	if (songName) {
-		title += ' ' + songName
+		title += ` ${songName}`
 	}
 
 	title += ' Jams'
 
-	// if (artists && artists.length > 0 && !date) {
-	// 	title += ' by '
-
 	if (artistNames && artistNames.length > 0) {
 		title += ' by '
-		artistNames.forEach((artist, i) => {
-			if (artist === 'Grateful Dead') title += 'The '
-			title += artist
-			if (i < artistNames.length - 2) title += ', '
-			if (i === artistNames.length - 2) title += ' and '
-		})
+		title += artistNames
+			.map((artist) => (artist === 'Grateful Dead' ? 'The ' + artist : artist))
+			.join(', ')
+			.replace(/, ([^,]*)$/, ' and $1')
 	}
 
-	if (date) {
-		console.log('date in utils', date)
-		title += ' from ' + new Date(date + 'T16:00:00').toLocaleDateString()
+	if (dateFilter) {
+		title += ' from ' + new Date(dateFilter + 'T16:00:00').toLocaleDateString()
+	} else {
+		if (beforeDateFilter && afterDateFilter) {
+			title += ' from ' + afterDateFilter + ' to ' + beforeDateFilter
+		} else if (beforeDateFilter) {
+			title += ' from ' + beforeDateFilter + ' and earlier'
+		} else if (afterDateFilter) {
+			title += ' from ' + afterDateFilter + ' and later'
+		}
 	}
 
-	if (beforeDateFilter && afterDateFilter && !date) {
-		title +=
-			beforeDateFilter === afterDateFilter
-				? ' from ' + beforeDateFilter
-				: ' from ' + afterDateFilter + ' to ' + beforeDateFilter
-	}
-
-	if (beforeDateFilter && !afterDateFilter && !date) {
-		title += ' from ' + beforeDateFilter + ' and earlier '
-	}
-
-	if (afterDateFilter && !beforeDateFilter && !date) {
-		title += ' from ' + afterDateFilter + ' and later '
-	}
-
-	return (title = title.trim())
+	return title.trim()
 }
