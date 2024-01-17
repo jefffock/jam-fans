@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData, useFetcher } from '@remix-run/react'
 import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { json } from '@remix-run/node'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import JamsHome from '../components/JamsHome'
 import Hero from '../components/Hero'
 import { getArtists, filterArtists } from '../modules/artist'
@@ -15,7 +15,13 @@ import FiltersButton from '../components/FiltersButton'
 import JamsTitle from '../components/JamsTitle'
 import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
-import { useWindowHeight, useWindowWidth } from '../utils'
+import {
+	useWindowHeight,
+	useWindowWidth,
+	scrollToBottomOfWindow,
+	scrollToTopOfWindow,
+	scrollToTopOfRef,
+} from '../utils'
 import JamCard from '../components/cards/JamCard'
 import { date } from 'zod'
 
@@ -31,20 +37,19 @@ export const loader = async ({ request }) => {
 	const songs = await getSongs()
 	const sounds = await getSounds()
 	const profile = await getProfile()
-	const filteredArtists = filterArtists({ artists, queryParams })
-	const filteredSounds = filterSounds({ sounds, queryParams })
 	let song_id = queryParams.song
-	const song = getSongById({ songs, id: song_id })
+	// const song = await getSongById({ songs, id: song_id })
 
 	return json(
 		{
 			artists,
 			songs,
-			jamsFromServer: jams,
+			allJams: jams,
 			sounds,
 			count: jams.length,
 			profile,
 			search: url.search,
+			song: song_id,
 		},
 		{
 			headers: response.headers,
@@ -53,7 +58,7 @@ export const loader = async ({ request }) => {
 }
 
 export default function Jams() {
-	const { artists, songs, sounds, count, search, user, profile, jamsFromServer, pageFromServer } = useLoaderData()
+	const { artists, songs, sounds, count, search, user, song, profile, allJams, pageFromServer } = useLoaderData()
 	const [open, setOpen] = useState(false)
 	// const [scrollPosition, setScrollPosition] = useState(0)
 	// const [clientHeight, setClientHeight] = useState(null)
@@ -62,24 +67,21 @@ export default function Jams() {
 	// const [page, setPage] = useState(pageFromServer)
 	// const fetcher = useFetcher()
 	// const [urlToLoad, setUrlToLoad] = useState(null)
-	// const [jams, setJams] = useState(jamsFromServer)
 	// const [newSearch, setNewSearch] = useState(search)
 	// const [isFetching, setIsFetching] = useState(false)
-	const [allJams, setAllJams] = useState(jamsFromServer)
 	const [showIframe, setShowIframe] = useState(false)
 	const [iframeUrl, setIframeUrl] = useState('')
 	const [showRatings, setShowRatings] = useState(false)
 	const headerRef = useRef(null)
 	const pageRef = useRef(null)
 	const [headerHeight, setHeaderHeight] = useState(0)
-	const [filteredJams, setFilteredJams] = useState(jamsFromServer)
 	const [artistFilters, setArtistFilters] = useState([])
-	const [songFilter, setSongFilter] = useState('')
+	const [songFilter, setSongFilter] = useState(song)
 	const [soundFilters, setSoundFilters] = useState([])
 	const [orderBy, setOrderBy] = useState('avg_rating')
 	const [showComments, setShowComments] = useState(false)
 	const [beforeDateFilter, setBeforeDateFilter] = useState(null)
-	const [afterDateFilter, setAfterDateFilter] = useState('')
+	const [afterDateFilter, setAfterDateFilter] = useState(null)
 	const [dateFilter, setDateFilter] = useState('')
 	const [linkFilter, setLinkFilter] = useState(false)
 	const [spotifyFilter, setSpotifyFilter] = useState(false)
@@ -90,6 +92,11 @@ export default function Jams() {
 	const jamCardRef = useRef(null)
 	const [jamCardHeight, setJamCardHeight] = useState(0)
 	const prevJamListRef = useRef(null)
+	const [title, setTitle] = useState('🔥 Jams')
+	const [query, setQuery] = useState('')
+	const windowHeight = useWindowHeight()
+	const windowWidth = useWindowWidth()
+	const scrollingDown = prevJamListRef.current < scrollTop
 
 	if (jamCardRef.current) {
 		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
@@ -97,45 +104,15 @@ export default function Jams() {
 		}
 	}
 
-	const windowHeight = useWindowHeight()
-	const windowWidth = useWindowWidth()
+	useEffect(() => {
+		setQuery('')
+	}, [songFilter])
 
 	useEffect(() => {
 		if (headerRef.current) {
 			setHeaderHeight(headerRef.current.clientHeight)
 		}
 	}, [])
-
-	const scrollToTop = (ref) => {
-		if (ref.current) {
-			// Use appropriate method based on the library
-			ref.current.scrollTop = 0 // For react-window
-			// listRef.current.scrollToRow(0); // For react-virtualized
-		}
-	}
-
-	// const scrollToBottom = (ref) => {
-	// 	if (ref.current) {
-	// 		// The maximum scrollable amount is scrollHeight - clientHeight
-	// 		const maxScrollTop = ref.current.scrollHeight - ref.current.clientHeight
-	// 		ref.current.scrollTop = maxScrollTop
-	// 	}
-	// }
-
-	const scrollToBottomOfWindow = () => {
-		window?.scrollTo({
-			top: document.body.scrollHeight,
-			behavior: 'smooth',
-		})
-	}
-
-	const scrollToTopOfWindow = () => {
-		window?.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		})
-	}
-	const scrollingDown = prevJamListRef.current < scrollTop
 
 	if (jamListRef.current && scrollTop > 100 && scrollingDown) {
 		if (window) {
@@ -149,69 +126,41 @@ export default function Jams() {
 		}
 	}
 
-	useEffect(() => {
-		let filtered = allJams
-		if (artistFilters.length > 0) {
-			filtered = filtered.filter((jam) => {
-				return artistFilters.includes(jam.artist_id.toString())
-			})
-		}
-		if (songFilter) {
-			//filter by song id
-			filtered = filtered.filter((jam) => {
-				return jam.song_name === songFilter
-			})
-		}
-		if (linkFilter) {
-			filtered = filtered.filter((jam) => {
-				return jam.listen_link
-			})
-		}
-		if (soundFilters.length > 0) {
-			filtered = filtered.filter((jam) => {
-				return soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))
-			})
-		}
-		if (dateFilter) {
-			filtered = filtered.filter((jam) => {
-				return jam.date === dateFilter
-			})
-		}
-		if (beforeDateFilter) {
-			console.log('beforeDateFilter', beforeDateFilter)
-			filtered = filtered.filter((jam) => {
-				return jam.year <= beforeDateFilter
-			})
-		}
-		if (afterDateFilter) {
-			console.log('afterDateFilter', afterDateFilter)
-			filtered = filtered.filter((jam) => {
-				return jam.year >= Number(afterDateFilter)
-			})
-		}
-		console.log('filtered length after filtering', filtered.length)
-		setFilteredJams(filtered)
-		scrollToTop(jamListRef)
-		// scrollToTopOfWindow()
-	}, [artistFilters, songFilter, soundFilters, beforeDateFilter, afterDateFilter, dateFilter, linkFilter, allJams])
+	const filteredJams = useMemo(() => {
+		return allJams.filter((jam) => {
+			return (
+				(!dateFilter || jam.date === dateFilter) &&
+				(!songFilter || jam.song_name === songFilter) &&
+				(artistFilters.length === 0 || artistFilters.includes(jam.artist_id.toString())) &&
+				(!linkFilter || jam.listen_link) &&
+				(soundFilters.length === 0 ||
+					soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))) &&
+				(!beforeDateFilter || jam.year <= beforeDateFilter) &&
+				(!afterDateFilter || jam.year >= Number(afterDateFilter))
+			)
+		})
+	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, soundFilters, beforeDateFilter, afterDateFilter])
 
-	const artistNames = artistFilters.map((id) => {
-		return artists.find((artist) => artist.id === parseInt(id))?.artist
-	})
-	const soundNames = soundFilters.map((id) => {
-		return sounds.find((sound) => sound.id === parseInt(id))?.label
-	})
-	const { title } = buildTitle({
-		queryParams: search,
-		beforeDateFilter,
-		afterDateFilter,
-		artistNames,
-		soundNames,
-		songFilter,
-		artists,
-		songs,
-		sounds,
-	})
+	useEffect(() => {
+		scrollToTopOfRef(jamListRef)
+		const newTitle = buildTitle({
+			queryParams: search,
+			beforeDateFilter,
+			afterDateFilter,
+			artistNames: artistFilters.map((id) => {
+				return artists.find((artist) => artist.id === parseInt(id))?.artist
+			}),
+			soundNames: soundFilters.map((id) => {
+				return sounds.find((sound) => sound.id === parseInt(id))?.label
+			}),
+			songName: songFilter,
+			artists,
+			songs,
+			sounds,
+			date: dateFilter,
+		})
+		setTitle(newTitle)
+	}, [filteredJams])
 
 	return (
 		<div ref={pageRef}>
@@ -220,9 +169,6 @@ export default function Jams() {
 				<div className="flex-column justify-center items-center pt-3 pb-2 mb-0" ref={headerRef}>
 					<JamsTitle title={title} />
 					<FiltersButton open={open} setOpen={setOpen} />
-					<div
-						className={`w-112 max-w-full ${scrollTop ? 'shadow-bottom' : ''} h-2 mx-auto z-100 mb-1`}
-					></div>
 				</div>
 				<JamFiltersClientside
 					sounds={sounds}
@@ -254,6 +200,8 @@ export default function Jams() {
 					jamsLength={filteredJams.length}
 					linkFilter={linkFilter}
 					setLinkFilter={setLinkFilter}
+					query={query}
+					setQuery={setQuery}
 				/>
 				<VirtualJamList
 					jamListRef={jamListRef}
@@ -267,7 +215,6 @@ export default function Jams() {
 					windowWidth={windowWidth}
 					scrollTop={scrollTop}
 					setScrollTop={setScrollTop}
-					scrollToTop={scrollToTop}
 					jamCardHeight={jamCardHeight}
 					prevJamListRef={prevJamListRef}
 				/>

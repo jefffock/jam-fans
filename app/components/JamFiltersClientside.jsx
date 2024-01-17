@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { Form, useSubmit, useFetcher, Link } from '@remix-run/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
@@ -39,8 +39,9 @@ export default function JamFiltersClientside({
 	jamsLength,
 	linkFilter,
 	setLinkFilter,
+	query,
+	setQuery,
 }) {
-	const [query, setQuery] = useState('')
 	const submit = useSubmit()
 	const fetcher = useFetcher()
 	const [date, setDate] = useState('')
@@ -64,13 +65,12 @@ export default function JamFiltersClientside({
 		setSongFilter(filteredSongs[0].id.toString())
 	}
 
-	const beforeYearDisplayValue = beforeDateFilter
-		? `Played in ${beforeDateFilter} or before`
-		: `Played in ${currentYear} or before`
+	const beforeYearDisplayValue = beforeDateFilter ? `${beforeDateFilter} or earlier` : `${currentYear} or earlier`
 
-	const afterYearDisplayValue = afterDateFilter ? `Played in ${afterDateFilter} or after` : 'Played in 1959 or after'
+	const afterYearDisplayValue = afterDateFilter ? `${afterDateFilter} or later` : '1960 or later'
 
 	function clearFilters() {
+		setQuery('')
 		setArtistFilters([])
 		setSoundFilters([])
 		setSongFilter('')
@@ -85,7 +85,6 @@ export default function JamFiltersClientside({
 			else {
 				input.value = ''
 			}
-			setSongFilter(null)
 		})
 	}
 
@@ -104,15 +103,6 @@ export default function JamFiltersClientside({
 			setSoundFilters((prev) => [...prev, soundId])
 		} else {
 			setSoundFilters((prev) => prev.filter((sound) => sound !== soundId))
-		}
-	}
-
-	function handleSongChange(e) {
-		if (e.target.checked) {
-			let songId = e.target.value
-			setSongFilter(songId)
-		} else {
-			setSongFilter('')
 		}
 	}
 
@@ -167,6 +157,13 @@ export default function JamFiltersClientside({
 		setLinkFilter(e.target.checked)
 	}
 
+	function clearSong() {
+		console.log('clear song')
+		setSongFilter('')
+		setSongSelected(null)
+		setQuery('')
+	}
+
 	return (
 		<Transition.Root show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -210,12 +207,12 @@ export default function JamFiltersClientside({
 											{/* Jam Filters*/}
 											<Form
 												action="/jams"
-												className="space-y-8 divide-y divide-gray-200"
+												className="space-y-6 divide-y divide-gray-200"
 												id="jam-filter-form"
 												onSubmit={() => e.preventDefault()}
 											>
 												<div className="relative mt-6 flex-1 px-4 sm:px-6">
-													<div className="space-y-8 divide-y divide-gray-200">
+													<div className="space-y-6 divide-y divide-gray-200">
 														{/* sound picker*/}
 														<div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
 															<div className="sm:col-span-6 mx-4">
@@ -280,7 +277,8 @@ export default function JamFiltersClientside({
 																							htmlFor={`${artist.artist}`}
 																							className="select-none font-medium text-gray-700 mx-2 whitespace-normal"
 																						>
-																							{artist.artist}
+																							{artist.artist +
+																								` (${artist.jam_count} jams)`}
 																						</label>
 																					</div>
 																					<div className="ml-3 flex h-5 items-center">
@@ -311,14 +309,11 @@ export default function JamFiltersClientside({
 														<div className="max-w-sm p-4">
 															<Combobox
 																as="div"
-																value={
-																	filteredSongs.length === songs.length
-																		? 'All songs'
-																		: songSelected
-																}
-																onChange={(e) => {
-																	setSongFilter(e)
-																	handleSongChange(e)
+																value={songSelected}
+																placeholder="All songs"
+																onChange={(event) => {
+																	setSongFilter(event)
+																	setSongSelected(event)
 																}}
 																name="song"
 															>
@@ -329,8 +324,13 @@ export default function JamFiltersClientside({
 																	<Combobox.Input
 																		className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm"
 																		onChange={(event) => {
+																			console.log(
+																				'event in first on change',
+																				event
+																			)
 																			setQuery(event.target.value)
-																			handleSongChange(event)
+
+																			// setSongFilter(event.target.value)
 																		}}
 																		displayValue={(song) => song}
 																		placeholder="Search for a song"
@@ -392,6 +392,17 @@ export default function JamFiltersClientside({
 																	)}
 																</div>
 															</Combobox>
+															{songFilter && (
+																<div className="flex justify-end">
+																	<button
+																		type="button"
+																		className="rounded-md border border-gray-300 bg-white mt-4 py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 text-right focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ml-5 mr-0"
+																		onClick={clearSong}
+																	>
+																		Clear song filter
+																	</button>
+																</div>
+															)}
 														</div>
 														{/* Year Pickers */}
 														{/* <h3 className='block text-2xl font-medium text-gray-900 px-4 pt-4'>
@@ -485,7 +496,7 @@ export default function JamFiltersClientside({
 																											)}
 																										>
 																											{date} or
-																											before
+																											earlier
 																										</span>
 
 																										{beforeDateFilter ? (
@@ -578,7 +589,7 @@ export default function JamFiltersClientside({
 																											)}
 																										>
 																											{date} or
-																											after
+																											later
 																										</span>
 
 																										{afterDateFilter ? (

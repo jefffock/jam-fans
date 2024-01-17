@@ -1,4 +1,4 @@
-export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, afterDateFilter, date }) {
+export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, afterDateFilter, date, songName }) {
 	console.log('buildTitle', {
 		artistNames,
 		soundNames,
@@ -14,8 +14,8 @@ export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, af
 			if (i === soundNames.length - 2) title += ' and '
 		})
 	}
-	if (song) {
-		title += ' ' + song.song
+	if (songName) {
+		title += ' ' + songName
 	}
 
 	title += ' Jams'
@@ -46,15 +46,12 @@ export function buildTitle({ artistNames, soundNames, song, beforeDateFilter, af
 	}
 
 	if (beforeDateFilter && !afterDateFilter && !date) {
-		title += ' from ' + beforeDateFilter + ' and before '
+		title += ' from ' + beforeDateFilter + ' and earlier '
 	}
 
 	if (afterDateFilter && !beforeDateFilter && !date) {
-		title += ' from ' + afterDateFilter + ' and after '
+		title += ' from ' + afterDateFilter + ' and later '
 	}
 
-	return {
-		title: title.trim(),
-		fullTitle: title.trim() + ' on Jam Fans',
-	}
+	return (title = title.trim())
 }

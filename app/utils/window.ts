@@ -45,3 +45,23 @@ export const useWindowWidth = () => {
 
 	return width
 }
+
+export const scrollToBottomOfWindow = () => {
+	window?.scrollTo({
+		top: document.body.scrollHeight,
+		behavior: 'smooth',
+	})
+}
+
+export const scrollToTopOfWindow = () => {
+	window?.scrollTo({
+		top: 0,
+		behavior: 'smooth',
+	})
+}
+
+export const scrollToTopOfRef = (ref) => {
+	if (ref.current) {
+		ref.current.scrollTop = 0
+	}
+}
