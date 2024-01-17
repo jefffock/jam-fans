@@ -1,6 +1,7 @@
 import JamCard from './cards/JamCard'
 import React, { useState, useRef, useEffect } from 'react'
 import { Iframe } from './IFrame'
+import { addShowByJamId } from '../modules/show'
 
 export default function VirtualJamList({
 	items,

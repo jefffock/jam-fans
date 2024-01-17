@@ -1,10 +1,22 @@
 import { Link } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
+import { addShowByJamId } from '../../modules/show'
 
 const JamCard = forwardRef((props, ref) => {
-	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
+	const { jam, user, showRatings, setShowIframe, setIframeUrl, addShowByJamId } = props
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
+
+	async function handleAddShowClick() {
+		try {
+			console.log('jam in handleaaddshowclick', jam)
+			console.log(typeof addShowByJamId)
+			const addedShow = await addShowByJamId(jam.id)
+			console.log('addedShow', addedShow)
+		} catch (error) {
+			console.error('Error adding show:', error)
+		}
+	}
 
 	function handleListenClick() {
 		setIframeUrl(jam?.listen_link)
@@ -41,7 +53,21 @@ const JamCard = forwardRef((props, ref) => {
 				</h5>
 				{/* first row */}
 				<div className="flex justify-between">
-					<h5 className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</h5>
+					<div className="flex items-center space-x-4">
+						{jam.show_id && <Link to={`/shows/${jam.show_id}`}>{jam.date}</Link>}
+
+						{!jam.show_id && (
+							<>
+								<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
+								<button
+									onClick={handleAddShowClick}
+									className="mb-2 font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md py-2 px-4 transition duration-300 ease-in-out"
+								>
+									Add this show
+								</button>
+							</>
+						)}
+					</div>
 					<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
