@@ -1,4 +1,4 @@
-import { db } from '~/database'
+import { db } from '../../database'
 
 export async function getArtists() {
 	const artists = await db.artists.findMany()
@@ -14,4 +14,9 @@ export async function getArtists() {
 	})
 
 	return artists
+}
+
+export async function getArtistsCount(): Promise<number> {
+	const count = await db.artists.count()
+	return count
 }

@@ -1,8 +1,8 @@
 import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useRouteError, useLoaderData } from '@remix-run/react'
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import { createBrowserClient } from '@supabase/ssr'
-import TopNav from 'app/components/TopNav'
-import BottomNav from 'app/components/BottomNav'
+import TopNav from './components/TopNav'
+import BottomNav from './components/BottomNav'
 
 // import type { LinksFunction } from "@remix-run/node";
 

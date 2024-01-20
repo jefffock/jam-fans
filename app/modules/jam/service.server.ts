@@ -1,5 +1,5 @@
-import type { Prisma } from '~/database'
-import { db } from '~/database'
+import type { Prisma } from '../../database'
+import { db } from '../../database'
 
 export async function addJam(data: {
 	date: string
@@ -147,7 +147,6 @@ export async function getJams() {
 
 	// Convert the map back to an array
 	const modifiedJams = Array.from(jamMap.values())
-	console.log('modified jams', modifiedJams?.slice(0, 2))
 	return modifiedJams
 }
 
@@ -216,7 +215,13 @@ export const loadJams = async (queryParams: QueryParams) => {
 	}
 }
 
-export const getJamsCount = async (queryParams: QueryParams) => {
+export const getJamsCount = async (queryParams?: QueryParams) => {
+	console.log('queryParams', queryParams)
+	if (!queryParams) {
+		console.log('no query params')
+		const allJamsCount = await db.jams.count()
+		return allJamsCount
+	}
 	// Initialize query parameters
 	let date,
 		beforeDate,
@@ -277,6 +282,8 @@ export const getJamsCount = async (queryParams: QueryParams) => {
 	}
 
 	// Get count
+	console.log('query', query)
 	const count = await db.jams.count(query)
+	console.log('count', count)
 	return count
 }

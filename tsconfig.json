@@ -1,11 +1,10 @@
 {
   "include": [
-    "remix.env.d.ts",
+    "env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "app/routes/__supabase/jams/lists.jsx",
     "app/root.tsx",
-    "app/routes/$.jsx", "app/modules/jam/utils.js",
+    "app/routes/$.jsx", "app/modules/jam/utils.js", "app/modules/.server/http.server.ts",
 	// ".eslintrc.js"
   ],
   "compilerOptions": {
@@ -13,8 +12,9 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+	"module": "ESNext",
+	"moduleResolution": "Bundler",
+	"resolveJsonModule": true,
     "target": "ES2019",
     "strict": true,
     "allowJs": true,
@@ -23,6 +23,8 @@
     "paths": {
       "~/*": ["./app/*"]
     },
+	"skipLibCheck": true,
+
 
     // Remix takes care of building everything in `remix build`.
     "noEmit": true

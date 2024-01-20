@@ -3,7 +3,7 @@ import { Form, useSubmit, useFetcher, Link, useSearchParams } from '@remix-run/r
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { getJamsCount } from '~/modules/jam'
+import { getJamsCount } from '../modules/jam/index.server'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')

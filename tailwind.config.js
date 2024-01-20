@@ -20,6 +20,7 @@ module.exports = {
 				20000: '20000ms',
 			},
 			spacing: {
+				
 				72: '18rem',
 				84: '21rem',
 				112: '28rem',
@@ -34,7 +35,20 @@ module.exports = {
 				'90p': '90%',
 				'95p': '95%',
 			},
+			colors: {
+				mondegreen: 'var(#20665f)',
+				lime: 'var(7cf680)',
+				// 			--mondegreen: #20665f;
+				// --lime: #7cf680;
+				// --pink: #db8ef1;
+				// --cyan: #db8ef1;
+				// --font-size: 16px;
+				// --spacing-unit: 10px;
+			},
+			fontSize: {
+				base: 'var(--font-base-size)',
+			},
+			plugins: [require('@tailwindcss/forms')],
 		},
 	},
-	plugins: [require('@tailwindcss/forms')],
 }

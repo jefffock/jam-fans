@@ -1,4 +1,4 @@
-import { db } from '~/database'
+import { db } from '../../database'
 
 export async function getShows() {
 	const shows = await db.shows.findMany()
@@ -26,4 +26,19 @@ export async function addShowByJamId(jamId: number | string) {
 	})
 
 	return newShow
+}
+
+export async function getShowById(showId: number | string) {
+	const show = await db.shows.findUnique({
+		where: {
+			id: showId,
+		},
+	})
+
+	return show
+}
+
+export async function getShowsCount(): Promise<number> {
+	const count = await db.shows.count()
+	return count
 }

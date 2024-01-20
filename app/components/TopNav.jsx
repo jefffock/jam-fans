@@ -4,16 +4,16 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useOutletContext, Link, NavLink } from '@remix-run/react'
 
 const navigation = [
-	{ name: 'Jams', href: '/jams', current: false },
-	{ name: 'Curate', href: '/add/jam', current: false },
-	{ name: 'Coming Soon™️', href: '/roadmap', current: false },
+	{ name: 'jams', href: '/jams', current: false },
+	{ name: 'curate', href: '/add/jam', current: false },
+	{ name: 'coming soon™️', href: '/roadmap', current: false },
 ]
 const userNavigation = [
-	{ name: 'Credits', href: '/credits' },
-	{ name: 'Contact', href: '/contact', current: false },
-	{ name: 'Terms of Service', href: '/terms' },
-	{ name: 'Privacy Policy', href: '/privacy' },
-	{ name: 'Sign out', href: '#' },
+	{ name: 'credits', href: '/credits' },
+	{ name: 'contact', href: '/contact', current: false },
+	{ name: 'terms of service', href: '/terms' },
+	{ name: 'privacy policy', href: '/privacy' },
+	{ name: 'sign out', href: '#' },
 ]
 
 function classNames(...classes) {

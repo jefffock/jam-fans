@@ -1,4 +1,4 @@
-import { db } from '~/database'
+import { db } from '../../database'
 import type { profiles } from '@prisma/client'
 
 export async function addPoints(data: { user_id: string; points: number }) {

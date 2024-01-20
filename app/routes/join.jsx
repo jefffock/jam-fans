@@ -2,7 +2,7 @@ import { Link, useOutletContext, useNavigate, useLoaderData } from '@remix-run/r
 import { createServerClient, parse, serialize, createBrowserClient } from '@supabase/ssr'
 import { useEffect, useState } from 'react'
 import { json } from '@remix-run/node'
-import SuccessAlert from 'app/components/alerts/successAlert'
+import SuccessAlert from '../components/alerts/successAlert'
 
 export async function loader({}) {
 	return {

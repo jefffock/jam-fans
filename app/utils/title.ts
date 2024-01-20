@@ -1,4 +1,14 @@
-export function buildTitle({ artistNames, soundNames, songName, beforeDateFilter, afterDateFilter, dateFilter }) {
+export function buildTitle({
+	artistNames,
+	soundNames,
+	songName,
+	beforeDateFilter,
+	afterDateFilter,
+	dateFilter,
+	showJams,
+	showSets,
+	showShows,
+}) {
 	let title = '🔥 '
 
 	if (soundNames && soundNames.length > 0) {
@@ -9,8 +19,24 @@ export function buildTitle({ artistNames, soundNames, songName, beforeDateFilter
 		title += ` ${songName}`
 	}
 
-	title += ' Jams'
-
+	if (showJams) {
+		title += ' jams'
+		if (showSets || showShows) {
+			title += ', '
+		}
+	}
+	if (showSets) {
+		title += ' sets'
+		if (showShows) {
+			title += ', '
+		}
+	}
+	if (showShows) {
+		if (showJams || showSets) {
+			title += ' and '
+		}
+		title += ' shows'
+	}
 	if (artistNames && artistNames.length > 0) {
 		title += ' by '
 		title += artistNames

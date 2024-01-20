@@ -9,8 +9,8 @@ import { useState, useEffect } from 'react'
 import FiltersButton from '../components/FiltersButton'
 import JamsHome from '../components/JamsHome'
 import Hero from '../components/Hero'
-import TopNav from '~/components/TopNav'
-import BottomNav from '~/components/BottomNav'
+import TopNav from '../components/TopNav'
+import BottomNav from '../components/BottomNav'
 
 export const loader = async () => {
 	console.log('in catchall $')

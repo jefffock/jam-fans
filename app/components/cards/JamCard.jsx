@@ -1,22 +1,11 @@
-import { Link } from '@remix-run/react'
+import { Link, useFetcher, Form } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
-import { addShowByJamId } from '../../modules/show'
 
 const JamCard = forwardRef((props, ref) => {
 	const { jam, user, showRatings, setShowIframe, setIframeUrl, addShowByJamId } = props
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
-
-	async function handleAddShowClick() {
-		try {
-			console.log('jam in handleaaddshowclick', jam)
-			console.log(typeof addShowByJamId)
-			const addedShow = await addShowByJamId(jam.id)
-			console.log('addedShow', addedShow)
-		} catch (error) {
-			console.error('Error adding show:', error)
-		}
-	}
+	const fetcher = useFetcher()
 
 	function handleListenClick() {
 		setIframeUrl(jam?.listen_link)
@@ -44,7 +33,7 @@ const JamCard = forwardRef((props, ref) => {
 	const link = `/add/jam?jamid=${jam?.id}&song=${jam.song_name}&artist=${jam.artist}&location=${jam.location}&date=${jam.date}`
 	return (
 		<div
-			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p my-6 mx-auto flex flex-col justify-between h-80 ${ref ? 'measure-div' : ''}`}
+			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p my-6 mx-auto flex flex-col justify-between h-90 ${ref ? 'measure-div' : ''}`}
 			ref={ref || null}
 		>
 			<div className="overflow-y-auto">
@@ -57,15 +46,19 @@ const JamCard = forwardRef((props, ref) => {
 						{jam.show_id && <Link to={`/shows/${jam.show_id}`}>{jam.date}</Link>}
 
 						{!jam.show_id && (
-							<>
+							<Form>
 								<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
+								<input type="hidden" name="jamArtist" value={jam.artist} />
+								<input type="hidden" name="jamDate" value={jam.date} />
+								<input type="hidden" name="jamLocation" value={jam.location} />
 								<button
-									onClick={handleAddShowClick}
-									className="mb-2 font-normal text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md py-2 px-4 transition duration-300 ease-in-out"
+									type="submit"
+									name="addShow"
+									className="mb-2 font-normal text-cyan-700 bg-white hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-800 focus:ring-opacity-50 rounded-md py-1 px-2 transition duration-300 ease-in-out border-2 border-cyan-700 hover:border-cyan-800"
 								>
-									Add this show
+									Add show
 								</button>
-							</>
+							</Form>
 						)}
 					</div>
 					<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>

@@ -4,11 +4,11 @@ import { json } from '@remix-run/node'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import JamsHome from '../components/JamsHome'
 import Hero from '../components/Hero'
-import { getArtists, filterArtists } from '../modules/artist'
-import { getSongById, getSongs } from '../modules/song'
-import { getSounds, filterSounds } from '../modules/sound'
-import { getJams, buildTitle } from '../modules/jam'
-import { getProfile } from '../modules/profile'
+import { getArtists, filterArtists } from '../modules/artist/index.server'
+import { getSongById, getSongs } from '../modules/song/index.server'
+import { getSounds, filterSounds } from '../modules/sound/index.server'
+import { getJams } from '../modules/jam/index.server'
+import { getProfile } from '../modules/profile/index.server'
 import JamList from '../components/JamList'
 import JamFiltersSlideout from '../components/JamFilters'
 import FiltersButton from '../components/FiltersButton'
@@ -16,6 +16,7 @@ import JamsTitle from '../components/JamsTitle'
 import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import {
+	buildTitle,
 	useWindowHeight,
 	useWindowWidth,
 	scrollToBottomOfWindow,
@@ -60,15 +61,6 @@ export const loader = async ({ request }) => {
 export default function Jams() {
 	const { artists, songs, sounds, count, search, user, song, profile, allJams, pageFromServer } = useLoaderData()
 	const [open, setOpen] = useState(false)
-	// const [scrollPosition, setScrollPosition] = useState(0)
-	// const [clientHeight, setClientHeight] = useState(null)
-	// const [shouldFetch, setShouldFetch] = useState(true)
-	// const [height, setHeight] = useState(null)
-	// const [page, setPage] = useState(pageFromServer)
-	// const fetcher = useFetcher()
-	// const [urlToLoad, setUrlToLoad] = useState(null)
-	// const [newSearch, setNewSearch] = useState(search)
-	// const [isFetching, setIsFetching] = useState(false)
 	const [showIframe, setShowIframe] = useState(false)
 	const [iframeUrl, setIframeUrl] = useState('')
 	const [showRatings, setShowRatings] = useState(false)

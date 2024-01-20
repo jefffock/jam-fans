@@ -6,7 +6,7 @@ import {
 	notFound,
 	isPost,
 	safeRedirect,
-} from './http.server'
+} from '../modules/.server/http.server'
 
 // @vitest-environment node
 // 👋 see https://vitest.dev/guide/environment.html#environments-for-specific-files

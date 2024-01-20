@@ -1,273 +1,78 @@
-import { useLoaderData, useFetcher } from '@remix-run/react'
-import type { LoaderFunctionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
+import type { ClientActionFunctionArgs, ClientLoaderFunctionArgs } from '@remix-run/react'
+import { useLoaderData, useFetcher, Outlet, Link } from '@remix-run/react'
 import { json, redirect } from '@remix-run/node'
 import { createServerClient, parse, serialize } from '@supabase/ssr'
-import { useState, useEffect } from 'react'
-import FiltersButton from '../components/FiltersButton'
 import Hero from '../components/Hero'
+import { getJamsCount, getJams } from '../modules/jam/index.server'
+import {
+	buildTitle,
+	useWindowHeight,
+	useWindowWidth,
+	scrollToBottomOfWindow,
+	scrollToTopOfWindow,
+	scrollToTopOfRef,
+	createFilterURL,
+} from '../utils'
+import { getSets, getSetsCount } from '../modules/set/index.server'
+import { getShows, getShowsCount } from '../modules/show/index.server'
+import { getArtistsCount, getArtists, filterArtists } from '../modules/artist/index.server'
+import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.server'
+import { getSongsCount, getSongById, getSongs } from '../modules/song/index.server'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import JamsHome from '../components/JamsHome'
+import { getProfile } from '../modules/profile/index.server'
+import JamList from '../components/JamList'
+import JamFiltersSlideout from '../components/JamFilters'
+import FiltersButton from '../components/FiltersButton'
+import JamsTitle from '../components/JamsTitle'
+import VirtualJamList from '../components/VirtualJamList'
+import JamFiltersClientside from '../components/JamFiltersClientside'
+import JamCard from '../components/cards/JamCard'
+import { useDebounce } from '~/hooks'
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-	console.log('in index loader')
+export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const response = new Response()
-	const cookies = parse(request.headers.get('Cookie') ?? '')
-	const headers = new Headers()
-
-	const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-		cookies: {
-			get(key) {
-				return cookies[key]
-			},
-			set(key, value, options) {
-				headers.append('Set-Cookie', serialize(key, value, options))
-			},
-			remove(key, options) {
-				headers.append('Set-Cookie', serialize(key, '', options))
-			},
-		},
-	})
-
-	const {
-		data: { user },
-	} = await supabase.auth.getUser()
-
-	let profile
-	if (user && user?.id && user != null) {
-		const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-		profile = data
-	}
-	const { data: sounds } = await supabase.from('sounds').select('label, text').order('label', { ascending: true })
-	let { data: allArtists } = await supabase
-		.from('artists')
-		.select('nickname, emoji_code, url, artist')
-		.order('name_for_order', { ascending: true })
 
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
 
-	delete queryParams['show-ratings']
-	delete queryParams['limit[label]']
-	const page = Number(queryParams.page) || 1
-	delete queryParams.page
+	const jams = await getJams()
+	const sets = await getSets()
+	const shows = await getShows()
+	const artists = await getArtists()
+	const songs = await getSongs()
+	const sounds = await getSounds()
+	// const profile = await getProfile()
+	const jamsCount = await getJamsCount()
+	const setsCount = await getSetsCount()
+	const showsCount = await getShowsCount()
+	const artistsCount = await getArtistsCount()
+	const soundsCount = await getSoundsCount()
+	const songsCount = await getSongsCount()
 
-	const stringParams = JSON.stringify(queryParams)
-
-	console.log('page', page)
-	//iterate through queryParamsArray and build a supabase query
-	let song
-	let date
-	let beforeDate
-	let afterDate
-	let orderBy = 'avg_rating'
-	let asc = false
-	let limit = 100
-	let showListenable = false
-	let urlToShow
-	let queryObjToStore = {}
-	let soundsInQuery: any[] = []
-	let artistsInQuery = []
-
-	for (const [key, value] of Object.entries(queryParams)) {
-		if (key.includes('sound')) {
-			soundsInQuery.push(value)
-		}
-		if (key.includes('artist')) {
-			artistsInQuery.push(value)
-		}
-		if (key.includes('song')) {
-			song = value
-		}
-		if (key.includes('before')) {
-			beforeDate = value
-		}
-		if (key.includes('after')) {
-			afterDate = value
-		}
-		if (key.includes('order')) {
-			orderBy = value
-		}
-		if (key.includes('asc')) {
-			asc = true
-		}
-		if (key.includes('limit')) {
-			limit = Number(value)
-		}
-		if (key.includes('show-links')) {
-			showListenable = true
-		}
-		if (key.includes('date')) {
-			date = value
-		}
-		if (key.includes('order')) {
-			orderBy = value
-		}
-	}
-	//cnovert date from mmddyyyy with no hyphens to yyyy-mm-dd
-	if (date) {
-		let year = date.slice(4, 8)
-		let month = date.slice(0, 2)
-		let day = date.slice(2, 4)
-		date = year + '-' + month + '-' + day
-	}
-	console.log('date in jams loader', date)
-	const list = await supabase.from('jams_lists').select('*').eq('params', stringParams).single()
-	if (list.data) {
-		urlToShow = '/jams/lists/' + list.data.id
-	}
-	let jams = supabase.from('jams').select('*')
-	let artistsInQueryNames: any[] = []
-	console.log('artistsInQuery', artistsInQuery)
-	if (artistsInQuery?.length > 0) {
-		//if first element is null, break
-		if (artistsInQuery[0] !== 'null') {
-			artistsInQuery.forEach((artist) => {
-				artistsInQueryNames.push(allArtists?.find((a) => a.url === artist)?.artist)
-			})
-			console.log('artistsInQueryNames', artistsInQueryNames)
-			jams = jams.in('artist', artistsInQueryNames)
-		}
-	}
-	if (song) {
-		jams = jams.eq('song_name', song)
-	}
-	if (afterDate && !date) {
-		let after = afterDate + '-01-01'
-		jams = jams.gte('date', after)
-	}
-	if (beforeDate && !date) {
-		let before = beforeDate + '-12-31'
-		jams = jams.lte('date', before)
-	}
-	if (showListenable) {
-		console.log('showListenable', showListenable)
-		jams = jams.not('listen_link', 'is', null)
-	}
-	if (soundsInQuery) {
-		let arrayOfLabels: any[] = []
-		soundsInQuery.forEach((sound) => {
-			arrayOfLabels.push(sounds?.find((s) => s.text === sound)?.label)
-		})
-		if (arrayOfLabels.length > 0) {
-			jams = jams.contains('sounds', arrayOfLabels)
-		}
-	}
-	if (date) {
-		console.log('date in index', date)
-		jams = jams.eq('date', date)
-	}
-	console.log('orderBy in jams loader', orderBy)
-	jams = jams.order(orderBy, { ascending: false })
-	if (orderBy === 'avg_rating') {
-		jams = jams.order('num_ratings', { ascending: false })
-	}
-	if (orderBy === 'num_ratings') {
-		jams = jams.order('avg_rating', { ascending: false })
-	}
-	jams = jams.order('song_name', { ascending: true })
-	jams = jams.order('id', { ascending: false })
-	const startRange = page ? (page - 1) * 15 : 0
-	const endRange = page ? page * 15 : 15
-	console.log('startRange', startRange)
-	console.log('endRange', endRange)
-	jams = jams.range(startRange, endRange)
-	// jams = jams.limit(10);
-	const { data: jamsFetched } = await jams
-	// if (orderBy === 'avg_rating') {
-	// }
-	// if (orderBy === 'num_ratings') {
-	// 	jams = jams.order('avg_rating', { ascending: false });
-	// }
-	//get base versions
-	// const { data: versions } = await supabase
-	// 	.from('versions')
-	// 	.select('*')
-	// 	.order('avg_rating', { ascending: false })
-	// 	.limit(100);
-	//get songs
-	const { data: songs } = await supabase.from('songs').select('song, artist')
-	//   let artists: any[] = [
-	// 	  {
-	// 		  nickname: 'All Bands',
-	// 		  emoji_code: '0x221E',
-	// 		  url: null,
-	// 		  artist: 'All Bands',
-	// 	  }
-	//   ].concat(allArtists);
-
-	const artists = [
-		{
-			nickname: 'All Bands',
-			emoji_code: '0x221E',
-			url: null,
-			artist: 'All Bands',
-		},
-	].concat(allArtists || [])
-
-	let title = '🔥 '
-	if (soundsInQuery?.length > 0) {
-		for (var i = 0; i < soundsInQuery.length; i++) {
-			title += sounds?.find((s) => s.text === soundsInQuery[i])?.label
-			//addcommaexceptlast
-			if (i < soundsInQuery.length - 2) title += ', '
-			if (i === soundsInQuery.length - 2) title += ' and '
-			soundsInQuery.forEach((sound) => {})
-		}
-		//remove last two characters
-	}
-	if (song) {
-		title += ' ' + song
-	}
-	title += ' Jams'
-	if (artistsInQueryNames?.length > 0 && !date) {
-		title += ' by '
-		title += ' '
-		for (var j = 0; j < artistsInQueryNames.length; j++) {
-			if (artistsInQueryNames[j] === 'Grateful Dead') title += 'The '
-			title += artistsInQueryNames[j]
-			if (j < artistsInQueryNames.length - 2) title += ', '
-			if (j === artistsInQueryNames.length - 2) title += ' and '
-		}
-	}
-	if (artistsInQueryNames?.length === 0 && !date) {
-		title += ' by All Bands'
-	}
-	if (date) {
-		title += ' from ' + new Date(date + 'T16:00:00').toLocaleDateString()
-	}
-	if (beforeDate && afterDate && !date) {
-		if (beforeDate === afterDate) {
-			title += ' from ' + beforeDate
-		} else {
-			title += ' from ' + afterDate + ' to ' + beforeDate
-		}
-	}
-	if (beforeDate && !afterDate && !date) {
-		title += ' from ' + beforeDate + ' and before '
-	}
-	if (afterDate && !beforeDate && !date) {
-		title += ' from ' + afterDate + ' and after '
-	}
-	title.trim()
-	const fullTitle = title + ' on Jam Fans'
-
-	let countFromSB = await supabase.from('versions').select('*', { count: 'exact', head: true })
-	const count = Number(countFromSB.count)
-	const search = url.search
+	let song_id = queryParams.song
+	// const song = await getSongById({ songs, id: song_id })
 
 	return json(
 		{
 			artists,
 			songs,
-			initialJams: jamsFetched,
+			allJams: jams,
+			allShows: shows,
+			allSets: sets,
 			sounds,
-			fullTitle,
-			title,
-			count,
-			search,
-			user,
-			profile,
-			initialPage: page,
+			count: jams.length,
+			// profile,
+			search: url.search,
+			song: song_id,
+			jamsCount,
+			setsCount,
+			showsCount,
+			artistsCount,
+			soundsCount,
+			songsCount,
 		},
 		{
 			headers: response.headers,
@@ -275,104 +80,280 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 	)
 }
 
-export default function Index() {
-	const { artists, songs, sounds, fullTitle, title, count, search, user, profile, initialJams, initialPage } =
-		useLoaderData<typeof loader>()
-	const [open, setOpen] = useState(false)
-	const [scrollPosition, setScrollPosition] = useState(0)
-	const [clientHeight, setClientHeight] = useState<number | null>(null)
-	const [shouldFetch, setShouldFetch] = useState(true)
-	const [height, setHeight] = useState(null)
-	const [page, setPage] = useState(2)
-	const fetcher = useFetcher()
-	const [jams, setJams] = useState(initialJams)
-	const [urlToLoad, setUrlToLoad] = useState(null)
+export async function action({ request }: ActionFunctionArgs) {
+	//get action name
+	const url = new URL(request.url)
+	const searchParams = new URLSearchParams(url.search)
+	const action = searchParams.get('action')
+	console.log('action', action)
+	return json({ ok: true })
+}
 
-	if (!artists) return <div>Loading...</div>
+// let isInitialRequest = true
+
+// export async function clientLoader({ request, serverLoader }: ClientLoaderFunctionArgs) {
+// 	// const cacheKey = generateKey(request)
+
+// 	if (isInitialRequest) {
+// 		isInitialRequest = false
+// 		const serverData = await serverLoader()
+// 		// cache.set(cacheKey, serverData)
+// 		return serverData
+// 	}
+
+// 	// const cachedData = await cache.get(cacheKey)
+// 	// if (cachedData) {
+// 	// 	return cachedData
+// 	// }
+
+// 	const serverData = await serverLoader()
+// 	// cache.set(cacheKey, serverData)
+// 	return serverData
+// }
+// clientLoader.hydrate = true // (2)
+
+// export async function clientAction({ request, serverAction }: ClientActionFunctionArgs) {
+// 	// const cacheKey = generateKey(request)
+// 	// cache.delete(cacheKey)
+// 	const serverData = await serverAction()
+// 	return serverData
+// }
+
+export default function Index() {
+	const {
+		artists,
+		songs,
+		sounds,
+		count,
+		search,
+		user,
+		song,
+		profile,
+		allJams,
+		allShows,
+		allSets,
+		pageFromServer,
+		jamsCount,
+		setsCount,
+		showsCount,
+		artistsCount,
+		soundsCount,
+		songsCount,
+	} = useLoaderData()
+	const [open, setOpen] = useState(false)
+	const [showIframe, setShowIframe] = useState(false)
+	const [iframeUrl, setIframeUrl] = useState('')
+	const [showRatings, setShowRatings] = useState(false)
+	const headerRef = useRef(null)
+	const pageRef = useRef(null)
+	const [headerHeight, setHeaderHeight] = useState(0)
+	const [artistFilters, setArtistFilters] = useState([])
+	const [songFilter, setSongFilter] = useState(song)
+	const [soundFilters, setSoundFilters] = useState([])
+	const [orderBy, setOrderBy] = useState('avg_rating')
+	const [showComments, setShowComments] = useState(false)
+	const [beforeDateFilter, setBeforeDateFilter] = useState(null)
+	const [afterDateFilter, setAfterDateFilter] = useState(null)
+	const [dateFilter, setDateFilter] = useState('')
+	const [linkFilter, setLinkFilter] = useState(false)
+	const [musicalEntitiesFilters, setMusicalEntitiesFilters] = useState({
+		jams: true,
+		sets: true,
+		shows: true,
+	})
+	const [spotifyFilter, setSpotifyFilter] = useState(false)
+	const [youtubeFilter, setYoutubeFilter] = useState(false)
+	const [appleFilter, setAppleFilter] = useState(false)
+	const [scrollTop, setScrollTop] = useState(0)
+	const jamListRef = useRef(null)
+	const jamCardRef = useRef(null)
+	const [jamCardHeight, setJamCardHeight] = useState(0)
+	const prevJamListRef = useRef(null)
+	const [title, setTitle] = useState('🔥 Jams')
+	const [query, setQuery] = useState('')
+	// const debouncedQuery = useDebounce(query, 300)
+	const windowHeight = useWindowHeight()
+	const windowWidth = useWindowWidth()
+	const scrollingDown = prevJamListRef.current < scrollTop
+	const [addJamLink, setAddJamLink] = useState('/add/jam')
+	const [showJams, setShowJams] = useState(true)
+	const [showSets, setShowSets] = useState(true)
+	const [showShows, setShowShows] = useState(true)
+
+	if (jamCardRef.current) {
+		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
+			setJamCardHeight(jamCardRef.current?.clientHeight)
+		}
+	}
 
 	useEffect(() => {
-		const scrollListener = () => {
-			setClientHeight(window.innerHeight)
-			setScrollPosition(window.scrollY)
-		}
+		setQuery('')
+	}, [songFilter])
 
-		if (typeof window !== 'undefined') {
-			window.addEventListener('scroll', scrollListener)
-		}
-
-		return () => {
-			if (typeof window !== 'undefined') {
-				window.removeEventListener('scroll', scrollListener)
-			}
+	useEffect(() => {
+		if (headerRef.current) {
+			setHeaderHeight(headerRef.current.clientHeight)
 		}
 	}, [])
 
-	useEffect(() => {
-		if (typeof document !== 'undefined' && urlToLoad) {
-			console.log('loading', urlToLoad)
-			fetcher.load(urlToLoad)
-			setUrlToLoad(null)
+	if (jamListRef.current && scrollTop > 100 && scrollingDown) {
+		if (window) {
+			scrollToBottomOfWindow()
 		}
-	}, [urlToLoad])
+	}
+
+	if (jamListRef.current && scrollTop < 10 && !scrollingDown) {
+		if (window) {
+			scrollToTopOfWindow()
+		}
+	}
+
+	const filteredJams = useMemo(() => {
+		return [...allJams, ...allSets, ...allShows]
+			.filter((jam) => {
+				return (
+					(!dateFilter || jam.date === dateFilter) &&
+					(!songFilter || jam.song_name === songFilter) &&
+					(artistFilters.length === 0 || artistFilters.includes(jam.artist_id.toString())) &&
+					(!linkFilter || jam.listen_link) &&
+					(soundFilters.length === 0 ||
+						soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))) &&
+					(!beforeDateFilter || jam.year <= beforeDateFilter) &&
+					(!afterDateFilter || jam.year >= Number(afterDateFilter))
+				)
+			})
+			.sort((a, b) => b.avg_rating - a.avg_rating)
+	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, soundFilters, beforeDateFilter, afterDateFilter])
 
 	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			if (initialPage === 1) {
-				setJams(initialJams)
-			}
-		}
-	}, [initialJams])
-
-	useEffect(() => {
-		if (!shouldFetch || !height) return
-		if (
-			(clientHeight && page !== 2 && clientHeight + scrollPosition + 2000 < height) ||
-			(clientHeight && page === 2 && clientHeight + scrollPosition + 1500 < height)
-		)
-			return
-		let newSearch = search.slice(1)
-		let urlToFetch = `/jams?index&${newSearch}&page=${page}`
-		fetcher.load(urlToFetch)
-		setShouldFetch(false)
-	}, [clientHeight, scrollPosition])
-
-	useEffect(() => {
-		const data: any = fetcher.data
-		if (data?.initialJams?.length === 0) {
-			setShouldFetch(false)
-			return
+		const filters = {
+			dateFilter: dateFilter,
+			beforeDateFilter,
+			afterDateFilter,
+			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
+			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
+			songName: songFilter,
+			showJams,
+			showSets,
+			showShows,
 		}
 
-		if (data?.initialJams?.length > 0 && jams) {
-			const allJams = [...jams, ...data.initialJams]
-			setJams(allJams)
-			setPage((page) => page + 1)
-			setShouldFetch(true)
-		}
-	}, [fetcher.data])
+		const newTitle = buildTitle(filters)
+		setTitle(newTitle)
+
+		scrollToTopOfRef(jamListRef)
+
+		const filterURL = createFilterURL('/add/jam', filters)
+		console.log('filterURL', filterURL)
+		setAddJamLink(filterURL)
+	}, [filteredJams])
 
 	return (
-		<div className="w-full h-full overflow-x-hidden">
-			{/* <Login supabase={supabase} session={session} />
-      <Nav /> */}
-			<Hero open={open} setOpen={setOpen} />
-			<JamsHome
-				artists={artists}
-				songs={songs}
-				jams={jams}
-				sounds={sounds}
-				open={open}
-				setOpen={setOpen}
-				// fullTitle={fullTitle}
-				title={title}
-				count={count}
-				search={search}
-				user={user}
-				profile={profile}
-				setClientHeight={setClientHeight}
-				setHeight={setHeight}
-				setUrlToLoad={setUrlToLoad}
-			/>
+		<div ref={pageRef}>
+			{!search && <Hero open={open} setOpen={setOpen} />}
+			<div className="flex flex-wrap justify-center">
+				<div className="flex items-center align-center justify-center space-x-10 pb-8 text-center mx-4">
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{jamsCount}</p>
+						<p className="text-sm text-gray-500">jams</p>
+					</div>
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{setsCount}</p>
+						<p className="text-sm text-gray-500">sets</p>
+					</div>
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{showsCount}</p>
+						<p className="text-sm text-gray-500">shows</p>
+					</div>
+				</div>
+				<div className="flex items-center align-center justify-center space-x-10 pb-8 mx-4">
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{songsCount}</p>
+						<p className="text-sm text-gray-500">songs</p>
+					</div>
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{artistsCount}</p>
+						<p className="text-sm text-gray-500">artists</p>
+					</div>
+					<div className="text-center w-14 items-center">
+						<p className="text-lg font-semibold text-gray-700">{soundsCount}</p>
+						<p className="text-sm text-gray-500">sounds</p>
+					</div>
+				</div>
+			</div>
+			<div className="bg-gray-100">
+				<div className="flex-column justify-center items-center pt-3 pb-2 mb-0" ref={headerRef}>
+					<JamsTitle title={title} />
+					<div className="flex justify-center gap-8 items-center">
+						<FiltersButton open={open} setOpen={setOpen} />
+						{/* <Link
+							to={addJamLink}
+							className="text-center text-xl underline text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out"
+						>
+							Add a Jam
+						</Link> */}
+					</div>
+				</div>
+				<JamFiltersClientside
+					sounds={sounds}
+					artists={artists}
+					songs={songs}
+					open={open}
+					setOpen={setOpen}
+					totalCount={count}
+					search={search}
+					showIframe={showIframe}
+					setArtistFilters={setArtistFilters}
+					setSongFilter={setSongFilter}
+					setSoundFilters={setSoundFilters}
+					setBeforeDateFilter={setBeforeDateFilter}
+					setAfterDateFilter={setAfterDateFilter}
+					setDateFilter={setDateFilter}
+					setShowComments={setShowComments}
+					setShowRatings={setShowRatings}
+					setOrderBy={setOrderBy}
+					songFilter={songFilter}
+					artistFilters={artistFilters}
+					soundFilters={soundFilters}
+					beforeDateFilter={beforeDateFilter}
+					afterDateFilter={afterDateFilter}
+					dateFilter={dateFilter}
+					showComments={showComments}
+					showRatings={showRatings}
+					orderBy={orderBy}
+					jamsLength={filteredJams.length}
+					linkFilter={linkFilter}
+					setLinkFilter={setLinkFilter}
+					query={query}
+					setQuery={setQuery}
+					musicalEntitiesFilters={musicalEntitiesFilters}
+					setMusicalEntitiesFilters={setMusicalEntitiesFilters}
+				/>
+				<VirtualJamList
+					jamListRef={jamListRef}
+					items={filteredJams}
+					user={user}
+					setShowIframe={setShowIframe}
+					setIframeUrl={setIframeUrl}
+					showRatings={showRatings}
+					headerHeight={headerHeight}
+					windowHeight={windowHeight}
+					windowWidth={windowWidth}
+					scrollTop={scrollTop}
+					setScrollTop={setScrollTop}
+					jamCardHeight={jamCardHeight}
+					prevJamListRef={prevJamListRef}
+				/>
+				{filteredJams.length > 0 && (
+					<JamCard
+						jam={filteredJams[0]}
+						user={user}
+						showRatings={showRatings}
+						className="measure-div"
+						ref={jamCardRef}
+					/>
+				)}
+			</div>
 		</div>
 	)
 }

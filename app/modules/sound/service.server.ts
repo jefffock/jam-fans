@@ -1,4 +1,4 @@
-import { db } from '~/database'
+import { db } from '../../database'
 
 export async function getSounds() {
 	const sounds = await db.sounds.findMany({
@@ -7,4 +7,9 @@ export async function getSounds() {
 		},
 	})
 	return sounds
+}
+
+export async function getSoundsCount(): Promise<number> {
+	const count = await db.sounds.count()
+	return count
 }
