@@ -5,7 +5,7 @@ export const addArtistConfig = {
 	fields: [
 		{
 			label: 'band name',
-			name: 'artist-name',
+			name: 'name',
 			placeholder: 'band name',
 			type: 'text',
 			required: true,

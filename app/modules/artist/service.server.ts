@@ -21,15 +21,16 @@ export async function getArtistsCount(): Promise<number> {
 	return count
 }
 
-export async function addArtist({ artist }) {
-	console.log('artist', artist)
+export async function addArtist({ name, emoji, nameForOrder, url }) {
+	console.log('artist', name, emoji, nameForOrder, url)
 	const artistAdded = await db.artists.create({
 		data: {
-			artist: artist.name,
-			emoji_code: artist.emoji,
-			name_for_order: artist.nameForOrder,
-			url: artist.url,
+			artist: name,
+			emoji_code: emoji,
+			name_for_order: nameForOrder,
+			url: url,
 			ratings: 0,
+			nickname: name,
 		},
 	})
 	console.log('artistAdded', artistAdded)

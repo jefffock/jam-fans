@@ -91,11 +91,11 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (_action === 'add-artist') {
 		console.log('...values', values)
 		//get emoji code from input
-		const emoji = values['artist-emoji']
+		const emoji = values['emoji']
 		const emojiCode = emoji ? emojiToUnicode(emoji) : emojiToUnicode('💚')
 		console.log('emojiCode', emojiCode)
 		//get artist name from input
-		const artistName = values['artist-name']
+		const artistName = values['name']
 		console.log('artistName', artistName)
 		//create url slug
 		const slug = slugify(artistName)
@@ -110,7 +110,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			nameForOrder: artistNameForSort,
 			url: slug,
 		}
-		await addArtist({ artist })
+		await addArtist(artist)
 		return json({ ok: true })
 	}
 	return json({ ok: true })
