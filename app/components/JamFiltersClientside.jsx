@@ -12,6 +12,7 @@ import MusicalEntityPicker from './EntityPicker'
 import FitlersSlideout from './FiltersSlideout'
 import DatePicker from './DatePicker'
 import Accordion from './Accordion'
+import { buildFiltersButtonText } from '~/utils'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -44,19 +45,23 @@ export default function JamFiltersClientside({
 	showComments,
 	showRatings,
 	orderBy,
-	jamsLength,
+	musicalEntitiesLength,
 	linkFilter,
 	setLinkFilter,
 	query,
 	setQuery,
 	musicalEntitiesFilters,
 	setMusicalEntitiesFilters,
+	jamsCount,
+	setsCount,
+	showsCount,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
 	const [date, setDate] = useState('')
 	const [dateInput, setDateInput] = useState('')
 	const [songSelected, setSongSelected] = useState(null)
+	const noFiltersSelected = musicalEntitiesLength === jamsCount + setsCount + showsCount
 
 	const dates = []
 	let currentYear = new Date().getFullYear()
@@ -166,36 +171,32 @@ export default function JamFiltersClientside({
 	return (
 		<FitlersSlideout open={open} setOpen={setOpen} showIframe={showIframe}>
 			<Form
-				action="/jams"
+				method="post"
 				className="space-y-6 divide-y divide-gray-200"
 				id="jam-filter-form"
 				onSubmit={() => e.preventDefault()}
 			>
 				<div className="relative flex-1 px-4 sm:px-6">
-					<div className="space-y-6 divide-y divide-gray-200">
+					<div className="divide-y divide-gray-200">
 						<MusicalEntityPicker
 							entitiesFilters={musicalEntitiesFilters}
 							setEntitiesFilters={setMusicalEntitiesFilters}
 						/>
-						<Accordion title="Bands">
+						<Accordion title="bands">
 							<ArtistPicker
 								artists={artists}
 								handleArtistsChange={handleArtistsChange}
 								artistFilters={artistFilters}
 							/>
 						</Accordion>
-						<Accordion title="Date">
-							<DatePicker
-								dateInput={dateInput}
-								handleDateInputChange={handleDateInputChange}
-								date={date}
+						<DatePicker dateInput={dateInput} handleDateInputChange={handleDateInputChange} date={date} />
+						<Accordion title="sounds">
+							<SoundPicker
+								sounds={sounds}
+								handleSoundsChange={handleSoundsChange}
+								soundFilters={soundFilters}
 							/>
 						</Accordion>
-						<SoundPicker
-							sounds={sounds}
-							handleSoundsChange={handleSoundsChange}
-							soundFilters={soundFilters}
-						/>
 						{/* Song Picker */}
 						<SongPicker
 							setQuery={setQuery}
@@ -430,39 +431,44 @@ export default function JamFiltersClientside({
 						</div>
 					</div>
 				</div>
-				<div className="absolute flex justify-evenly flex-row-reverse bottom-0 right-0 py-4 bg-white w-full max-w-md px-2">
-					{jamsLength === 0 && (
-						<Link to="/add/jam" className="underline mr-2 bottom-0 self-center">
+				<div className="absolute flex justify-evenly flex-col bottom-0 right-0 py-4 bg-white w-full max-w-md px-2">
+					{musicalEntitiesLength === 0 && (
+						<Link to="/add/jam" className="underline bottom-0 self-center">
 							Add a Jam?
 						</Link>
 					)}
 
 					<button
 						className={
-							jamsLength !== 0
+							`m-4` + musicalEntitiesLength !== 0
 								? 'inline-flex justify-center rounded-md border border-transparent bg-cyan-600 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2'
 								: 'inline-flex justify-center rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 cursor-not-allowed'
 						}
 						onClick={(e) => handleCloseFilters(e)}
-						disabled={jamsLength === 0}
+						disabled={musicalEntitiesLength === 0}
 					>
-						{jamsLength !== 0 ? `See ${jamsLength} jams` : `0 😢`}
+						{buildFiltersButtonText(musicalEntitiesFilters, musicalEntitiesLength)}
 					</button>
-
-					<button
-						type="button"
-						className="rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-						onClick={clearFilters}
-					>
-						Clear Filters
-					</button>
-					<button
-						type="button"
-						className="rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-						onClick={() => setOpen(false)}
-					>
-						Cancel
-					</button>
+					<div className="m-4">
+						{!noFiltersSelected && (
+							<button
+								type="button"
+								className="rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+								onClick={clearFilters}
+							>
+								Clear Filters
+							</button>
+						)}
+						{musicalEntitiesLength === 0 && (
+							<button
+								type="button"
+								className="rounded-md border border-gray-300 bg-white py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+								onClick={() => setOpen(false)}
+							>
+								Close
+							</button>
+						)}
+					</div>
 				</div>
 			</Form>
 			{/* </div> */}

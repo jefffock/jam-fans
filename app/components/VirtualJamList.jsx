@@ -4,7 +4,6 @@ import { Iframe } from './IFrame'
 
 export default function VirtualJamList({
 	items,
-	itemHeight,
 	user,
 	setShowIframe,
 	setIframeUrl,

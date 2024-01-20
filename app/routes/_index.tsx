@@ -13,10 +13,12 @@ import {
 	scrollToTopOfWindow,
 	scrollToTopOfRef,
 	createFilterURL,
+	slugify,
+	emojiToUnicode,
 } from '../utils'
 import { getSets, getSetsCount } from '../modules/set/index.server'
 import { getShows, getShowsCount } from '../modules/show/index.server'
-import { getArtistsCount, getArtists, filterArtists } from '../modules/artist/index.server'
+import { getArtistsCount, getArtists, addArtist } from '../modules/artist/index.server'
 import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.server'
 import { getSongsCount, getSongById, getSongs } from '../modules/song/index.server'
 import { useState, useEffect, useRef, useMemo } from 'react'
@@ -30,6 +32,7 @@ import VirtualJamList from '../components/VirtualJamList'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import JamCard from '../components/cards/JamCard'
 import { useDebounce } from '~/hooks'
+import SiteStats from '~/components/SiteStats'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const response = new Response()
@@ -82,10 +85,34 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export async function action({ request }: ActionFunctionArgs) {
 	//get action name
-	const url = new URL(request.url)
-	const searchParams = new URLSearchParams(url.search)
-	const action = searchParams.get('action')
-	console.log('action', action)
+	let formData = await request.formData()
+	let { _action, ...values } = Object.fromEntries(formData)
+	console.log('_action', _action)
+	if (_action === 'add-artist') {
+		console.log('...values', values)
+		//get emoji code from input
+		const emoji = values['artist-emoji']
+		const emojiCode = emoji ? emojiToUnicode(emoji) : emojiToUnicode('💚')
+		console.log('emojiCode', emojiCode)
+		//get artist name from input
+		const artistName = values['artist-name']
+		console.log('artistName', artistName)
+		//create url slug
+		const slug = slugify(artistName)
+		const artistNameForSort = slug
+			.replace(/^(a |the |an |- )/i, '')
+			.trim()
+			.slice(0, 3)
+
+		const artist = {
+			name: artistName,
+			emoji: emojiCode,
+			nameForOrder: artistNameForSort,
+			url: slug,
+		}
+		await addArtist({ artist })
+		return json({ ok: true })
+	}
 	return json({ ok: true })
 }
 
@@ -208,22 +235,42 @@ export default function Index() {
 		}
 	}
 
-	const filteredJams = useMemo(() => {
-		return [...allJams, ...allSets, ...allShows]
-			.filter((jam) => {
+	const filteredMusicalEntities = useMemo(() => {
+		let combinedArray = []
+		if (musicalEntitiesFilters.jams) {
+			combinedArray = [...combinedArray, ...allJams]
+		}
+		if (musicalEntitiesFilters.sets) {
+			combinedArray = [...combinedArray, ...allSets]
+		}
+		if (musicalEntitiesFilters.shows) {
+			combinedArray = [...combinedArray, ...allShows]
+		}
+		return combinedArray
+			.filter((item) => {
 				return (
-					(!dateFilter || jam.date === dateFilter) &&
-					(!songFilter || jam.song_name === songFilter) &&
-					(artistFilters.length === 0 || artistFilters.includes(jam.artist_id.toString())) &&
-					(!linkFilter || jam.listen_link) &&
+					(!dateFilter || item.date === dateFilter) &&
+					(!songFilter || item?.song_name === songFilter) &&
+					(artistFilters.length === 0 || artistFilters.includes(item.artist_id.toString())) &&
+					(!linkFilter || item.listen_link) &&
 					(soundFilters.length === 0 ||
-						soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))) &&
-					(!beforeDateFilter || jam.year <= beforeDateFilter) &&
-					(!afterDateFilter || jam.year >= Number(afterDateFilter))
+						soundFilters.every((filter) => jitem.sound_ids.includes(filter.toString()))) &&
+					(!beforeDateFilter || item.year <= beforeDateFilter) &&
+					(!afterDateFilter || item.year >= Number(afterDateFilter))
 				)
 			})
 			.sort((a, b) => b.avg_rating - a.avg_rating)
-	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, soundFilters, beforeDateFilter, afterDateFilter])
+	}, [
+		allJams,
+		dateFilter,
+		songFilter,
+		artistFilters,
+		linkFilter,
+		soundFilters,
+		beforeDateFilter,
+		afterDateFilter,
+		musicalEntitiesFilters,
+	])
 
 	useEffect(() => {
 		const filters = {
@@ -246,52 +293,24 @@ export default function Index() {
 		const filterURL = createFilterURL('/add/jam', filters)
 		console.log('filterURL', filterURL)
 		setAddJamLink(filterURL)
-	}, [filteredJams])
+	}, [filteredMusicalEntities])
 
 	return (
 		<div ref={pageRef}>
-			{!search && <Hero open={open} setOpen={setOpen} />}
-			<div className="flex flex-wrap justify-center">
-				<div className="flex items-center align-center justify-center space-x-10 pb-8 text-center mx-4">
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{jamsCount}</p>
-						<p className="text-sm text-gray-500">jams</p>
-					</div>
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{setsCount}</p>
-						<p className="text-sm text-gray-500">sets</p>
-					</div>
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{showsCount}</p>
-						<p className="text-sm text-gray-500">shows</p>
-					</div>
-				</div>
-				<div className="flex items-center align-center justify-center space-x-10 pb-8 mx-4">
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{songsCount}</p>
-						<p className="text-sm text-gray-500">songs</p>
-					</div>
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{artistsCount}</p>
-						<p className="text-sm text-gray-500">artists</p>
-					</div>
-					<div className="text-center w-14 items-center">
-						<p className="text-lg font-semibold text-gray-700">{soundsCount}</p>
-						<p className="text-sm text-gray-500">sounds</p>
-					</div>
-				</div>
-			</div>
+			<Hero />
+			<SiteStats
+				jamsCount={jamsCount}
+				setsCount={setsCount}
+				showsCount={showsCount}
+				artistsCount={artistsCount}
+				songsCount={songsCount}
+				soundsCount={soundsCount}
+			/>
 			<div className="bg-gray-100">
 				<div className="flex-column justify-center items-center pt-3 pb-2 mb-0" ref={headerRef}>
 					<JamsTitle title={title} />
 					<div className="flex justify-center gap-8 items-center">
 						<FiltersButton open={open} setOpen={setOpen} />
-						{/* <Link
-							to={addJamLink}
-							className="text-center text-xl underline text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out"
-						>
-							Add a Jam
-						</Link> */}
 					</div>
 				</div>
 				<JamFiltersClientside
@@ -321,17 +340,20 @@ export default function Index() {
 					showComments={showComments}
 					showRatings={showRatings}
 					orderBy={orderBy}
-					jamsLength={filteredJams.length}
+					musicalEntitiesLength={filteredMusicalEntities.length}
 					linkFilter={linkFilter}
 					setLinkFilter={setLinkFilter}
 					query={query}
 					setQuery={setQuery}
 					musicalEntitiesFilters={musicalEntitiesFilters}
 					setMusicalEntitiesFilters={setMusicalEntitiesFilters}
+					jamsCount={jamsCount}
+					setsCount={setsCount}
+					showsCount={showsCount}
 				/>
 				<VirtualJamList
 					jamListRef={jamListRef}
-					items={filteredJams}
+					items={filteredMusicalEntities}
 					user={user}
 					setShowIframe={setShowIframe}
 					setIframeUrl={setIframeUrl}
@@ -344,9 +366,9 @@ export default function Index() {
 					jamCardHeight={jamCardHeight}
 					prevJamListRef={prevJamListRef}
 				/>
-				{filteredJams.length > 0 && (
+				{filteredMusicalEntities.length > 0 && (
 					<JamCard
-						jam={filteredJams[0]}
+						jam={filteredMusicalEntities[0]}
 						user={user}
 						showRatings={showRatings}
 						className="measure-div"

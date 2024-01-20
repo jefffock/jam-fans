@@ -1,11 +1,11 @@
 export default function SoundPicker({ sounds, soundFilters, handleSoundsChange }) {
 	return (
-		<div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+		<div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
 			<div className="sm:col-span-6 mx-4">
 				<div className="mt-1 flex rounded-md shadow-sm">
 					<fieldset>
-						<legend className="text-2xl text-gray-900">Sounds</legend>
-						<div className="mt-4 divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll sm:col-span-6">
+						<legend className="text-2xl text-gray-900 hidden">Sounds</legend>
+						<div className="divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll sm:col-span-6">
 							{sounds &&
 								sounds?.map((sound, soundIdx) => (
 									<div key={soundIdx} className="relative flex items-start py-4">

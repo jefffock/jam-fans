@@ -9,7 +9,7 @@ export default function MusicalEntityPicker({ entitiesFilters, setEntitiesFilter
 	}
 
 	return (
-		<div className="flex justify-center gap-10 max-w-12 mx-auto">
+		<div className="flex justify-center gap-10 max-w-12 mx-auto p-4">
 			{Object.entries(entitiesFilters).map(([key, value]) => (
 				<label key={key} className="flex items-center space-x-2">
 					<input

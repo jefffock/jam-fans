@@ -51,7 +51,7 @@ export default function SongPicker({
 				}}
 				name="song"
 			>
-				<Combobox.Label className="block text-2xl  text-gray-900">Song</Combobox.Label>
+				<Combobox.Label className="block text-2xl  text-gray-900">song</Combobox.Label>
 				<div className="relative mt-1 px-30">
 					<Combobox.Input
 						className="w-full rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm"
@@ -109,7 +109,7 @@ export default function SongPicker({
 						className="rounded-md border border-gray-300 bg-white mt-4 py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 text-right focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ml-5 mr-0"
 						onClick={clearSong}
 					>
-						Clear song filter
+						clear
 					</button>
 				</div>
 			)}

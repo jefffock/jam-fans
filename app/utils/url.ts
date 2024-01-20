@@ -21,3 +21,16 @@ export function createFilterURL(baseURL, filters) {
 
 	return `${baseURL}?${params.toString()}`
 }
+
+export function slugify(string) {
+	if (!string) {
+		return ''
+	}
+	return string
+		.toLowerCase()
+		.replace(/ /g, '-')
+		.replace(/[^\w-]+/g, '')
+		.replace(/--+/g, '-')
+		.replace(/^-+/, '')
+		.replace(/-+$/, '')
+}

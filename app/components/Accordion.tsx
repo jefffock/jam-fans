@@ -10,7 +10,7 @@ export default function Accordion({ title, children }) {
 
 	return (
 		<div>
-			<div className="flex justify-between items-center cursor-pointer my-4" onClick={toggleOpen}>
+			<div className="flex justify-between items-center cursor-pointer p-4" onClick={toggleOpen}>
 				<h3 className="text-2xl text-gray-900">{title}</h3>
 				{isOpen ? <MinusIcon className="h-8" /> : <PlusIcon className="h-8" />}
 			</div>

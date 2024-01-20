@@ -30,3 +30,14 @@ export async function getSongsCount(): Promise<number> {
 	const count = await db.songs.count()
 	return count
 }
+
+export async function addSong({ song, artist, submitter_id }) {
+	const songAdded = await db.songs.create({
+		data: {
+			song: song,
+			artist: artist,
+			submitter_id: submitter_id,
+		},
+	})
+	return songAdded
+}

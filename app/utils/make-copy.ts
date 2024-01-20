@@ -59,3 +59,19 @@ export function buildTitle({
 
 	return title.trim()
 }
+
+export function buildFiltersButtonText(filters, count) {
+	// Filter keys that are true
+	let enabledEntities
+	if (filters) {
+		enabledEntities = Object.keys(filters).filter((key) => filters[key])
+	} else {
+		enabledEntities = ['jams', 'sets', 'shows']
+	}
+
+	// Convert array to a string like "jams, sets, and shows"
+	const entityString = enabledEntities.join(', ').replace(/, ([^,]*)$/, ' and $1')
+
+	// Return the full description
+	return count !== 0 ? `see ${count} ${entityString}` : `0 😢`
+}

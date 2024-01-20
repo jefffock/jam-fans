@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/solid'
+import ConfigurableAddItemModal from './ConfigurableAddItemModal'
+import { addArtistConfig } from '~/config'
 
 export default function ArtistPicker({ artists, handleArtistsChange, artistFilters }) {
+	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	const openModal = (e) => {
+		e.preventDefault()
+		setIsModalOpen(true)
+	}
+	const closeModal = () => setIsModalOpen(false)
 	return (
 		<div className="sm:col-span-4 mx-4">
 			<fieldset>
@@ -35,6 +44,12 @@ export default function ArtistPicker({ artists, handleArtistsChange, artistFilte
 								</div>
 							</div>
 						))}
+				</div>
+				<div>
+					<button onClick={openModal} className="bg-blue-500 text-white rounded p-2">
+						Suggest an Artist
+					</button>
+					<ConfigurableAddItemModal isOpen={isModalOpen} onClose={closeModal} config={addArtistConfig} />
 				</div>
 			</fieldset>
 		</div>

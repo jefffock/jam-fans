@@ -27,20 +27,20 @@ export default function FitlersSlideout({ open, setOpen, showIframe, children })
 									>
 										<div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6">
 											<div className="px-4 sm:px-6">
-												<div className="flex items-start justify-between">
-													<Dialog.Title className="text-2xl font-med text-gray-900 px-4">
-														Filters
-													</Dialog.Title>
-													<div className="ml-3 flex h-7 items-center">
+												<div className="flex-end">
+													<div className="grid h-7 justify-items-end">
 														<button
 															type="button"
-															className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+															className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
 															onClick={() => setOpen(false)}
 														>
 															<span className="sr-only">Close panel</span>
 															<XMarkIcon className="h-6 w-6" aria-hidden="true" />
 														</button>
 													</div>
+													<Dialog.Title className="text-center text-lg font-med text-gray-900 p-4">
+														happy exploring!
+													</Dialog.Title>
 												</div>
 											</div>
 											{children}
