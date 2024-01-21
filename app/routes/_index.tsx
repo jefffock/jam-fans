@@ -33,6 +33,11 @@ import JamFiltersClientside from '../components/JamFiltersClientside'
 import JamCard from '../components/cards/JamCard'
 import { useDebounce } from '~/hooks'
 import SiteStats from '~/components/SiteStats'
+import useFilteredMusicalEntities from '~/hooks/use-filtered-musical-entities'
+import useFilterEffects from '~/hooks/use-filter-effects'
+import EntityListHeader from '~/components/EntityListHeader'
+import EntityListContainer from '~/components/EntityListContainer'
+import { db } from '../database'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const response = new Response()
@@ -41,22 +46,37 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
 
-	const jams = await getJams()
-	const sets = await getSets()
-	const shows = await getShows()
-	const artists = await getArtists()
-	const songs = await getSongs()
-	const sounds = await getSounds()
-	// const profile = await getProfile()
-	const jamsCount = await getJamsCount()
-	const setsCount = await getSetsCount()
-	const showsCount = await getShowsCount()
-	const artistsCount = await getArtistsCount()
-	const soundsCount = await getSoundsCount()
-	const songsCount = await getSongsCount()
+	const [
+		jams,
+		sets,
+		shows,
+		artists,
+		songs,
+		sounds,
+		// profile,
+		jamsCount,
+		setsCount,
+		showsCount,
+		artistsCount,
+		soundsCount,
+		songsCount,
+	] = await Promise.all([
+		getJams({ db }),
+		getSets({ db }),
+		getShows({ db }),
+		getArtists({ db }),
+		getSongs({ db }),
+		getSounds({ db }),
+		// getProfile(),
+		getJamsCount({ db }),
+		getSetsCount({ db }),
+		getShowsCount({ db }),
+		getArtistsCount({ db }),
+		getSoundsCount({ db }),
+		getSongsCount({ db }),
+	])
 
 	let song_id = queryParams.song
-	// const song = await getSongById({ songs, id: song_id })
 
 	return json(
 		{
@@ -87,64 +107,12 @@ export async function action({ request }: ActionFunctionArgs) {
 	//get action name
 	let formData = await request.formData()
 	let { _action, ...values } = Object.fromEntries(formData)
-	console.log('_action', _action)
 	if (_action === 'add-artist') {
-		console.log('...values', values)
-		//get emoji code from input
-		const emoji = values['emoji']
-		const emojiCode = emoji ? emojiToUnicode(emoji) : emojiToUnicode('💚')
-		console.log('emojiCode', emojiCode)
-		//get artist name from input
-		const artistName = values['name']
-		console.log('artistName', artistName)
-		//create url slug
-		const slug = slugify(artistName)
-		const artistNameForSort = slug
-			.replace(/^(a |the |an |- )/i, '')
-			.trim()
-			.slice(0, 3)
-
-		const artist = {
-			name: artistName,
-			emoji: emojiCode,
-			nameForOrder: artistNameForSort,
-			url: slug,
-		}
-		await addArtist(artist)
+		await addArtist(values)
 		return json({ ok: true })
 	}
 	return json({ ok: true })
 }
-
-// let isInitialRequest = true
-
-// export async function clientLoader({ request, serverLoader }: ClientLoaderFunctionArgs) {
-// 	// const cacheKey = generateKey(request)
-
-// 	if (isInitialRequest) {
-// 		isInitialRequest = false
-// 		const serverData = await serverLoader()
-// 		// cache.set(cacheKey, serverData)
-// 		return serverData
-// 	}
-
-// 	// const cachedData = await cache.get(cacheKey)
-// 	// if (cachedData) {
-// 	// 	return cachedData
-// 	// }
-
-// 	const serverData = await serverLoader()
-// 	// cache.set(cacheKey, serverData)
-// 	return serverData
-// }
-// clientLoader.hydrate = true // (2)
-
-// export async function clientAction({ request, serverAction }: ClientActionFunctionArgs) {
-// 	// const cacheKey = generateKey(request)
-// 	// cache.delete(cacheKey)
-// 	const serverData = await serverAction()
-// 	return serverData
-// }
 
 export default function Index() {
 	const {
@@ -155,11 +123,9 @@ export default function Index() {
 		search,
 		user,
 		song,
-		profile,
 		allJams,
 		allShows,
 		allSets,
-		pageFromServer,
 		jamsCount,
 		setsCount,
 		showsCount,
@@ -235,33 +201,11 @@ export default function Index() {
 		}
 	}
 
-	const filteredMusicalEntities = useMemo(() => {
-		let combinedArray = []
-		if (musicalEntitiesFilters.jams) {
-			combinedArray = [...combinedArray, ...allJams]
-		}
-		if (musicalEntitiesFilters.sets) {
-			combinedArray = [...combinedArray, ...allSets]
-		}
-		if (musicalEntitiesFilters.shows) {
-			combinedArray = [...combinedArray, ...allShows]
-		}
-		return combinedArray
-			.filter((item) => {
-				return (
-					(!dateFilter || item.date === dateFilter) &&
-					(!songFilter || item?.song_name === songFilter) &&
-					(artistFilters.length === 0 || artistFilters.includes(item.artist_id.toString())) &&
-					(!linkFilter || item.listen_link) &&
-					(soundFilters.length === 0 ||
-						soundFilters.every((filter) => jitem.sound_ids.includes(filter.toString()))) &&
-					(!beforeDateFilter || item.year <= beforeDateFilter) &&
-					(!afterDateFilter || item.year >= Number(afterDateFilter))
-				)
-			})
-			.sort((a, b) => b.avg_rating - a.avg_rating)
-	}, [
+	const filteredMusicalEntities = useFilteredMusicalEntities({
 		allJams,
+		allSets,
+		allShows,
+		musicalEntitiesFilters,
 		dateFilter,
 		songFilter,
 		artistFilters,
@@ -269,31 +213,28 @@ export default function Index() {
 		soundFilters,
 		beforeDateFilter,
 		afterDateFilter,
-		musicalEntitiesFilters,
-	])
+	})
 
-	useEffect(() => {
-		const filters = {
-			dateFilter: dateFilter,
-			beforeDateFilter,
-			afterDateFilter,
-			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
-			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
-			songName: songFilter,
-			showJams,
-			showSets,
-			showShows,
-		}
-
-		const newTitle = buildTitle(filters)
-		setTitle(newTitle)
-
-		scrollToTopOfRef(jamListRef)
-
-		const filterURL = createFilterURL('/add/jam', filters)
-		console.log('filterURL', filterURL)
-		setAddJamLink(filterURL)
-	}, [filteredMusicalEntities])
+	useFilterEffects({
+		dateFilter,
+		beforeDateFilter,
+		afterDateFilter,
+		artistFilters,
+		artists,
+		soundFilters,
+		sounds,
+		songFilter,
+		showJams,
+		showSets,
+		showShows,
+		buildTitle,
+		setTitle,
+		scrollToTopOfRef,
+		jamListRef,
+		createFilterURL,
+		setAddJamLink,
+		filteredMusicalEntities,
+	})
 
 	return (
 		<div ref={pageRef}>
@@ -306,13 +247,8 @@ export default function Index() {
 				songsCount={songsCount}
 				soundsCount={soundsCount}
 			/>
-			<div className="bg-gray-100">
-				<div className="flex-column justify-center items-center pt-3 pb-2 mb-0" ref={headerRef}>
-					<JamsTitle title={title} />
-					<div className="flex justify-center gap-8 items-center">
-						<FiltersButton open={open} setOpen={setOpen} />
-					</div>
-				</div>
+			<EntityListContainer>
+				<EntityListHeader title={title} open={open} setOpen={setOpen} headerRef={headerRef} />
 				<JamFiltersClientside
 					sounds={sounds}
 					artists={artists}
@@ -375,7 +311,7 @@ export default function Index() {
 						ref={jamCardRef}
 					/>
 				)}
-			</div>
+			</EntityListContainer>
 		</div>
 	)
 }

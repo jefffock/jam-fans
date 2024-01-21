@@ -1,6 +1,6 @@
 import { db } from '../../database'
 
-export async function getSounds() {
+export async function getSounds({ db }) {
 	const sounds = await db.sounds.findMany({
 		orderBy: {
 			label: 'asc',
@@ -9,7 +9,7 @@ export async function getSounds() {
 	return sounds
 }
 
-export async function getSoundsCount(): Promise<number> {
+export async function getSoundsCount({ db }): Promise<number> {
 	const count = await db.sounds.count()
 	return count
 }

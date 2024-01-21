@@ -1,6 +1,6 @@
 import { db } from '../../database'
 
-export async function getShows() {
+export async function getShows({ db }) {
 	const shows = await db.shows.findMany()
 	return shows
 }
@@ -38,7 +38,7 @@ export async function getShowById(showId: number | string) {
 	return show
 }
 
-export async function getShowsCount(): Promise<number> {
+export async function getShowsCount({ db }): Promise<number> {
 	const count = await db.shows.count()
 	return count
 }

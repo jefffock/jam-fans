@@ -19,3 +19,25 @@ export const addArtistConfig = {
 		},
 	],
 }
+
+export const addShowConfig = {
+	title: 'add a show',
+	action: 'add-show',
+	submitButtonName: 'add show',
+	fields: [
+		{
+			label: 'band',
+			name: 'name',
+			placeholder: 'band',
+			type: 'text',
+			required: true,
+		},
+		{
+			label: 'date',
+			name: 'date',
+			placeholder: 'mmddyyyy',
+			type: 'text',
+			required: false,
+		},
+	],
+}

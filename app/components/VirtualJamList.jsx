@@ -1,6 +1,7 @@
 import JamCard from './cards/JamCard'
 import React, { useState, useRef, useEffect } from 'react'
 import { Iframe } from './IFrame'
+import { getRatingsVisible } from '~/utils'
 
 export default function VirtualJamList({
 	items,
@@ -29,6 +30,7 @@ export default function VirtualJamList({
 		prevJamListRef.current = scrollTop
 		setScrollTop(event.currentTarget.scrollTop)
 	}
+	const ratingsVisible = getRatingsVisible()
 
 	return (
 		<div
@@ -51,7 +53,7 @@ export default function VirtualJamList({
 									user={user}
 									setShowIframe={setShowIframe}
 									setIframeUrl={setIframeUrl}
-									showRatings={showRatings}
+									showRatings={ratingsVisible}
 								/>
 							)
 						}

@@ -1,6 +1,5 @@
 import type { Prisma } from '../../database'
 import { db } from '../../database'
-
 export async function addJam(data: {
 	date: string
 	artist: string
@@ -121,7 +120,7 @@ export async function getJamsByShow(data: { show_id: number }) {
 	return versions
 }
 
-export async function getJams() {
+export async function getJams({ db }) {
 	const allJams = await db.jams.findMany({
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})

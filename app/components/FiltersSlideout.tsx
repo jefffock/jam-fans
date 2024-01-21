@@ -2,7 +2,7 @@ import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
 import { Fragment } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
-export default function FitlersSlideout({ open, setOpen, showIframe, children }) {
+export default function FiltersSlideout({ open, setOpen, showIframe, children }) {
 	return (
 		<Transition.Root show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -39,14 +39,12 @@ export default function FitlersSlideout({ open, setOpen, showIframe, children })
 														</button>
 													</div>
 													<Dialog.Title className="text-center text-lg font-med text-gray-900 p-4">
-														happy exploring!
+														jam explorer
 													</Dialog.Title>
 												</div>
 											</div>
 											{children}
 										</div>
-										{/* end jam filters */}
-										{/* </Form> */}
 									</div>
 								</Dialog.Panel>
 							</Transition.Child>

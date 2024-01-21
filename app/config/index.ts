@@ -1,1 +1,1 @@
-export * from './addArtistConfig'
+export * from './modals'

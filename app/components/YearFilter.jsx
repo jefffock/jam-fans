@@ -6,18 +6,18 @@ function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
 }
 
-export default function YearFilter({ before }) {
+export default function YearFilter({ isBefore }) {
 	const [selected, setSelected] = useState(null)
 	const dates = []
 	let currentYear = new Date().getFullYear()
 	for (var i = currentYear; i > 1959; i--) {
-		dates.push(i)
+		dates.push(i) 
 	}
 	const displayValue = selected
-		? before
+		? isBefore
 			? `Played in ${selected} or before`
 			: `Played in ${selected} or after`
-		: before
+		: isBefore
 			? `Played in ${currentYear} or before`
 			: `Played in 1965 or after`
 
@@ -26,7 +26,7 @@ export default function YearFilter({ before }) {
 			{({ open }) => (
 				<div>
 					<Listbox.Label className="block text-sm font-medium text-gray-700">
-						{before ? 'Before' : 'After'}
+						{isBefore ? 'Before' : 'After'}
 					</Listbox.Label>
 					<div className="relative mt-1">
 						<Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm">

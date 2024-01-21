@@ -12,7 +12,7 @@ export default function FiltersButton({ open, setOpen }) {
 				onClick={handleClick}
 			>
 				<FunnelIcon className=" mr-2 h-5 w-5 text-white" aria-hidden="true" />
-				<p className="text-lg">filters</p>
+				<p className="text-lg">explore</p>
 			</button>
 		</div>
 	)
