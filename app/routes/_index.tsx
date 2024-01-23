@@ -17,7 +17,7 @@ import {
 	emojiToUnicode,
 } from '../utils'
 import { getSets, getSetsCount } from '../modules/set/index.server'
-import { getShows, getShowsCount } from '../modules/show/index.server'
+import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
 import { getArtistsCount, getArtists, addArtist } from '../modules/artist/index.server'
 import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.server'
 import { getSongsCount, getSongById, getSongs } from '../modules/song/index.server'
@@ -129,13 +129,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export async function action({ request }: ActionFunctionArgs) {
 	//get action name
-	console.log('in action in _index')
+
 	let formData = await request.formData()
 	console.log('formData', formData)
 	let { _action, ...values } = Object.fromEntries(formData)
 	if (_action === 'add-artist') {
 		await addArtist(values)
 		return json({ ok: true })
+	}
+
+	if (_action === 'add-show') {
+		console.log('in add show', values)
+		const addedShow = await addShow(values)
 	}
 	return json({ ok: true })
 }
@@ -199,7 +204,6 @@ export default function Index() {
 	const [showJams, setShowJams] = useState(true)
 	const [showSets, setShowSets] = useState(true)
 	const [showShows, setShowShows] = useState(true)
-	console.log('profile', profile)
 
 	if (jamCardRef.current) {
 		if (jamCardHeight !== jamCardRef.current?.clientHeight) {

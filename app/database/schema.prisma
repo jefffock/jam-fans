@@ -287,7 +287,6 @@ model users {
   @@schema("auth")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model add_link {
   id         BigInt    @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
@@ -299,8 +298,17 @@ model add_link {
   @@schema("public")
 }
 
+model artist_suggestions {
+  id           BigInt   @id @unique @default(autoincrement())
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  submitter_id String?  @default(dbgenerated("auth.uid()")) @db.Uuid
+  name         String?
+  votes        Int?     @default(1) @db.SmallInt
+
+  @@schema("public")
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model artists {
   id             Int              @id(map: "Artists_pkey") @default(autoincrement())
   artist         String           @unique(map: "Artists_artist_key")
@@ -347,7 +355,6 @@ model goose_songs {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model helpful_votes_ideas {
   id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
@@ -362,7 +369,20 @@ model helpful_votes_ideas {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model helpful_votes_ideas_duplicate {
+  id           Int       @id @default(autoincrement())
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+  idea_id      Int
+  user_name    String
+  counter      Int?      @default(1) @db.SmallInt
+  vote         Int       @default(1) @db.SmallInt
+  submitter_id String?   @db.Uuid
+  ideas        ideas     @relation(fields: [idea_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users?    @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
 model helpful_votes_ratings {
   id         Int       @id(map: "helpful_votes_reviews_pkey") @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
@@ -378,7 +398,6 @@ model helpful_votes_ratings {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model ideas {
   id                            Int                             @id @default(autoincrement())
   created_at                    DateTime?                       @default(now()) @db.Timestamptz(6)
@@ -407,7 +426,72 @@ model issues {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model jams {
+  id                  Int       @id @default(autoincrement())
+  date                String
+  avg_rating          Float     @default(0) @db.Real
+  location            String?
+  submitter_name      String?
+  artist              String
+  song_id             Int
+  user_id             String?   @db.Uuid
+  listen_link         String?
+  song_name           String?
+  num_ratings         Int?      @default(0)
+  song_submitter_name String?
+  sounds              String[]
+  set_id              BigInt?
+  show_id             Int?
+  venue_id            BigInt?
+  artist_id           Int?
+  sound_ids           String[]
+  year                Int?      @db.SmallInt
+  month               Int?      @db.SmallInt
+  day                 Int?      @db.SmallInt
+  artists             artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sets                sets?     @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shows               shows?    @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songs               songs     @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?   @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ratings             ratings[]
+
+  @@schema("public")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model jams_duplicate {
+  id                  Int       @id @default(autoincrement())
+  date                String
+  avg_rating          Float     @default(0) @db.Real
+  location            String?
+  submitter_name      String?
+  artist              String
+  song_id             Int
+  user_id             String?   @db.Uuid
+  listen_link         String?
+  song_name           String?
+  num_ratings         Int?      @default(0)
+  song_submitter_name String?
+  sounds              String[]
+  set_id              BigInt?
+  show_id             Int?
+  venue_id            BigInt?
+  artist_id           Int?
+  sound_ids           String[]
+  year                Int?      @db.SmallInt
+  month               Int?      @db.SmallInt
+  day                 Int?      @db.SmallInt
+  created_at          DateTime? @default(now()) @db.Date
+  artists             artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sets                sets?     @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shows               shows?    @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songs               songs     @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?   @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
 model jams_lists {
   id         BigInt    @id(map: "jams_lists_duplicate_pkey") @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
@@ -447,6 +531,22 @@ model neighbor_songs {
   original_artist String?
   created_at      DateTime? @db.Timestamptz(6)
   updated_at      DateTime? @db.Timestamptz(6)
+
+  @@schema("public")
+}
+
+model phishnet_jamcharts {
+  songid          BigInt  @id
+  song            String?
+  slug            String?
+  abbr            String?
+  artist          String?
+  debut           String?
+  last_played     String?
+  times_played    BigInt?
+  last_permalink  String?
+  debut_permalink String?
+  gap             BigInt?
 
   @@schema("public")
 }
@@ -492,8 +592,36 @@ model phishnet_songs {
   @@schema("public")
 }
 
+model phishnet_songs_duplicate {
+  songid          BigInt  @id
+  song            String?
+  slug            String?
+  abbr            String?
+  artist          String?
+  debut           String?
+  last_played     String?
+  times_played    BigInt?
+  last_permalink  String?
+  debut_permalink String?
+  gap             BigInt?
+
+  @@schema("public")
+}
+
+model phishnet_venues {
+  venueid    BigInt  @id
+  venuename  String?
+  city       String?
+  state      String?
+  country    String?
+  venuenotes String?
+  alias      BigInt?
+  short_name String?
+
+  @@schema("public")
+}
+
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model profiles {
   id                    String                  @id @db.Uuid
   updated_at            DateTime?               @db.Timestamptz(6)
@@ -514,7 +642,19 @@ model profiles {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model profiles_duplicate {
+  id         String    @id @db.Uuid
+  updated_at DateTime? @db.Timestamptz(6)
+  name       String    @unique(map: "profiles_duplicate_username_key")
+  avatar_url String?
+  can_write  Boolean   @default(true)
+  points     Int       @default(10)
+  users      users     @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
 model ratings {
   id                    Int                     @id(map: "Ratings_pkey") @default(autoincrement())
   created_at            DateTime?               @default(now()) @db.Timestamptz(6)
@@ -527,7 +667,7 @@ model ratings {
   profile_id            String?                 @db.Uuid
   musical_entity        MusicalEntity           @default(Jam)
   set_id                BigInt?
-  show_id               BigInt?
+  show_id               Int?
   jam_id                Int?
   helpful_votes_ratings helpful_votes_ratings[]
   jams                  jams?                   @relation(fields: [jam_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -557,7 +697,6 @@ model ratings_duplicate {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sets {
   id             BigInt           @id @default(autoincrement())
   created_at     DateTime?        @default(now()) @db.Timestamptz(6)
@@ -566,7 +705,7 @@ model sets {
   vibes          String[]
   profile_id     String?          @db.Uuid
   type           Set?
-  show_id        BigInt?
+  show_id        Int?
   multi_song     String[]
   song_ids       Int[]
   sound_ids      BigInt[]
@@ -575,15 +714,15 @@ model sets {
   ratings        ratings[]
   artists        artists?         @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles       profiles?        @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  shows          shows?           @relation(fields: [show_id], references: [id], onDelete: NoAction)
+  shows          shows?           @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   versions       versions[]
 
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model shows {
-  id             BigInt           @id @default(autoincrement())
+  id             Int              @id @default(autoincrement())
   created_at     DateTime?        @default(now()) @db.Timestamptz(6)
   date           DateTime?        @db.Date
   artist_id      Int?
@@ -597,6 +736,7 @@ model shows {
   year           Int?             @db.SmallInt
   sound_ids      BigInt[]
   date_text      String?
+  location       String?
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -610,7 +750,6 @@ model shows {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model songs {
   id                 Int                  @id(map: "Songs_pkey") @default(autoincrement())
   song               String
@@ -629,7 +768,6 @@ model songs {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sounds {
   id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
@@ -693,6 +831,20 @@ model tapers_choice_songs {
   @@schema("public")
 }
 
+model tours {
+  id         BigInt     @id @default(autoincrement())
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  artist_id  Int?
+  year       String?
+  continent  Continent?
+  region     Region[]
+  season     Season?
+  shows      shows[]
+  artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction)
+
+  @@schema("public")
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model um_songs {
   id              BigInt    @id
@@ -707,7 +859,6 @@ model um_songs {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model update_tags {
   id         BigInt    @id @default(autoincrement())
   version_id Int?
@@ -716,156 +867,6 @@ model update_tags {
   username   String?
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   versions   versions? @relation(fields: [version_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model versions {
-  id                  Int           @id(map: "Versions_pkey") @default(autoincrement())
-  date                String
-  avg_rating          Float         @default(0) @db.Real
-  location            String?
-  submitter_name      String?
-  artist              String
-  song_id             Int
-  user_id             String?       @db.Uuid
-  listen_link         String?
-  song_name           String?
-  num_ratings         Int?          @default(0)
-  song_submitter_name String?
-  sounds              String[]
-  set_id              BigInt?
-  show_id             BigInt?
-  sound_ids           BigInt?
-  venue_id            BigInt?
-  add_link            add_link[]
-  ratings             ratings[]
-  update_tags         update_tags[]
-  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction)
-  shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction)
-  songs               songs         @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venues              venues?       @relation(fields: [venue_id], references: [id], onDelete: NoAction)
-
-  @@schema("public")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model versions_duplicate {
-  id                  Int                 @id @default(autoincrement())
-  date                String
-  avg_rating          Float               @default(0) @db.Real
-  location            String?
-  submitter_name      String?             @default("")
-  artist              String
-  song_id             Int
-  user_id             String?             @db.Uuid
-  listen_link         String?
-  song_name           String?
-  num_ratings         Int?                @default(0)
-  song_submitter_name String?
-  sounds              String[]
-  ratings_duplicate   ratings_duplicate[]
-  songs               songs               @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users               users?              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-model artist_suggestions {
-  id           BigInt   @id @unique @default(autoincrement())
-  created_at   DateTime @default(now()) @db.Timestamptz(6)
-  submitter_id String?  @default(dbgenerated("auth.uid()")) @db.Uuid
-  name         String?
-  votes        Int?     @default(1) @db.SmallInt
-
-  @@schema("public")
-}
-
-model helpful_votes_ideas_duplicate {
-  id           Int       @id @default(autoincrement())
-  created_at   DateTime? @default(now()) @db.Timestamptz(6)
-  idea_id      Int
-  user_name    String
-  counter      Int?      @default(1) @db.SmallInt
-  vote         Int       @default(1) @db.SmallInt
-  submitter_id String?   @db.Uuid
-  ideas        ideas     @relation(fields: [idea_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users        users?    @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model profiles_duplicate {
-  id         String    @id @db.Uuid
-  updated_at DateTime? @db.Timestamptz(6)
-  name       String    @unique(map: "profiles_duplicate_username_key")
-  avatar_url String?
-  can_write  Boolean   @default(true)
-  points     Int       @default(10)
-  users      users     @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@schema("public")
-}
-
-model phishnet_jamcharts {
-  songid          BigInt  @id
-  song            String?
-  slug            String?
-  abbr            String?
-  artist          String?
-  debut           String?
-  last_played     String?
-  times_played    BigInt?
-  last_permalink  String?
-  debut_permalink String?
-  gap             BigInt?
-
-  @@schema("public")
-}
-
-model phishnet_songs_duplicate {
-  songid          BigInt  @id
-  song            String?
-  slug            String?
-  abbr            String?
-  artist          String?
-  debut           String?
-  last_played     String?
-  times_played    BigInt?
-  last_permalink  String?
-  debut_permalink String?
-  gap             BigInt?
-
-  @@schema("public")
-}
-
-model phishnet_venues {
-  venueid    BigInt  @id
-  venuename  String?
-  city       String?
-  state      String?
-  country    String?
-  venuenotes String?
-  alias      BigInt?
-  short_name String?
-
-  @@schema("public")
-}
-
-model tours {
-  id         BigInt     @id @default(autoincrement())
-  created_at DateTime   @default(now()) @db.Timestamptz(6)
-  artist_id  Int?
-  year       String?
-  continent  Continent?
-  region     Region[]
-  season     Season?
-  shows      shows[]
-  artists    artists?   @relation(fields: [artist_id], references: [id], onDelete: NoAction)
 
   @@schema("public")
 }
@@ -889,66 +890,53 @@ model venues {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model jams {
-  id                  Int       @id @default(autoincrement())
+model versions {
+  id                  Int           @id(map: "Versions_pkey") @default(autoincrement())
   date                String
-  avg_rating          Float     @default(0) @db.Real
+  avg_rating          Float         @default(0) @db.Real
   location            String?
   submitter_name      String?
   artist              String
   song_id             Int
-  user_id             String?   @db.Uuid
+  user_id             String?       @db.Uuid
   listen_link         String?
   song_name           String?
-  num_ratings         Int?      @default(0)
+  num_ratings         Int?          @default(0)
   song_submitter_name String?
   sounds              String[]
   set_id              BigInt?
-  show_id             BigInt?
+  show_id             Int?
+  sound_ids           BigInt?
   venue_id            BigInt?
-  artist_id           Int?
-  sound_ids           String[]
-  year                Int?      @db.SmallInt
-  month               Int?      @db.SmallInt
-  day                 Int?      @db.SmallInt
-  artists             artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sets                sets?     @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  shows               shows?    @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  songs               songs     @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venues              venues?   @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  add_link            add_link[]
   ratings             ratings[]
+  update_tags         update_tags[]
+  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction)
+  shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songs               songs         @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?       @relation(fields: [venue_id], references: [id], onDelete: NoAction)
 
   @@schema("public")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model jams_duplicate {
-  id                  Int      @id @default(autoincrement())
+model versions_duplicate {
+  id                  Int                 @id @default(autoincrement())
   date                String
-  avg_rating          Float    @default(0) @db.Real
+  avg_rating          Float               @default(0) @db.Real
   location            String?
-  submitter_name      String?
+  submitter_name      String?             @default("")
   artist              String
   song_id             Int
-  user_id             String?  @db.Uuid
+  user_id             String?             @db.Uuid
   listen_link         String?
   song_name           String?
-  num_ratings         Int?     @default(0)
+  num_ratings         Int?                @default(0)
   song_submitter_name String?
   sounds              String[]
-  set_id              BigInt?
-  show_id             BigInt?
-  venue_id            BigInt?
-  artist_id           Int?
-  sound_ids           String[]
-  year                Int?     @db.SmallInt
-  month               Int?     @db.SmallInt
-  day                 Int?     @db.SmallInt
-  artists             artists? @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sets                sets?    @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  shows               shows?   @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  songs               songs    @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venues              venues?  @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ratings_duplicate   ratings_duplicate[]
+  songs               songs               @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
@@ -989,6 +977,25 @@ enum Continent {
   Asia
   Australia
   Africa
+
+  @@schema("public")
+}
+
+enum DataSource {
+  Songfish
+  Phishnet
+  SetlistFM
+
+  @@schema("public")
+}
+
+/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+enum MusicalEntity {
+  Jam
+  Set
+  Show
+  Album
+  Song
 
   @@schema("public")
 }
@@ -1050,25 +1057,6 @@ enum idea {
   Feature
   Tag
   Other
-
-  @@schema("public")
-}
-
-/// This enum is commented in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-enum MusicalEntity {
-  Jam
-  Set
-  Show
-  Album
-  Song
-
-  @@schema("public")
-}
-
-enum DataSource {
-  Songfish
-  Phishnet
-  SetlistFM
 
   @@schema("public")
 }

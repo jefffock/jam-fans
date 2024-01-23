@@ -1,7 +1,6 @@
 import { db } from '../../database'
 import type { profiles } from '@prisma/client'
 
-
 export async function addPoints(data: { user_id: string; points: number }) {
 	const { user_id, points } = data
 
@@ -30,12 +29,10 @@ export async function createProfile(user_id: string, name: string) {
 }
 
 export async function getProfile(user_id: string) {
-	console.log('in get Profile user_id', user_id)
 	const profile = await db.profiles.findUnique({
 		where: {
 			id: user_id,
 		},
 	})
-	console.log('profile in getProfile', profile)
 	return profile
 }

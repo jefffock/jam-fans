@@ -5,6 +5,20 @@ export async function getShows() {
 	return shows
 }
 
+export async function addShow({ date, location, artist_id }) {
+	console.log(' in addShow server', date, location, artist_id)
+	const artistId = Number(artist_id)
+	const newShow = await db.shows.create({
+		data: {
+			artist_id: artistId,
+			date_text: date,
+			location: location,
+		},
+	})
+
+	return newShow
+}
+
 export async function addShowByJamId(jamId: number | string) {
 	const jam = await db.jams.findUnique({
 		where: {

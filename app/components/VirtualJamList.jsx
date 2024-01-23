@@ -1,9 +1,11 @@
 import JamCard from './cards/JamCard'
+import ShowCard from './cards/ShowCard'
+import SetCard from './cards/SetCard'
 import React, { useState, useRef, useEffect } from 'react'
 import { Iframe } from './IFrame'
 import { getRatingsVisible } from '~/utils'
 
-export default function VirtualJamList({
+export default function VirtualEntityList({
 	items,
 	user,
 	setShowIframe,
@@ -44,8 +46,8 @@ export default function VirtualJamList({
 				{/* <div style={{ height: `${totalHeight}px`, position: 'relative' }}> */}
 				{/* <div style={{ position: 'absolute', top: `${offsetTop}px` }}> */}
 				<div className="max-w-100vw flex flex-col items-center justify-center">
-					{itemsToRender.map((item, index) => {
-						if (item) {
+					{itemsToRender?.map((item, index) => {
+						if (item?.song_name) {
 							return (
 								<JamCard
 									key={`visibile-${index}`}
@@ -56,6 +58,8 @@ export default function VirtualJamList({
 									showRatings={ratingsVisible}
 								/>
 							)
+						} else if (!item?.show_id) {
+							return <pre>{JSON.stringify(item)}</pre>
 						}
 						return (
 							<div

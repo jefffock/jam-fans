@@ -29,7 +29,6 @@ const inactiveClassName =
 
 export default function TopNav({ profile }) {
 	// console.log('session', session)
-	console.log('profile in topnav', profile)
 	// view session
 	const logout = useFormAction('logout')
 	const userNavigationLoggedIn = [

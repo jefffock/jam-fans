@@ -13,8 +13,7 @@ import TopNav from '../components/TopNav'
 import BottomNav from '../components/BottomNav'
 
 export const loader = async () => {
-	console.log('in catchall $')
-	return redirect('/jams')
+	return redirect('/')
 	const response = new Response()
 	const cookies = parse(request.headers.get('Cookie') ?? '')
 	const headers = new Headers()
@@ -49,7 +48,6 @@ export const loader = async () => {
 		profile = data
 	}
 	console.log('user', user)
-	console.log('profile', profile)
 	if (user && !profile) {
 		console.log('redirecting to /welcome')
 		return redirect('/welcome')
