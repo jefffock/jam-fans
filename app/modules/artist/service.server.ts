@@ -1,6 +1,6 @@
 import { db } from '../../database'
 
-export async function getArtists({ db }) {
+export async function getArtists() {
 	const artists = await db.artists.findMany()
 
 	// Custom sort function
@@ -16,7 +16,7 @@ export async function getArtists({ db }) {
 	return artists
 }
 
-export async function getArtistsCount({ db }): Promise<number> {
+export async function getArtistsCount(): Promise<number> {
 	const count = await db.artists.count()
 	return count
 }

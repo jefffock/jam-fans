@@ -38,6 +38,7 @@ if (NODE_ENV === 'production') {
 	}
 	db = global.__db__
 	db.$connect()
+	console.log('Connected to DB')
 }
 
 export { db, Prisma }

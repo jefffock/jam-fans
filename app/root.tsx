@@ -1,8 +1,12 @@
 import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useRouteError, useLoaderData } from '@remix-run/react'
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
-import { createBrowserClient } from '@supabase/ssr'
+import { createBrowserClient, createServerClient } from '@supabase/ssr'
 import TopNav from './components/TopNav'
 import BottomNav from './components/BottomNav'
+import { AuthSession } from '@supabase/supabase-js'
+import { getAuthSession } from './modules/auth'
+import { json } from '@remix-run/node'
+import { getProfile } from './modules/profile/index.server'
 
 // import type { LinksFunction } from "@remix-run/node";
 
@@ -44,7 +48,7 @@ export function ErrorBoundary() {
 					</a>{' '}
 					or{' '}
 					<a className="color-blue underline" href="https://twitter.com/jeffphox">
-						twatter
+						bird app
 					</a>
 				</p>
 				<Scripts />
@@ -53,24 +57,35 @@ export function ErrorBoundary() {
 	)
 }
 
-export async function loader({}: LoaderFunctionArgs) {
-	return {
-		env: {
-			SUPABASE_URL: process.env.SUPABASE_URL!,
-			SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
-		},
+export async function loader({ request }: LoaderFunctionArgs) {
+	const authSession = await getAuthSession(request)
+	console.log('authSession in root loader', authSession)
+	let profile = null
+	if (authSession) {
+		profile = await getProfile(authSession.userId)
+		return json({ profile })
 	}
+	if (!authSession) {
+		return json({})
+	}
+	return json({})
 }
 
-export default function Root() {
-	const { env } = useLoaderData<typeof loader>()
-
-	const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
-	async function getSession() {
-		const { data: session, error } = await supabase.auth.getSession()
-		return session
-	}
-
+export default function Root({ profile }) {
+	console.log('in Root', profile)
+	// supabase.auth.onAuthStateChange((event, session) => {
+	// 	console.log('in onAuthStateChange', event, session)
+	// 	if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+	// 		// delete cookies on sign out
+	// 		const expires = new Date(0).toUTCString()
+	// 		document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+	// 		document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+	// 	} else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+	// 		const maxAge = 100 * 365 * 24 * 60 * 60 // 100 years, never expires
+	// 		document.cookie = `my-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
+	// 		document.cookie = `my-refresh-token=${session.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
+	// 	}
+	// })
 	return (
 		<html lang="en">
 			<head>
@@ -79,11 +94,11 @@ export default function Root() {
 				<Links />
 			</head>
 			<body>
-				<div className="w-full h-full">
-					<TopNav supabase={supabase} session={() => getSession()} />
-					<Outlet />
+				{/* <div className="w-full h-full">
+					<TopNav profile={profile} />
 					<BottomNav />
-				</div>
+				</div> */}
+				<Outlet />
 				<ScrollRestoration />
 				<Scripts />
 				<LiveReload />

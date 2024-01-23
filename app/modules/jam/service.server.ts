@@ -120,7 +120,7 @@ export async function getJamsByShow(data: { show_id: number }) {
 	return versions
 }
 
-export async function getJams({ db }) {
+export async function getJams() {
 	const allJams = await db.jams.findMany({
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})

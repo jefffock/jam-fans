@@ -38,43 +38,67 @@ import useFilterEffects from '~/hooks/use-filter-effects'
 import EntityListHeader from '~/components/EntityListHeader'
 import EntityListContainer from '~/components/EntityListContainer'
 import { db } from '../database'
+import { getAuthSession } from '~/modules/auth'
+import TopNav from '~/components/TopNav'
+import BottomNav from '~/components/BottomNav'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+	// console.log('request', request)
+
 	const response = new Response()
+	const authSession = await getAuthSession(request)
 
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
+	console.log('queryParams', queryParams)
 
-	const [
-		jams,
-		sets,
-		shows,
-		artists,
-		songs,
-		sounds,
-		// profile,
-		jamsCount,
-		setsCount,
-		showsCount,
-		artistsCount,
-		soundsCount,
-		songsCount,
-	] = await Promise.all([
-		getJams({ db }),
-		getSets({ db }),
-		getShows({ db }),
-		getArtists({ db }),
-		getSongs({ db }),
-		getSounds({ db }),
-		// getProfile(),
-		getJamsCount({ db }),
-		getSetsCount({ db }),
-		getShowsCount({ db }),
-		getArtistsCount({ db }),
-		getSoundsCount({ db }),
-		getSongsCount({ db }),
-	])
+	const jams = await getJams()
+	const sets = await getSets()
+	const shows = await getShows()
+	const artists = await getArtists()
+	const songs = await getSongs()
+	const sounds = await getSounds()
+	const jamsCount = await getJamsCount()
+	const setsCount = await getSetsCount()
+	const showsCount = await getShowsCount()
+	const artistsCount = await getArtistsCount()
+	const soundsCount = await getSoundsCount()
+	const songsCount = await getSongsCount()
+	let profile = null
+	if (authSession) {
+		profile = await getProfile(authSession.userId)
+	}
+
+	// const [
+	// 	jams,
+	// 	sets,
+	// 	shows,
+	// 	artists,
+	// 	songs,
+	// 	sounds,
+	// 	// profile,
+	// 	jamsCount,
+	// 	setsCount,
+	// 	showsCount,
+	// 	artistsCount,
+	// 	soundsCount,
+	// 	songsCount,
+	// ] = await Promise.all([
+	// 	getJams({ db }),
+	// 	getSets({ db }),
+	// 	getShows({ db }),
+	// 	getArtists({ db }),
+	// 	getSongs({ db }),
+	// 	getSounds({ db }),
+	// 	// getProfile(),
+	// 	getJamsCount({ db }),
+	// 	getSetsCount({ db }),
+	// 	getShowsCount({ db }),
+	// 	getArtistsCount({ db }),
+	// 	getSoundsCount({ db }),
+	// 	getSongsCount({ db }),
+	// ])
 
 	let song_id = queryParams.song
 
@@ -87,7 +111,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			allSets: sets,
 			sounds,
 			count: jams.length,
-			// profile,
+			profile,
 			search: url.search,
 			song: song_id,
 			jamsCount,
@@ -105,7 +129,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export async function action({ request }: ActionFunctionArgs) {
 	//get action name
+	console.log('in action in _index')
 	let formData = await request.formData()
+	console.log('formData', formData)
 	let { _action, ...values } = Object.fromEntries(formData)
 	if (_action === 'add-artist') {
 		await addArtist(values)
@@ -132,6 +158,7 @@ export default function Index() {
 		artistsCount,
 		soundsCount,
 		songsCount,
+		profile,
 	} = useLoaderData()
 	const [open, setOpen] = useState(false)
 	const [showIframe, setShowIframe] = useState(false)
@@ -172,6 +199,7 @@ export default function Index() {
 	const [showJams, setShowJams] = useState(true)
 	const [showSets, setShowSets] = useState(true)
 	const [showShows, setShowShows] = useState(true)
+	console.log('profile', profile)
 
 	if (jamCardRef.current) {
 		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
@@ -237,7 +265,8 @@ export default function Index() {
 	})
 
 	return (
-		<div ref={pageRef}>
+		<div className="w-full h-full" ref={pageRef}>
+			<TopNav profile={profile} />
 			<Hero />
 			<SiteStats
 				jamsCount={jamsCount}
@@ -312,6 +341,7 @@ export default function Index() {
 					/>
 				)}
 			</EntityListContainer>
+			<BottomNav />
 		</div>
 	)
 }

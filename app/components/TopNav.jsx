@@ -1,19 +1,21 @@
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useOutletContext, Link, NavLink } from '@remix-run/react'
+import { useOutletContext, Link, NavLink, Form, useFormAction } from '@remix-run/react'
 
 const navigation = [
-	{ name: 'jams', href: '/jams', current: false },
-	{ name: 'curate', href: '/add/jam', current: false },
-	{ name: 'coming soon™️', href: '/roadmap', current: false },
+	// { name: 'jams', href: '/jams', current: false },
+	// { name: 'curate', href: '/add/jam', current: false },
+	// { name: 'coming soon™️', href: '/roadmap', current: false },
 ]
-const userNavigation = [
+
+const userNavigationLoggedOut = [
+	{ name: 'login', href: '/ssrlogin' },
+	{ name: 'create an account', href: '/join' },
 	{ name: 'credits', href: '/credits' },
-	{ name: 'contact', href: '/contact', current: false },
-	{ name: 'terms of service', href: '/terms' },
-	{ name: 'privacy policy', href: '/privacy' },
-	{ name: 'sign out', href: '#' },
+	{ name: 'contact', href: '/contact' },
+	// { name: 'terms of service', href: '/terms' },
+	// { name: 'privacy policy', href: '/privacy' },
 ]
 
 function classNames(...classes) {
@@ -25,22 +27,25 @@ const activeClassName =
 const inactiveClassName =
 	'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
 
-export default function TopNav({ supabase, session }) {
-	const user = session?.user
-	//if user add login and signup to userNavigation and remove sign out
-	if (!user && userNavigation.length === 5) {
-		userNavigation.unshift({ name: 'Login', href: '/login' }, { name: 'Create an account', href: '/join' })
-		userNavigation.pop()
+export default function TopNav({ profile }) {
+	// console.log('session', session)
+	console.log('profile in topnav', profile)
+	// view session
+	const logout = useFormAction('logout')
+	const userNavigationLoggedIn = [
+		{ name: `${profile?.name}, welcome back!`, href: '/account' },
+		{ name: 'account', href: '/account' },
+		{ name: 'credits', href: '/credits' },
+		{ name: 'contact', href: '/contact' },
+		{ name: 'sign out', href: '/logout' },
+	]
+
+	const userNavigation = profile ? userNavigationLoggedIn : userNavigationLoggedOut
+
+	const handleSignOut = () => {
+		logout()
 	}
 
-	async function handleSignOut() {
-		const { error } = await supabase.auth.signOut()
-		if (error) {
-			console.error(error)
-		} else {
-			navigate('/')
-		}
-	}
 	return (
 		<>
 			<div className="min-h-full">
@@ -113,19 +118,19 @@ export default function TopNav({ supabase, session }) {
 												))}
 											</div>
 										)} */}
-										{!user && (
+										{!profile && (
 											<div className="hidden lg:-my-px lg:mx-4 lg:flex lg:space-x-8">
 												<a
 													href="/login"
 													className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex align-baseline px-1 border-b-2 text-sm font-medium mr-8 pb-2"
 												>
-													Login
+													login
 												</a>
 												<a
 													href="/join"
 													className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 border-b-2 text-sm font-medium mr-8"
 												>
-													Create an account
+													create an account
 												</a>
 											</div>
 										)}
@@ -181,69 +186,12 @@ export default function TopNav({ supabase, session }) {
 												{item.name}
 											</Disclosure.Button>
 										))}
-										{/* {!user && (
-											<div className=''>
-												<Disclosure.Button className='ml-auto space-y-1 self-center'>
-													<a
-														href='/login'
-														className={classNames(
-															'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-														)}
-													>
-														Login
-													</a>
-												</Disclosure.Button>
-												<br />
-												<Disclosure.Button className='ml-auto space-y-1 self-center'>
-													<a
-														href='/join'
-														className={classNames(
-															'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-															'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-														)}
-													>
-														Create an account
-													</a>
-												</Disclosure.Button>
-											</div>
-										)} */}
-										{/* {!user &&
-											userNavigation &&
-											userNavigation.map((item) => (
-												<Disclosure.Button
-													key={item.name}
-													as='a'
-													href={item.href}
-													className={classNames(
-														item?.current
-															? 'bg-cyan-50 border-cyan-500 text-cyan-700'
-															: 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
-														'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
-													)}
-													onClick={
-														item.name === 'Sign out'
-															? () => handleSignOut()
-															: null
-													}
-												>
-													{item.name}
-												</Disclosure.Button>
-											))} */}
 									</div>
 								</div>
 							</Disclosure.Panel>
 						</>
 					)}
 				</Disclosure>
-				{/* 
-        <div className="py-3">
-          <header>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">{title ?? 'Jams'}</h1>
-            </div>
-          </header>
-        </div> */}
 			</div>
 		</>
 	)

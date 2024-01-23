@@ -1,6 +1,7 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 
-import { getCurrentPath, isGet, makeRedirectToFromHere, NODE_ENV, safeRedirect, SESSION_SECRET } from '~/utils'
+import { NODE_ENV, SESSION_SECRET } from '~/utils'
+import { getCurrentPath, isGet, makeRedirectToFromHere, safeRedirect } from '../.server/http.server'
 
 import { refreshAccessToken, verifyAuthSession } from './service.server'
 import type { AuthSession } from './types'
@@ -80,6 +81,7 @@ export async function commitAuthSession(
 
 export async function destroyAuthSession(request: Request) {
 	const session = await getSession(request)
+	console.log('going to destory session', session)
 
 	return redirect('/', {
 		headers: {

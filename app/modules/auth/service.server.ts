@@ -4,6 +4,41 @@ import { SERVER_URL } from '~/utils/env'
 import { mapAuthSession } from './mappers'
 import type { AuthSession } from './types'
 
+// async function signInWithOtp(event) {
+// 	const { data, error } = await supabase.auth.signInWithOtp({
+// 		email: email,
+// 	})
+// 	if (error) {
+// 		console.error('Sign in error :( contact hi@jam.fans or @jeffphox on Twitter for support', error)
+// 	} else {
+// 		setMagicLinkSuccessText(`Success! Check ${email} for your magic link!`)
+// 	}
+// }
+
+export async function signInWithGoogle() {
+	const { data, error } = await getSupabaseAdmin().auth.signInWithOAuth({
+		provider: 'google',
+		options: {
+			redirectTo: `https://jam.fans/auth/callback`,
+		},
+	})
+	if (error) {
+		console.error('sign in with google error', error)
+	} else {
+		console.log('data google', data)
+	}
+}
+
+// async function handlePasswordReset() {
+// 	if (!email) return alert('Please enter your email address.')
+// 	const { data, error } = await supabase.auth.resetPasswordForEmail(email)
+// 	if (error) {
+// 		console.error('error', error)
+// 	} else {
+// 		setPasswordResetSuccessText(`Success! Check ${email} for your password reset link!`)
+// 	}
+// }
+
 export async function createEmailAuthAccount(email: string, password: string) {
 	const { data, error } = await getSupabaseAdmin().auth.admin.createUser({
 		email,
@@ -17,6 +52,7 @@ export async function createEmailAuthAccount(email: string, password: string) {
 }
 
 export async function signInWithEmail(email: string, password: string) {
+	console.log('signInWithEmail', email, password)
 	const { data, error } = await getSupabaseAdmin().auth.signInWithPassword({
 		email,
 		password,

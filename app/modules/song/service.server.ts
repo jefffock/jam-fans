@@ -1,6 +1,6 @@
 import { db } from '../../database'
 
-export async function getSongs({ db }) {
+export async function getSongs() {
 	const songs = await db.songs.findMany({
 		select: {
 			song: true,
@@ -26,7 +26,7 @@ export function getSongById({ songs, id }) {
 	return filteredSongs[0]
 }
 
-export async function getSongsCount({ db }): Promise<number> {
+export async function getSongsCount(): Promise<number> {
 	const count = await db.songs.count()
 	return count
 }
