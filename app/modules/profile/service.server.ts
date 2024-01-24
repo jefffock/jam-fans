@@ -36,3 +36,10 @@ export async function getProfile(user_id: string) {
 	})
 	return profile
 }
+
+// TODO: implement this
+export async function getProfileFromRequest(req: any) {
+	const { user_id } = req.session
+	const profile = await getProfile(user_id)
+	return profile
+}

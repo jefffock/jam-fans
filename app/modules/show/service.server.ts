@@ -1,7 +1,12 @@
 import { db } from '../../database'
 
 export async function getShows() {
-	const shows = await db.shows.findMany()
+	const shows = await db.shows.findMany({
+		include: {
+			artists: true,
+		},
+	})
+
 	return shows
 }
 
@@ -43,12 +48,16 @@ export async function addShowByJamId(jamId: number | string) {
 }
 
 export async function getShowById(showId: number | string) {
+	console.log('showId', showId)
 	const show = await db.shows.findUnique({
 		where: {
 			id: showId,
 		},
+		include: {
+			artists: true,
+		},
 	})
-
+	console.log('show', show)
 	return show
 }
 

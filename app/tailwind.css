@@ -1058,6 +1058,10 @@ video {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .flex-row {
   flex-direction: row;
 }
@@ -1116,6 +1120,10 @@ video {
 
 .gap-10 {
   gap: 2.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .gap-y-6 {
@@ -1673,6 +1681,11 @@ video {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
 }
 
 .font-medium {

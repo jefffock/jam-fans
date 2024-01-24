@@ -60,6 +60,7 @@ export default function JamFiltersClientside({
 	jamsCount,
 	setsCount,
 	showsCount,
+	showsOnDate,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
@@ -177,6 +178,7 @@ export default function JamFiltersClientside({
 							handleDateInputChange={handleDateInputChange}
 							date={date}
 							dateFilter={dateFilter}
+							showsOnDate={showsOnDate}
 						/>
 						<Accordion title="sounds">
 							<SoundPicker

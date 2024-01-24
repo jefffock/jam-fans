@@ -1,7 +1,7 @@
 import { getAuthSession, requireAuthSession } from '~/modules/auth'
 import { getProfile } from '~/modules/profile/service.server'
 import { json } from '@remix-run/node'
-import { Form } from '@remix-run/react'
+import { Form, useLoaderData, Link } from '@remix-run/react'
 import { useState, useEffect } from 'react'
 
 export const loader = async ({ request }) => {
@@ -27,18 +27,17 @@ export const loader = async ({ request }) => {
 	return json({ profile })
 }
 
-export default function Account({ profile }) {
-	console.log('profile in account', profile)
-	const [userProfile, setUserProfile] = useState(profile)
-
-	useEffect(() => {
-		setUserProfile(profile)
-	})
+export default function Account() {
+	const { profile } = useLoaderData()
 
 	return (
 		<>
+			<Link to="/">Home</Link>
 			<h1>Account</h1>
-			<p>{userProfile?.name}</p>
+			<p>{profile?.name}</p>
+			<p>{profile?.points} points</p>
+			<br />
+			<br />
 			<Form method="post" action="/logout">
 				<button type="submit">Logout</button>
 			</Form>

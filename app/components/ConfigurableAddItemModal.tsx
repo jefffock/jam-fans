@@ -1,11 +1,11 @@
 import React from 'react'
 
-export default function ConfigurableAddItemModal({ isOpen, onClose, config }) {
+export default function ConfigurableAddItemModal({ isOpen, onClose, config, date, artist }) {
 	if (!isOpen) return null
 	console.log('config', config)
 
 	return (
-		<div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center">
+		<div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center z-100">
 			<div className="bg-white p-5 rounded">
 				<h2 className="text-xl font-bold mb-4">{config.title}</h2>
 				{config.fields.map((field, index) => (
@@ -18,6 +18,7 @@ export default function ConfigurableAddItemModal({ isOpen, onClose, config }) {
 							name={field.name}
 							id={field.name}
 							className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+							defaultValue={field.name === 'date' ? date : field.name === 'artist' ? artist : null}
 						/>
 					</div>
 				))}

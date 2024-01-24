@@ -2,6 +2,7 @@ import ConfigurableAddItemModal from './ConfigurableAddItemModal'
 import { addShowConfig } from '~/config'
 import { useState } from 'react'
 import { openModal, closeModal } from '~/utils/modal'
+import { Link } from '@remix-run/react'
 
 // Function to format date from 'yyyy-mm-dd' to 'mm/dd/yyyy'
 const addSlashes = (dateStr) => {
@@ -21,40 +22,58 @@ const formatDateDisplay = (dateStr) => {
 	return `${month}/${day}/${year}`
 }
 
-export default function DatePicker({ dateInput, handleDateInputChange, date }) {
+export default function DatePicker({ dateFilter, handleDateInputChange, date, showsOnDate }) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
-	const handleDateChange = (e) => {
-		console.log('e.target.value', e.target.value)
-		// const newDate = addSlashes(e.target.value)
-		// handleDateInputChange(newDate)
-	}
-
 	return (
-		<div className="p-4">
-			<label htmlFor="date" className="block text-2xl text-gray-900">
-				date
-			</label>
-			<input
-				type="date"
-				name="date"
-				id="date-input"
-				className="border border-gray-300 rounded-md p-2"
-				placeholder="mm/dd/yyyy"
-				onChange={handleDateInputChange}
-				max={new Date().toISOString().split('T')[0]}
-				min="1900-01-01"
-			/>
-			<p>{date}</p>
-			<p className="text-2xl">{date ? new Date(date + 'T16:00:00').toLocaleDateString() : ''}</p>
-			{date && (
-				<div>
-					<button onClick={openModal} className="bg-blue-500 text-white rounded p-2">
-						add a show
-					</button>
-					<ConfigurableAddItemModal isOpen={isModalOpen} onClose={closeModal} config={addShowConfig} />
-				</div>
-			)}
+		<div className="p-4 grid grid-cols-2 gap-4">
+			<div>
+				<label htmlFor="date" className="block text-2xl text-gray-900">
+					date
+				</label>
+				<input
+					type="date"
+					name="date"
+					id="date-input"
+					className="border border-gray-300 rounded-md p-2 mt-2 w-full"
+					placeholder="mm/dd/yyyy"
+					onChange={handleDateInputChange}
+					max={new Date().toISOString().split('T')[0]}
+					min="1900-01-01"
+				/>
+			</div>
+
+			<div className="flex flex-col">
+				{showsOnDate && showsOnDate.length > 0 && (
+					<>
+						<p className="text-lg font-semibold mb-2">shows on jam fans</p>
+						{showsOnDate.map((show) => (
+							<Link to={`/shows/${show.id}`} key={show.id} className="flex flex-row mb-2">
+								<p className="text-md underline">
+									{show.artists.artist} - {show.location}
+								</p>
+							</Link>
+						))}
+					</>
+				)}
+
+				{dateFilter && (
+					<div>
+						<button
+							onClick={(event) => openModal(setIsModalOpen, event)}
+							className="bg-blue-500 text-white rounded p-2 mt-2"
+						>
+							add a show
+						</button>
+						<ConfigurableAddItemModal
+							isOpen={isModalOpen}
+							onClose={() => closeModal(setIsModalOpen)}
+							config={addShowConfig}
+							date={dateFilter}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }

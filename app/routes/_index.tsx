@@ -204,6 +204,7 @@ export default function Index() {
 	const [showJams, setShowJams] = useState(true)
 	const [showSets, setShowSets] = useState(true)
 	const [showShows, setShowShows] = useState(true)
+	const [showsOnDate, setShowsOnDate] = useState([])
 
 	if (jamCardRef.current) {
 		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
@@ -266,6 +267,8 @@ export default function Index() {
 		createFilterURL,
 		setAddJamLink,
 		filteredMusicalEntities,
+		allShows,
+		setShowsOnDate,
 	})
 
 	return (
@@ -319,6 +322,7 @@ export default function Index() {
 					jamsCount={jamsCount}
 					setsCount={setsCount}
 					showsCount={showsCount}
+					showsOnDate={showsOnDate}
 				/>
 				<VirtualJamList
 					jamListRef={jamListRef}
@@ -345,7 +349,7 @@ export default function Index() {
 					/>
 				)}
 			</EntityListContainer>
-			<BottomNav />
+			{/* <BottomNav /> */}
 		</div>
 	)
 }
