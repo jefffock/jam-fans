@@ -28,7 +28,7 @@ const useFilteredMusicalEntities = ({
 		return combinedArray
 			.filter((item) => {
 				return (
-					(!dateFilter || item.date === dateFilter) &&
+					(!dateFilter || item.date === dateFilter || item.date_text === dateFilter) &&
 					(!songFilter || item?.song_name === songFilter) &&
 					(artistFilters.length === 0 || artistFilters.includes(item.artist_id.toString())) &&
 					(!linkFilter || item.listen_link) &&

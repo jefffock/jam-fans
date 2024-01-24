@@ -115,13 +115,13 @@ export default function JamFiltersClientside({
 		}
 	}
 
-	function handleDateInputChange(dateInputString) {
-		console.log('dateInputString', dateInputString)
-		setDateInput(dateInputString)
-		if (dateInputString.length === 10) {
-			setDateFilter(dateInputString)
-			// }
-			// }
+	function handleDateInputChange(e) {
+		console.log('dateInputString', e.target.value)
+		const year = Number(e.target.value.slice(0, 4))
+		console.log('year', year)
+		// check if year is between 1900 and present year
+		if (year >= 1900 && year <= new Date().getFullYear()) {
+			setDateFilter(e.target.value)
 		}
 	}
 
@@ -172,7 +172,12 @@ export default function JamFiltersClientside({
 							handleArtistsChange={handleArtistsChange}
 							artistFilters={artistFilters}
 						/>
-						<DatePicker dateInput={dateInput} handleDateInputChange={handleDateInputChange} date={date} />
+						<DatePicker
+							dateInput={dateInput}
+							handleDateInputChange={handleDateInputChange}
+							date={date}
+							dateFilter={dateFilter}
+						/>
 						<Accordion title="sounds">
 							<SoundPicker
 								sounds={sounds}

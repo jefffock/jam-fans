@@ -428,17 +428,17 @@ model issues {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model jams {
-  id                  Int       @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   date                String
-  avg_rating          Float     @default(0) @db.Real
+  avg_rating          Float         @default(0) @db.Real
   location            String?
   submitter_name      String?
   artist              String
   song_id             Int
-  user_id             String?   @db.Uuid
+  user_id             String?       @db.Uuid
   listen_link         String?
   song_name           String?
-  num_ratings         Int?      @default(0)
+  num_ratings         Int?          @default(0)
   song_submitter_name String?
   sounds              String[]
   set_id              BigInt?
@@ -446,14 +446,15 @@ model jams {
   venue_id            BigInt?
   artist_id           Int?
   sound_ids           String[]
-  year                Int?      @db.SmallInt
-  month               Int?      @db.SmallInt
-  day                 Int?      @db.SmallInt
-  artists             artists?  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sets                sets?     @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  shows               shows?    @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  songs               songs     @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venues              venues?   @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  year                Int?          @db.SmallInt
+  month               Int?          @db.SmallInt
+  day                 Int?          @db.SmallInt
+  entity              MusicalEntity @default(Jam)
+  artists             artists?      @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  songs               songs         @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues              venues?       @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ratings             ratings[]
 
   @@schema("public")
@@ -709,6 +710,7 @@ model sets {
   multi_song     String[]
   song_ids       Int[]
   sound_ids      BigInt[]
+  entity         MusicalEntity    @default(Set)
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -737,6 +739,7 @@ model shows {
   sound_ids      BigInt[]
   date_text      String?
   location       String?
+  entity         MusicalEntity    @default(Show)
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
