@@ -18,6 +18,7 @@ import FiltersForm from './FiltersForm'
 import Checkbox from './Checkbox'
 import EntityDisplayPreferences from './EntityDisplayPreferences'
 import { FilterButtonsContainer } from './FilterButtonsContainer'
+import AddEntity from './AddEntity'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -61,13 +62,17 @@ export default function JamFiltersClientside({
 	setsCount,
 	showsCount,
 	showsOnDate,
+	filteredMusicalEntities,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
 	const [date, setDate] = useState('')
 	const [dateInput, setDateInput] = useState('')
 	const [songSelected, setSongSelected] = useState(null)
+	const [activeTab, setActiveTab] = useState('explore')
 	const noFiltersSelected = musicalEntitiesLength === jamsCount + setsCount + showsCount
+
+	console.log('artist fitlers', artistFilters)
 
 	const dates = []
 	let currentYear = new Date().getFullYear()
@@ -160,71 +165,89 @@ export default function JamFiltersClientside({
 	}
 
 	return (
-		<FiltersSlideout open={open} setOpen={setOpen} showIframe={showIframe}>
-			<FiltersForm>
-				<div className="relative flex-1 px-4 sm:px-6">
-					<div className="divide-y divide-gray-200">
-						<MusicalEntityPicker
-							entitiesFilters={musicalEntitiesFilters}
-							setEntitiesFilters={setMusicalEntitiesFilters}
-						/>
-						<ArtistPicker
-							artists={artists}
-							handleArtistsChange={handleArtistsChange}
-							artistFilters={artistFilters}
-						/>
-						<DatePicker
-							dateInput={dateInput}
-							handleDateInputChange={handleDateInputChange}
-							date={date}
-							dateFilter={dateFilter}
-							showsOnDate={showsOnDate}
-						/>
-						<Accordion title="sounds">
-							<SoundPicker
-								sounds={sounds}
-								handleSoundsChange={handleSoundsChange}
-								soundFilters={soundFilters}
+		<FiltersSlideout
+			open={open}
+			setOpen={setOpen}
+			showIframe={showIframe}
+			activeTab={activeTab}
+			setActiveTab={setActiveTab}
+		>
+			{activeTab === 'explore' && (
+				<FiltersForm>
+					<div className="relative flex-1 px-4 sm:px-6">
+						<div className="divide-y divide-gray-200">
+							<MusicalEntityPicker
+								entitiesFilters={musicalEntitiesFilters}
+								setEntitiesFilters={setMusicalEntitiesFilters}
 							/>
-						</Accordion>
-						<SongPicker
-							setQuery={setQuery}
-							songSelected={songSelected}
-							songFilter={songFilter}
-							setSongFilter={setSongFilter}
-							clearSong={clearSong}
-							setSongSelected={setSongSelected}
-							query={query}
-							songs={songs}
-						/>
-						<YearFilter
-							filterType="before"
-							value={beforeDateFilter}
-							onChange={setBeforeDateFilter}
-							dates={dates}
-							displayValue={beforeYearDisplayValue}
-						/>
+							<ArtistPicker
+								artists={artists}
+								handleArtistsChange={handleArtistsChange}
+								artistFilters={artistFilters}
+							/>
+							<DatePicker
+								dateInput={dateInput}
+								handleDateInputChange={handleDateInputChange}
+								date={date}
+								dateFilter={dateFilter}
+								showsOnDate={showsOnDate}
+							/>
+							<Accordion title="sounds">
+								<SoundPicker
+									sounds={sounds}
+									handleSoundsChange={handleSoundsChange}
+									soundFilters={soundFilters}
+								/>
+							</Accordion>
+							<SongPicker
+								setQuery={setQuery}
+								songSelected={songSelected}
+								songFilter={songFilter}
+								setSongFilter={setSongFilter}
+								clearSong={clearSong}
+								setSongSelected={setSongSelected}
+								query={query}
+								songs={songs}
+							/>
+							<YearFilter
+								filterType="before"
+								value={beforeDateFilter}
+								onChange={setBeforeDateFilter}
+								dates={dates}
+								displayValue={beforeYearDisplayValue}
+							/>
 
-						<YearFilter
-							filterType="after"
-							value={afterDateFilter}
-							onChange={setAfterDateFilter}
-							dates={dates}
-							displayValue={afterYearDisplayValue}
-						/>
-						<EntityDisplayPreferences handleLinkChange={handleLinkChange} linkFilter={linkFilter} />
+							<YearFilter
+								filterType="after"
+								value={afterDateFilter}
+								onChange={setAfterDateFilter}
+								dates={dates}
+								displayValue={afterYearDisplayValue}
+							/>
+							<EntityDisplayPreferences handleLinkChange={handleLinkChange} linkFilter={linkFilter} />
+						</div>
 					</div>
-				</div>
-				<FilterButtonsContainer
-					musicalEntitiesFilters={musicalEntitiesFilters}
-					musicalEntitiesLength={musicalEntitiesLength}
-					noFiltersSelected={noFiltersSelected}
-					handleCloseFilters={handleCloseFilters}
-					buildFiltersButtonText={buildFiltersButtonText}
-					clearFilters={clearFilters}
-					setOpen={setOpen}
+					<FilterButtonsContainer
+						musicalEntitiesFilters={musicalEntitiesFilters}
+						musicalEntitiesLength={musicalEntitiesLength}
+						noFiltersSelected={noFiltersSelected}
+						handleCloseFilters={handleCloseFilters}
+						buildFiltersButtonText={buildFiltersButtonText}
+						clearFilters={clearFilters}
+						setOpen={setOpen}
+					/>
+				</FiltersForm>
+			)}
+			{activeTab === 'add' && (
+				<AddEntity
+					artists={artists}
+					artist={artistFilters[0]}
+					dateFilter={dateFilter}
+					handleDateInputChange={handleDateInputChange}
+					date={date}
+					filteredMusicalEntities={filteredMusicalEntities}
 				/>
-			</FiltersForm>
+			)}
 		</FiltersSlideout>
 	)
 }

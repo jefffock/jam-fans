@@ -323,6 +323,7 @@ export default function Index() {
 					setsCount={setsCount}
 					showsCount={showsCount}
 					showsOnDate={showsOnDate}
+					filteredMusicalEntities={filteredMusicalEntities}
 				/>
 				<VirtualJamList
 					jamListRef={jamListRef}
