@@ -19,6 +19,16 @@ export default function AddEntity({
 
 	const showOnJF = selectedArtist && dateFilter && filteredMusicalEntities.find((entity) => entity.entity === 'Show')
 
+	// const setsOnJF = selectedArtist && dateFilter && filteredMusicalEntities.filter((entity) => entity.entity === 'Set')
+
+	const setsOnJF = [{ type: 'Set 2' }]
+
+	const jamsOnJF = selectedArtist && dateFilter && filteredMusicalEntities.filter((entity) => entity.entity === 'Jam')
+
+	const availableSets = SETS.filter((set) => !setsOnJF.some((setsOnJfItem) => setsOnJfItem.type === set))
+
+	console.log('availableSets', availableSets)
+
 	return (
 		<div>
 			{selectedArtist ? (
@@ -46,15 +56,21 @@ export default function AddEntity({
 					<textarea>Comment</textarea>
 				</>
 			)}
-			<p>SetPicker ch</p>
+			<p>sets on jam fans</p>
 			{selectedArtist &&
 				dateFilter &&
-				filteredMusicalEntities
-					.filter((entity) => entity.entity === 'Set')
-					.map((set, index) => <p>{set.type}</p>)}
+				setsOnJF.map((set, index) => (
+					<>
+						<p key={index}>{set.type}</p>
+						<p>Rate {set.type}</p>
+						<p>Comment on {set.type}</p>
+						<button>add rating and comment</button>
+					</>
+				))}
+			<p>available sets to add to jam fans</p>
 			{selectedArtist &&
 				dateFilter &&
-				SETS.map((set, index) => (
+				availableSets.map((set, index) => (
 					<>
 						<button className="border-2" key={index} onClick={() => console.log('set', set)}>
 							Add {set}
