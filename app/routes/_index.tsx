@@ -16,7 +16,7 @@ import {
 	slugify,
 	emojiToUnicode,
 } from '../utils'
-import { getSets, getSetsCount } from '../modules/set/index.server'
+import { getSets, getSetsCount, addSet } from '../modules/set/index.server'
 import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
 import { getArtistsCount, getArtists, addArtist } from '../modules/artist/index.server'
 import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.server'
@@ -141,6 +141,11 @@ export async function action({ request }: ActionFunctionArgs) {
 	if (_action === 'add-show') {
 		console.log('in add show', values)
 		const addedShow = await addShow(values)
+	}
+	if (_action === 'add-set') {
+		console.log('in add set', values)
+		const addedSet = await addSet(values)
+		console.log('addedSet', addedSet)
 	}
 	return json({ ok: true })
 }

@@ -11,6 +11,7 @@
 		"generate:css": "npx tailwindcss -o ./app/tailwind.css",
 		"typecheck": "tsc",
 		"db": "npx prisma db pull && npx prisma generate",
+		"db:force": "npx prisma db pull --force && npx prisma generate",
 		"lint": "eslint --cache \"app/**/*.{js,jsx,ts,tsx}\"",
 		"lint:fix": "eslint --cache --fix \"app/**/*.{js,jsx,ts,tsx}\"",
 		"postinstall": "prisma generate"

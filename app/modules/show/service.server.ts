@@ -10,17 +10,18 @@ export async function getShows() {
 	return shows
 }
 
-export async function addShow({ date, location, artist_id }) {
-	console.log(' in addShow server', date, location, artist_id)
-	const artistId = Number(artist_id)
+export async function addShow(values) {
+	console.log(' in addShow server', values)
 	const newShow = await db.shows.create({
 		data: {
-			artist_id: artistId,
-			date_text: date,
-			location: location,
+			...values,
+			artist_id: Number(values.artist_id),
+			year: Number(values.year),
+			month: Number(values.month),
+			day: Number(values.day),
 		},
 	})
-
+	console.log('newShow', newShow)
 	return newShow
 }
 

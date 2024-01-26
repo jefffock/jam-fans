@@ -191,6 +191,7 @@ export default function JamFiltersClientside({
 								date={date}
 								dateFilter={dateFilter}
 								showsOnDate={showsOnDate}
+								setActiveTab={setActiveTab}
 							/>
 							<Accordion title="sounds">
 								<SoundPicker

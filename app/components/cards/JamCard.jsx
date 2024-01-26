@@ -26,16 +26,6 @@ const JamCard = forwardRef((props, ref) => {
 	function handleCommentClick() {
 		setShowComments(!showComments)
 	}
-	async function onAddShowClick() {
-		console.log('adding show')
-		console.log('jam', jam)
-		const added = fetcher.submit(
-			{ jamId: jam.id, date: jam.date, location: jam.location },
-			{ method: 'POST' },
-			{ navigate: false }
-		)
-		console.log('added', added ?? 'none')
-	}
 
 	let songEmojis = jam.song_emoji?.split(',')
 	let artistEmojis = jam.artist_emoji?.split(',')
@@ -56,21 +46,23 @@ const JamCard = forwardRef((props, ref) => {
 						{jam.show_id && <Link to={`/shows/${jam.show_id}`}>{jam.date}</Link>}
 
 						{!jam.show_id && (
-							<Form method="post">
+							<fetcher.Form method="post" action="?index" preventScrollReset={true}>
 								<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
 								<input type="hidden" name="artist_id" value={jam.artist_id} />
-								<input type="hidden" name="date" value={jam.date} />
+								<input type="hidden" name="date_text" value={jam.date} />
+								<input type="hidden" name="day" value={jam.date.slice(8, 10)} />
+								<input type="hidden" name="month" value={jam.date.slice(5, 7)} />
+								<input type="hidden" name="year" value={jam.date.slice(0, 4)} />
 								<input type="hidden" name="location" value={jam.location} />
 								<button
 									type="submit"
 									name="_action"
 									value="add-show"
 									className="mb-2 font-normal text-cyan-700 bg-white hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-800 focus:ring-opacity-50 rounded-md py-1 px-2 transition duration-300 ease-in-out border-2 border-cyan-700 hover:border-cyan-800 cursor:pointer"
-									onClick={() => onAddShowClick()}
 								>
 									add show
 								</button>
-							</Form>
+							</fetcher.Form>
 						)}
 					</div>
 					<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>

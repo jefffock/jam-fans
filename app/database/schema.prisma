@@ -288,7 +288,7 @@ model users {
 }
 
 model add_link {
-  id         BigInt    @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   username   String?
   link       String?
@@ -299,7 +299,7 @@ model add_link {
 }
 
 model artist_suggestions {
-  id           BigInt   @id @unique @default(autoincrement())
+  id           Int      @id @unique @default(autoincrement())
   created_at   DateTime @default(now()) @db.Timestamptz(6)
   submitter_id String?  @default(dbgenerated("auth.uid()")) @db.Uuid
   name         String?
@@ -322,6 +322,7 @@ model artists {
   jam_count      Int?             @default(0)
   data_source    DataSource?
   musicbrainz_id String?          @db.Uuid
+  sites          String[]
   jams           jams[]
   jams_duplicate jams_duplicate[]
   sets           sets[]
@@ -332,7 +333,7 @@ model artists {
 }
 
 model eggy_songs {
-  id              BigInt    @id(map: "goose_songs_pkey")
+  id              Int       @id(map: "goose_songs_pkey")
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -344,7 +345,7 @@ model eggy_songs {
 }
 
 model goose_songs {
-  id              BigInt    @id(map: "goose_songs_pkey1")
+  id              Int       @id(map: "goose_songs_pkey1")
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -415,7 +416,7 @@ model ideas {
 }
 
 model issues {
-  id          BigInt    @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   created_at  DateTime? @default(now()) @db.Timestamptz(6)
   broken_link Boolean?  @default(false)
   issue       String?
@@ -441,9 +442,9 @@ model jams {
   num_ratings         Int?          @default(0)
   song_submitter_name String?
   sounds              String[]
-  set_id              BigInt?
+  set_id              Int?
   show_id             Int?
-  venue_id            BigInt?
+  venue_id            Int?
   artist_id           Int?
   sound_ids           String[]
   year                Int?          @db.SmallInt
@@ -475,9 +476,9 @@ model jams_duplicate {
   num_ratings         Int?      @default(0)
   song_submitter_name String?
   sounds              String[]
-  set_id              BigInt?
+  set_id              Int?
   show_id             Int?
-  venue_id            BigInt?
+  venue_id            Int?
   artist_id           Int?
   sound_ids           String[]
   year                Int?      @db.SmallInt
@@ -494,7 +495,7 @@ model jams_duplicate {
 }
 
 model jams_lists {
-  id         BigInt    @id(map: "jams_lists_duplicate_pkey") @default(autoincrement())
+  id         Int       @id(map: "jams_lists_duplicate_pkey") @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   query      String?   @unique(map: "jams_lists_duplicate_query_key")
   params     String?   @unique(map: "jams_lists_duplicate_params_key")
@@ -504,7 +505,7 @@ model jams_lists {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model kglw_songs {
-  id              BigInt    @id
+  id              Int       @id
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -516,7 +517,7 @@ model kglw_songs {
 }
 
 model lists {
-  id         BigInt    @id(map: "lists_duplicate_pkey") @default(autoincrement())
+  id         Int       @id(map: "lists_duplicate_pkey") @default(autoincrement())
   created_at DateTime? @default(now()) @db.Timestamptz(6)
   url        String?
   query      String?
@@ -525,7 +526,7 @@ model lists {
 }
 
 model neighbor_songs {
-  id              BigInt    @id
+  id              Int       @id
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -537,7 +538,7 @@ model neighbor_songs {
 }
 
 model phishnet_jamcharts {
-  songid          BigInt  @id
+  songid          Int     @id
   song            String?
   slug            String?
   abbr            String?
@@ -553,7 +554,7 @@ model phishnet_jamcharts {
 }
 
 model phishnet_shows {
-  showid             BigInt  @id
+  showid             Int     @id
   showyear           BigInt?
   showmonth          BigInt?
   showday            BigInt?
@@ -578,7 +579,7 @@ model phishnet_shows {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model phishnet_songs {
-  songid          BigInt  @id(map: "phish-songs_pkey")
+  songid          Int     @id(map: "phish-songs_pkey")
   song            String?
   slug            String?
   abbr            String?
@@ -594,7 +595,7 @@ model phishnet_songs {
 }
 
 model phishnet_songs_duplicate {
-  songid          BigInt  @id
+  songid          Int     @id
   song            String?
   slug            String?
   abbr            String?
@@ -610,7 +611,7 @@ model phishnet_songs_duplicate {
 }
 
 model phishnet_venues {
-  venueid    BigInt  @id
+  venueid    Int     @id
   venuename  String?
   city       String?
   state      String?
@@ -667,7 +668,7 @@ model ratings {
   submitter_name        String?
   profile_id            String?                 @db.Uuid
   musical_entity        MusicalEntity           @default(Jam)
-  set_id                BigInt?
+  set_id                Int?
   show_id               Int?
   jam_id                Int?
   helpful_votes_ratings helpful_votes_ratings[]
@@ -699,18 +700,20 @@ model ratings_duplicate {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model sets {
-  id             BigInt           @id @default(autoincrement())
+  id             Int              @id @default(autoincrement())
   created_at     DateTime?        @default(now()) @db.Timestamptz(6)
   artist_id      Int?
   setlist        String[]
   vibes          String[]
   profile_id     String?          @db.Uuid
-  type           Set?
   show_id        Int?
   multi_song     String[]
   song_ids       Int[]
   sound_ids      BigInt[]
   entity         MusicalEntity    @default(Set)
+  festival       Boolean?         @default(false)
+  set_number     SetNumber        @default(set_2)
+  date           String
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -731,15 +734,16 @@ model shows {
   song_ids       Int[]
   vibes          String[]
   profile_id     String?          @db.Uuid
-  venue_id       BigInt?
-  tour_id        BigInt?
+  venue_id       Int?
+  tour_id        Int?
   day            Int?             @db.SmallInt
   month          Int?             @db.SmallInt
   year           Int?             @db.SmallInt
-  sound_ids      BigInt[]
+  sound_ids      Int[]
   date_text      String?
   location       String?
   entity         MusicalEntity    @default(Show)
+  set_ids        Int[]
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -747,7 +751,7 @@ model shows {
   artists        artists?         @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles       profiles?        @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tours          tours?           @relation(fields: [tour_id], references: [id], onDelete: NoAction)
-  venues         venues?          @relation(fields: [venue_id], references: [id], onDelete: NoAction)
+  venues         venues?          @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   versions       versions[]
 
   @@schema("public")
@@ -785,7 +789,7 @@ model tab_songs {
   showdate             String?
   permalink            String?
   showyear             BigInt?
-  uniqueid             BigInt  @id
+  uniqueid             Int     @id
   meta                 String?
   reviews              String?
   exclude              String?
@@ -823,7 +827,7 @@ model tab_songs {
 }
 
 model tapers_choice_songs {
-  id              BigInt    @id
+  id              Int       @id
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -835,7 +839,7 @@ model tapers_choice_songs {
 }
 
 model tours {
-  id         BigInt     @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   created_at DateTime   @default(now()) @db.Timestamptz(6)
   artist_id  Int?
   year       String?
@@ -850,7 +854,7 @@ model tours {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model um_songs {
-  id              BigInt    @id
+  id              Int       @id
   name            String?
   slug            String?
   isoriginal      BigInt?
@@ -863,7 +867,7 @@ model um_songs {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model update_tags {
-  id         BigInt    @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   version_id Int?
   tags_added String?
   length     Int?      @db.SmallInt
@@ -875,7 +879,7 @@ model update_tags {
 }
 
 model venues {
-  id             BigInt           @id @default(autoincrement())
+  id             Int              @id @default(autoincrement())
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
   name           String?
   city           String?
@@ -907,14 +911,14 @@ model versions {
   num_ratings         Int?          @default(0)
   song_submitter_name String?
   sounds              String[]
-  set_id              BigInt?
+  set_id              Int?
   show_id             Int?
   sound_ids           BigInt?
-  venue_id            BigInt?
+  venue_id            Int?
   add_link            add_link[]
   ratings             ratings[]
   update_tags         update_tags[]
-  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction)
+  sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   songs               songs         @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   venues              venues?       @relation(fields: [venue_id], references: [id], onDelete: NoAction)
@@ -1027,13 +1031,12 @@ enum Season {
   @@schema("public")
 }
 
-enum Set {
-  Set_1    @map("Set 1")
-  Set_2    @map("Set 2")
-  Set_3    @map("Set 3")
-  Encore
-  Festival
-  Late
+enum SetNumber {
+  set_1    @map("set 1")
+  set_2    @map("set 2")
+  set_3    @map("set 3")
+  encore
+  late_set @map("late set")
 
   @@schema("public")
 }

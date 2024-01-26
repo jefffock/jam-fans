@@ -22,7 +22,15 @@ const formatDateDisplay = (dateStr) => {
 	return `${month}/${day}/${year}`
 }
 
-export default function DatePicker({ dateFilter, handleDateInputChange, date, showsOnDate }) {
+export default function DatePicker({
+	dateFilter,
+	handleDateInputChange,
+	date,
+	showsOnDate,
+	setActiveTab,
+	inAdd = false,
+	artist,
+}) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	return (
@@ -40,6 +48,7 @@ export default function DatePicker({ dateFilter, handleDateInputChange, date, sh
 					onChange={handleDateInputChange}
 					max={new Date().toISOString().split('T')[0]}
 					min="1900-01-01"
+					disabled={inAdd && !artist}
 				/>
 			</div>
 
@@ -57,20 +66,23 @@ export default function DatePicker({ dateFilter, handleDateInputChange, date, sh
 					</>
 				)}
 
-				{dateFilter && (
+				{!inAdd && dateFilter && (
 					<div>
 						<button
-							onClick={(event) => openModal(setIsModalOpen, event)}
+							onClick={(e) => {
+								e.preventDefault()
+								setActiveTab('add')
+							}}
 							className="bg-blue-500 text-white rounded p-2 mt-2"
 						>
-							add a show
+							add a jam, set or show from {dateFilter}
 						</button>
-						<ConfigurableAddItemModal
+						{/* <ConfigurableAddItemModal
 							isOpen={isModalOpen}
 							onClose={() => closeModal(setIsModalOpen)}
 							config={addShowConfig}
 							date={dateFilter}
-						/>
+						/> */}
 					</div>
 				)}
 			</div>

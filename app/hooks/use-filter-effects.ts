@@ -40,13 +40,8 @@ const useFilterEffects = ({
 
 		scrollToTopOfRef(jamListRef)
 
-		const filterURL = createFilterURL('/add/jam', filters)
-		console.log('filterURL', filterURL)
-		setAddJamLink(filterURL)
-
 		const showsOnDate = allShows.filter((show) => show.date_text === dateFilter)
 
-		console.log('showsOnDate', showsOnDate)
 		setShowsOnDate(showsOnDate)
 	}, [
 		filteredMusicalEntities,
