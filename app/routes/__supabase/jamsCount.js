@@ -64,8 +64,8 @@ export const loader = async ({ request, params }) => {
 		if (key.includes('show-links')) {
 			showListenable = true;
 		} if (key.includes('date')) {
-      date = value;
-    }
+		date = value;
+		}
 	}
 
 	let jams = supabaseClient

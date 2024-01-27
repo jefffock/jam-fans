@@ -14,7 +14,7 @@ export default function FiltersButton({ open, setOpen }) {
 				className='-ml-1 mr-2 h-5 w-5 text-cyan-500'
 				aria-hidden='true'
 			/>
-			Filters - Find jams by sound, band, song, year
+			Filters - Find jams by band or song
 		</button>
 	);
 }
