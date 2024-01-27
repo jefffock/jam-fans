@@ -243,7 +243,7 @@ export default function JamFiltersSlideout({
 												<div className='relative mt-6 flex-1 px-4 sm:px-6'>
 													<div className='space-y-8 divide-y divide-gray-200'>
 														{/* sound picker*/}
-														<div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
+														{/* <div className='mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6'>
 															<div className='sm:col-span-6 mx-4'>
 																<div className='mt-1 flex rounded-md shadow-sm'>
 																	<fieldset>
@@ -284,7 +284,7 @@ export default function JamFiltersSlideout({
 																	</fieldset>
 																</div>
 															</div>
-														</div>
+														</div> */}
 														{/* Artist Band Picker */}
 														<div className='sm:col-span-4 mx-4 mt-6'>
 															<div className='mt-1 flex rounded-md shadow-sm'>
