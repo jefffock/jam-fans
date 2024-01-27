@@ -221,23 +221,23 @@ export default function Index() {
 		setQuery('')
 	}, [songFilter])
 
-	useEffect(() => {
-		if (headerRef.current) {
-			setHeaderHeight(headerRef.current.clientHeight)
-		}
-	}, [])
+	// useEffect(() => {
+	// 	if (headerRef.current) {
+	// 		setHeaderHeight(headerRef.current.clientHeight)
+	// 	}
+	// }, [])
 
-	if (jamListRef.current && scrollTop > 100 && scrollingDown) {
-		if (window) {
-			scrollToBottomOfWindow()
-		}
-	}
+	// if (jamListRef.current && scrollTop > 100 && scrollingDown) {
+	// 	if (window) {
+	// 		scrollToBottomOfWindow()
+	// 	}
+	// }
 
-	if (jamListRef.current && scrollTop < 10 && !scrollingDown) {
-		if (window) {
-			scrollToTopOfWindow()
-		}
-	}
+	// if (jamListRef.current && scrollTop < 10 && !scrollingDown) {
+	// 	if (window) {
+	// 		scrollToTopOfWindow()
+	// 	}
+	// }
 
 	const filteredMusicalEntities = useFilteredMusicalEntities({
 		allJams,

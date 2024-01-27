@@ -1,4 +1,4 @@
-import { resolve } from 'node:path'
+pimport { resolve } from 'node:path'
 
 import type { EntryContext } from '@remix-run/node'
 import { createInstance } from 'i18next'

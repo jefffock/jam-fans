@@ -122,6 +122,9 @@ export async function getJamsByShow(data: { show_id: number }) {
 
 export async function getJams() {
 	const allJams = await db.jams.findMany({
+		include: {
+			artists: true,
+		},
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
 

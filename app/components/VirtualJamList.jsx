@@ -1,5 +1,6 @@
 import JamCard from './cards/JamCard'
 import ShowCard from './cards/ShowCard'
+import SetCard from './cards/SetCard'
 // import SetCard from './cards/SetCard'
 import React, { useState, useRef, useEffect } from 'react'
 import { Iframe } from './IFrame'
@@ -20,14 +21,17 @@ export default function VirtualEntityList({
 	prevJamListRef,
 	jamCardHeight,
 }) {
-	let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
+	// let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
+	let cardHeight = 322
 	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
 	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items?.length)
 	const visibleItems = items?.slice(startIndex, endIndex)
 	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex + 1)] : []
 	const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items?.length - endIndex)] : []
 	// combine placeholders and visible items into one array
-	const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
+	// const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
+	// TODO: re-implement virtual list
+	const itemsToRender = items
 	const handleScroll = (event) => {
 		prevJamListRef.current = scrollTop
 		setScrollTop(event.currentTarget.scrollTop)
@@ -37,10 +41,9 @@ export default function VirtualEntityList({
 	return (
 		<div
 			ref={jamListRef}
-			className=" overflow-y-scroll pb-20"
-			//`,
-			style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
-			onScroll={handleScroll}
+			// className=" overflow-y-scroll pb-20"
+			// style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
+			// onScroll={handleScroll}
 		>
 			<div>
 				{/* <div style={{ height: `${totalHeight}px`, position: 'relative' }}> */}
@@ -64,13 +67,7 @@ export default function VirtualEntityList({
 						// else if (item?.entity === 'Set') {
 						// 	return <SetCard key={`visibile-${index}`} set={item} user={user} />
 						// }
-						return (
-							<div
-								key={`placeholder-${index}`}
-								// style={{ height: cardHeight, width: cardWidth }}
-								className="h-80 m-6"
-							></div>
-						)
+						return <SetCard key={`visible-${index}`} set={item} user={user} />
 					})}
 				</div>
 			</div>

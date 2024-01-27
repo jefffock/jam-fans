@@ -3,7 +3,11 @@ import type { sets } from '@prisma/client'
 import { SetNumber } from '@prisma/client'
 
 export async function getSets() {
-	const sets = await db.sets.findMany()
+	const sets = await db.sets.findMany({
+		include: {
+			artists: true,
+		},
+	})
 	return sets
 }
 
