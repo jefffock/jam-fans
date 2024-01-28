@@ -3,6 +3,7 @@ import DatePicker from './DatePicker'
 import { Form, useFetcher } from '@remix-run/react'
 import { fetchEnsResolver } from 'wagmi/actions'
 import RatingButtons from './RatingButtons'
+import AddJamSetShow from './AddJamSetShow'
 
 const SETS = [
 	{ label: 'set 1', value: 'set_1' },
@@ -12,14 +13,6 @@ const SETS = [
 	{ label: 'late set', value: 'late_set' },
 ]
 
-const setNumberMap = {
-	set_1: 'set 1',
-	set_2: 'set 2',
-	set_3: 'set 3',
-	encore: 'encore',
-	late_set: 'late set',
-}
-
 export default function AddEntity({
 	artist,
 	date,
@@ -27,6 +20,8 @@ export default function AddEntity({
 	dateFilter,
 	handleDateInputChange,
 	filteredMusicalEntities,
+	activeAddTab,
+	setActiveAddTab,
 }) {
 	const [selectedArtist, setSelectedArtist] = useState(
 		JSON.stringify(artists.find((art) => art.id === Number(artist))) || ''
@@ -79,112 +74,56 @@ export default function AddEntity({
 	}
 
 	return (
-		<div className="m-4 text-xl text-gray">
-			<select className="border-2" value={selectedArtist} onChange={(e) => setSelectedArtist(e.target.value)}>
-				<option value="">Select an artist</option>
-				{artists.map((art, index) => (
-					<option key={index} value={JSON.stringify(art)}>
-						{art.artist}
-					</option>
-				))}
-			</select>
-
-			{selectedArtist && (
-				<DatePicker
+		<div className="m-4 text-lg text-gray">
+			<div className="flex space-x-10 mx-auto text-center max-w-fit mb-4">
+				<button
+					type="button"
+					className={`${activeAddTab === 'jamSetShow' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
+					disabled={activeAddTab === 'jamSetShow'}
+					onClick={() => setActiveAddTab('jamSetShow')}
+				>
+					jams, sets, shows
+				</button>
+				<button
+					type="button"
+					className={`${activeAddTab === 'artist' ? 'text-cyan-700' : 'text-neutral-500'}`}
+					disabled={activeAddTab === 'artist'}
+					onClick={() => setActiveAddTab('artist')}
+				>
+					bands
+				</button>
+				<button
+					type="button"
+					className={`${activeAddTab === 'song' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
+					disabled={activeAddTab === 'song'}
+					onClick={() => setActiveAddTab('song')}
+				>
+					songs
+				</button>
+				<button
+					type="button"
+					className={`${activeAddTab === 'sound' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
+					disabled={activeAddTab === 'sound'}
+					onClick={() => setActiveAddTab('sound')}
+				>
+					sounds
+				</button>
+			</div>
+			{activeAddTab === 'jamSetShow' && (
+				<AddJamSetShow
+					selectedArtist={selectedArtist}
 					dateFilter={dateFilter}
-					handleDateInputChange={handleDateInputChange}
+					artists={artists}
 					date={date}
-					showsOnDate={null}
-					inAdd={true}
-					artist={selectedArtist}
+					handleDateInputChange={handleDateInputChange}
+					showOnJF={showOnJF}
+					setsOnJF={setsOnJF}
+					availableSets={availableSets}
+					setlist={setlist}
+					location={location}
+					setSelectedArtist={setSelectedArtist}
 				/>
 			)}
-			{selectedArtist && <p>{JSON.parse(selectedArtist).artist}</p>}
-			<p>{dateFilter}</p>
-			<p>{location}</p>
-			{showOnJF && (
-				<>
-					<p className="text-center">your rating</p>
-					<RatingButtons entity={showOnJF} entityType="Show" actionName="rate-show" />
-				</>
-			)}
-			{!showOnJF && dateFilter && selectedArtist && (
-				<Form method="post" preventScrollReset={true}>
-					<input type="hidden" name="entity" value="Show" />
-					<input type="hidden" name="date_text" value={dateFilter} />
-					<input type="hidden" name="year" value={dateFilter.slice(0, 4)} />
-					<input type="hidden" name="month" value={dateFilter.slice(5, 7)} />
-					<input type="hidden" name="day" value={dateFilter.slice(8, 10)} />
-					<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
-					<input type="hidden" name="location" value={location} />
-					<button type="submit" name="_action" value="add-show" className="border-2">
-						Add {JSON.parse(selectedArtist).artist}&apos;s {dateFilter} show
-					</button>
-				</Form>
-			)}
-			{selectedArtist && dateFilter && setsOnJF && <p>sets on jam fans</p>}
-			{selectedArtist &&
-				dateFilter &&
-				setsOnJF &&
-				setsOnJF.map((set, index) => (
-					<>
-						<p key={index}>{setNumberMap[set.set_number]}</p>
-						<button className="border-2 p-2 m-2">Rate {setNumberMap[set.set_number]}</button>
-						<button className="border-2 p-2 m-2">Comment on {setNumberMap[set.set_number]}</button>
-						<button className="border-2 p-2 m-2">add rating and comment</button>
-					</>
-				))}
-			{/* {selectedArtist && dateFilter && availableSets && <p>available sets to add to jam fans</p>} */}
-			{selectedArtist && dateFilter && availableSets && <p>add a set:</p>}
-			{selectedArtist &&
-				dateFilter &&
-				availableSets.map((set, index) => (
-					<>
-						<Form method="post" preventScrollReset={true}>
-							<input type="hidden" name="entity" value="Set" />
-							<input type="hidden" name="set_number" value={set.value} />
-							<input type="hidden" name="date" value={dateFilter} />
-							<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
-							<button
-								type="submit"
-								name="_action"
-								value="add-set"
-								className="border-2 p-2 m-2"
-								key={index}
-							>
-								Add {set.label} from {dateFilter}
-							</button>
-						</Form>
-					</>
-				))}
-
-			{setlist && selectedArtist && dateFilter && (
-				<>
-					<p>setlist</p>
-					{setlist.map((song, index) =>
-						song.label.indexOf('Added') === -1 ? (
-							<div className="flex" key={index}>
-								{/* <p key={index}>{song.label}</p> */}
-								<button className="border-2 p-2 m-2">Add {song.label}</button>
-							</div>
-						) : (
-							<div className="flex" key={index}>
-								<p key={index}>{song.label}</p>
-								<button className="border-2 p-2 m-2"> Rate </button>
-								<button className="border-2 p-2 m-2"> Comment </button>
-							</div>
-						)
-					)}
-				</>
-			)}
-
-			{selectedArtist &&
-				dateFilter &&
-				filteredMusicalEntities?.map((entity, index) => (
-					<div key={index}>
-						<pre>{JSON.stringify(entity.entity + entity.id, null, 2)}</pre>
-					</div>
-				))}
 		</div>
 	)
 }

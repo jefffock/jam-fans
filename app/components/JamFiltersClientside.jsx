@@ -71,6 +71,7 @@ export default function JamFiltersClientside({
 	const [dateInput, setDateInput] = useState('')
 	const [songSelected, setSongSelected] = useState(null)
 	const [activeTab, setActiveTab] = useState('explore')
+	const [activeAddTab, setActiveAddTab] = useState('jamSetShow')
 	const noFiltersSelected = musicalEntitiesLength === jamsCount + setsCount + showsCount
 
 	const dates = []
@@ -163,6 +164,19 @@ export default function JamFiltersClientside({
 		setQuery('')
 	}
 
+	function handleAddArtistClick() {
+		setActiveTab('add')
+		setActiveAddTab('artist')
+	}
+
+	const filteredSetsCount = useMemo(() => {
+		return filteredMusicalEntities?.filter((entity) => entity.type === 'set').length
+	}, [filteredMusicalEntities])
+
+	const filteredJamsCount = useMemo(() => {
+		return filteredMusicalEntities?.filter((entity) => entity.type === 'jam').length
+	}, [filteredMusicalEntities])
+
 	return (
 		<FiltersSlideout
 			open={open}
@@ -182,6 +196,7 @@ export default function JamFiltersClientside({
 							artists={artists}
 							handleArtistsChange={handleArtistsChange}
 							artistFilters={artistFilters}
+							onClick={handleAddArtistClick}
 						/>
 						<DatePicker
 							dateInput={dateInput}
@@ -190,6 +205,10 @@ export default function JamFiltersClientside({
 							dateFilter={dateFilter}
 							showsOnDate={showsOnDate}
 							setActiveTab={setActiveTab}
+							showLabel={false}
+							setActiveAddTab={setActiveAddTab}
+							jamsCount={filteredJamsCount}
+							setsCount={filteredSetsCount}
 						/>
 						<Accordion title="sounds">
 							<SoundPicker
@@ -208,21 +227,23 @@ export default function JamFiltersClientside({
 							query={query}
 							songs={songs}
 						/>
-						<YearFilter
-							filterType="before"
-							value={beforeDateFilter}
-							onChange={setBeforeDateFilter}
-							dates={dates}
-							displayValue={beforeYearDisplayValue}
-						/>
+						<div className="flex justify-between">
+							<YearFilter
+								filterType="before"
+								value={beforeDateFilter}
+								onChange={setBeforeDateFilter}
+								dates={dates}
+								displayValue={beforeYearDisplayValue}
+							/>
 
-						<YearFilter
-							filterType="after"
-							value={afterDateFilter}
-							onChange={setAfterDateFilter}
-							dates={dates}
-							displayValue={afterYearDisplayValue}
-						/>
+							<YearFilter
+								filterType="after"
+								value={afterDateFilter}
+								onChange={setAfterDateFilter}
+								dates={dates}
+								displayValue={afterYearDisplayValue}
+							/>
+						</div>
 						<EntityDisplayPreferences handleLinkChange={handleLinkChange} linkFilter={linkFilter} />
 					</FiltersFormBody>
 					<FilterButtonsContainer
@@ -244,6 +265,8 @@ export default function JamFiltersClientside({
 					handleDateInputChange={handleDateInputChange}
 					date={date}
 					filteredMusicalEntities={filteredMusicalEntities}
+					activeAddTab={activeAddTab}
+					setActiveAddTab={setActiveAddTab}
 				/>
 			)}
 		</FiltersSlideout>

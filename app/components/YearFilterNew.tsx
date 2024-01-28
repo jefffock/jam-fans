@@ -4,17 +4,17 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 const YearFilter = ({ filterType, value, onChange, dates, displayValue }) => {
 	return (
-		<div className="p-4">
-			<Listbox value={value} onChange={onChange} className="max-w-sm">
+		<div className="p-4 w-full">
+			<Listbox value={value} onChange={onChange}>
 				{({ open }) => (
 					<>
-						<Listbox.Label className="block text-2xl text-gray-900">
+						<Listbox.Label className="block text-2xl text-gray-900 hidden">
 							{filterType === 'before' ? 'before' : 'after'}
 						</Listbox.Label>
 						<div className="relative mt-1">
-							<Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm">
+							<Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-2 pr-4 text-left shadow-sm focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 sm:text-sm">
 								<span className="block truncate">{displayValue}</span>
-								<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+								<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1">
 									<ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
 								</span>
 							</Listbox.Button>
@@ -30,7 +30,7 @@ const YearFilter = ({ filterType, value, onChange, dates, displayValue }) => {
 										<Listbox.Option
 											key={idx}
 											className={({ active }) =>
-												`relative cursor-default select-none py-2 pl-3 pr-9 ${
+												`relative cursor-default select-none py-2 pl-3 pr-4 ${
 													active ? 'text-white bg-cyan-600' : 'text-gray-900'
 												}`
 											}

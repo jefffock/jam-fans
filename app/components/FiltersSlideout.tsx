@@ -5,7 +5,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, setActiveTab, children }) {
 	return (
 		<Transition.Root show={open} as={Fragment}>
-			<Dialog as="div" className="relative z-10" onClose={setOpen}>
+			<Dialog as="div" className="relative z-10 text-lg" onClose={setOpen}>
 				<div className="fixed inset-0" />
 				<div className="fixed inset-0 overflow-hidden">
 					<div className="absolute inset-0 overflow-hidden">
@@ -33,9 +33,10 @@ export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, 
 															type="button"
 															className={`${
 																activeTab === 'explore'
-																	? 'text-cyan-600 underline'
+																	? 'text-cyan-700 '
 																	: 'text-gray-500'
 															}`}
+															disabled={activeTab === 'explore'}
 															onClick={() => setActiveTab('explore')}
 														>
 															explore
@@ -43,10 +44,9 @@ export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, 
 														<button
 															type="button"
 															className={`${
-																activeTab === 'add'
-																	? 'text-cyan-600 underline'
-																	: 'text-gray-500'
+																activeTab === 'add' ? 'text-cyan-700 ' : 'text-gray-500'
 															}`}
+															disabled={activeTab === 'add'}
 															onClick={() => setActiveTab('add')}
 														>
 															add

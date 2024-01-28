@@ -1,5 +1,6 @@
 import { Link, useFetcher, Form } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
+import ButtonSmall from '../ButtonSmall'
 
 const JamCard = forwardRef((props, ref) => {
 	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
@@ -56,21 +57,21 @@ const JamCard = forwardRef((props, ref) => {
 						)}
 						{!jam.show_id && fetcher?.state === 'idle' && (
 							<fetcher.Form method="post" action="?index" preventScrollReset={true}>
-								<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
 								<input type="hidden" name="artist_id" value={jam.artist_id} />
 								<input type="hidden" name="date_text" value={jam.date} />
 								<input type="hidden" name="day" value={jam?.date?.slice(8, 10)} />
 								<input type="hidden" name="month" value={jam?.date?.slice(5, 7)} />
 								<input type="hidden" name="year" value={jam?.date?.slice(0, 4)} />
 								<input type="hidden" name="location" value={jam.location} />
-								<button
-									type="submit"
-									name="_action"
-									value="add-show"
-									className="mb-2 font-normal text-cyan-700 bg-white hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-800 focus:ring-opacity-50 rounded-md py-1 px-2 transition duration-300 ease-in-out border-2 border-cyan-700 hover:border-cyan-800 cursor:pointer"
-								>
-									add show
-								</button>
+								<div className="flex justify-items-start gap-8 align-middle">
+									<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
+									<ButtonSmall
+										text={'add show'}
+										type={'submit'}
+										name={'_action'}
+										value={'add-show'}
+									/>
+								</div>
 							</fetcher.Form>
 						)}
 					</div>
@@ -136,13 +137,13 @@ const JamCard = forwardRef((props, ref) => {
 				{!user && (
 					<Link
 						to={link}
-						className="underline self-center align-middle transition-all ease-in hover:scale-125 duration-500 hover:duration-20000 hover:pl-2 color text-cyan-500 hover:text-cyan-600"
+						className="underline self-center align-middle transition-all ease-in hover:scale-125 duration-500 hover:duration-20000 hover:pl-2 color text-cyan-700 hover:text-cyan-600"
 					>
 						Add Sounds
 					</Link>
 				)}
 				{user && (
-					<Link to={link} className="underline self-center align-middle text-cyan-500 hover:text-cyan-600">
+					<Link to={link} className="underline self-center align-middle text-cyan-700 hover:text-cyan-600">
 						{jam.listen_link ? 'Curate' : 'Curate and/or add a link'}
 					</Link>
 				)}

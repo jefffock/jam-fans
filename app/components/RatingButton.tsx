@@ -11,7 +11,7 @@ export default function RatingButton({ rating, entityId, entityType, actionName,
 				type="submit"
 				name="_action"
 				value={actionName}
-				className={`${currentRating === rating ? 'text-cyan-500 border-cyan-500 hover' : 'text-gray-400 hover:text-gray-500 hover:border-gray-500 border-gray-400'} text-2xl border-2 rounded-2xl  p-4 w-16 text-center`}
+				className={`${currentRating === rating || fetcher?.state !== 'idle' ? 'text-cyan-700 border-cyan-700 hover' : 'text-gray-400 hover:text-gray-500 hover:border-gray-500 border-gray-400'} text-2xl border-2 rounded-2xl  p-2 w-12 text-center`}
 				disabled={currentRating === rating}
 			>
 				{rating}

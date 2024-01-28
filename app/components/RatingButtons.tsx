@@ -6,7 +6,7 @@ export default function RatingButtons({ entity, entityType, actionName }) {
 	const ratings = [6, 7, 8, 9, 10]
 	console.log('entity in rating buttons', entity)
 	return (
-		<div className="flex justify-between p-2">
+		<div className="flex justify-center gap-4 p-2 max-w-screen">
 			{ratings.map((rating) => (
 				<RatingButton
 					key={rating}

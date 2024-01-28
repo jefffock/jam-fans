@@ -19,7 +19,7 @@ export default function MusicalEntityPicker({ entitiesFilters, setEntitiesFilter
 						onChange={handleEntityChange}
 						className="form-checkbox h-5 w-5 accent-cyan-600"
 					/>
-					<span className="text-gray-700 capitalize">{key}</span>
+					<span className="text-gray-700">{key}</span>
 				</label>
 			))}
 		</div>

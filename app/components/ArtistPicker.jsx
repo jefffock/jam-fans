@@ -5,8 +5,9 @@ import ConfigurableAddItemModal from './ConfigurableAddItemModal'
 import { addArtistConfig } from '~/config'
 import Accordion from './Accordion'
 import { openModal, closeModal } from '~/utils/modal'
+import ButtonSmall from './ButtonSmall'
 
-export default function ArtistPicker({ artists, handleArtistsChange, artistFilters }) {
+export default function ArtistPicker({ artists, handleArtistsChange, artistFilters, onClick }) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	return (
@@ -43,11 +44,8 @@ export default function ArtistPicker({ artists, handleArtistsChange, artistFilte
 								</div>
 							))}
 					</div>
-					<div>
-						<button onClick={openModal} className="bg-blue-500 text-white rounded p-2">
-							add an artist
-						</button>
-						<ConfigurableAddItemModal isOpen={isModalOpen} onClose={closeModal} config={addArtistConfig} />
+					<div className="flex justify-center pb-4">
+						<ButtonSmall onClick={onClick} text="add an artist" />
 					</div>
 				</fieldset>
 			</div>
