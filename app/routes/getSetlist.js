@@ -154,7 +154,6 @@ export const loader = async ({ request, params }) => {
 		console.log('url to fetch: ', url)
 		const setlistData = await fetch(url)
 		setlist = await setlistData.json()
-		console.log('setlist: ', setlist)
 		if (setlist && setlist.data && setlist.data.length > 0) {
 			const song = setlist.data[0]
 			location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
@@ -211,8 +210,6 @@ export const loader = async ({ request, params }) => {
 			setlist = titles
 		}
 	}
-	console.log('setlist', setlist)
-	console.log('location', location)
 	return json(
 		{ setlist: setlist || [], location },
 		{

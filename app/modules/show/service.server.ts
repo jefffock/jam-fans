@@ -1,17 +1,53 @@
 import { db } from '../../database'
 
-export async function getShows() {
+export async function getShows(userId) {
 	const shows = await db.shows.findMany({
 		include: {
 			artists: true,
 		},
+		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
+
+	let userRatings = {}
+
+	if (userId) {
+		const ratings = await db.ratings.findMany({
+			where: {
+				profile_id: userId,
+				entity_type: 'Show',
+			},
+			select: {
+				entity_id: true,
+				rating: true,
+			},
+		})
+
+		userRatings = ratings.reduce((acc, rating) => {
+			acc[rating.entity_id] = rating.rating
+			return acc
+		}, {})
+
+		shows.forEach((show) => {
+			show.userRating = userRatings[show.id] || undefined
+		})
+	}
 
 	return shows
 }
 
 export async function addShow(values) {
 	console.log(' in addShow server', values)
+	// make sure show isn't already in db
+	const show = await db.shows.findFirst({
+		where: {
+			date_text: values.date_text,
+			artist_id: Number(values.artist_id),
+		},
+	})
+	console.log('show', show)
+	if (show) {
+		throw new Error('Show already exists')
+	}
 	const newShow = await db.shows.create({
 		data: {
 			...values,
@@ -65,4 +101,19 @@ export async function getShowById(showId: number | string) {
 export async function getShowsCount(): Promise<number> {
 	const count = await db.shows.count()
 	return count
+}
+
+export async function updateRatingForShow(showId) {
+	const ratings = await db.ratings.findMany({
+		where: { entity_id: showId, rating: { not: null } },
+		select: { rating: true },
+	})
+
+	const averageRating =
+		ratings.length > 0 ? ratings.reduce((sum, { rating }) => sum + rating, 0) / ratings.length : null
+
+	await db.shows.update({
+		where: { id: showId },
+		data: { avg_rating: averageRating, num_ratings: ratings.length },
+	})
 }

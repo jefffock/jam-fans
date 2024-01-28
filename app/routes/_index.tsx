@@ -23,7 +23,7 @@ import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.
 import { getSongsCount, getSongById, getSongs } from '../modules/song/index.server'
 import { useState, useEffect, useRef, useMemo } from 'react'
 import JamsHome from '../components/JamsHome'
-import { getProfile } from '../modules/profile/index.server'
+import { getProfile, getProfileFromRequest } from '../modules/profile/index.server'
 import JamList from '../components/JamList'
 import JamFiltersSlideout from '../components/JamFilters'
 import FiltersButton from '../components/FiltersButton'
@@ -46,16 +46,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// console.log('request', request)
 
 	const response = new Response()
-	const authSession = await getAuthSession(request)
 
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
 	console.log('queryParams', queryParams)
 
-	const jams = await getJams()
-	const sets = await getSets()
-	const shows = await getShows()
+	const profile = await getProfileFromRequest(request)
+	const jams = await getJams(profile?.id)
+	const sets = await getSets(profile?.id)
+	const shows = await getShows(profile?.id)
 	const artists = await getArtists()
 	const songs = await getSongs()
 	const sounds = await getSounds()
@@ -65,10 +65,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const artistsCount = await getArtistsCount()
 	const soundsCount = await getSoundsCount()
 	const songsCount = await getSongsCount()
-	let profile = null
-	if (authSession) {
-		profile = await getProfile(authSession.userId)
-	}
+	// let profile = null
+	// if (authSession) {
+	// 	profile = await getProfile(authSession.userId)
+	// }
 
 	// const [
 	// 	jams,
@@ -199,7 +199,7 @@ export default function Index() {
 	const jamCardRef = useRef(null)
 	const [jamCardHeight, setJamCardHeight] = useState(0)
 	const prevJamListRef = useRef(null)
-	const [title, setTitle] = useState('🔥 Jams')
+	const [title, setTitle] = useState('🔥 jams, sets, and shows')
 	const [query, setQuery] = useState('')
 	// const debouncedQuery = useDebounce(query, 300)
 	const windowHeight = useWindowHeight()

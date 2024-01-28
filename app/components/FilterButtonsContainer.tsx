@@ -10,7 +10,7 @@ export const FilterButtonsContainer = ({
 	musicalEntitiesFilters,
 }) => {
 	return (
-		<div className="absolute flex justify-evenly flex-col bottom-0 right-0 py-4 bg-white w-full max-w-md px-2">
+		<div className="absolute flex justify-evenly flex-col bottom-0 py-4 bg-white w-96 px-2 mx-auto">
 			{musicalEntitiesLength === 0 && (
 				<Link to="/add/jam" className="underline bottom-0 self-center">
 					Add a Jam?

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import DatePicker from './DatePicker'
 import { Form, useFetcher } from '@remix-run/react'
 import { fetchEnsResolver } from 'wagmi/actions'
+import RatingButtons from './RatingButtons'
 
 const SETS = [
 	{ label: 'set 1', value: 'set_1' },
@@ -34,11 +35,7 @@ export default function AddEntity({
 	const [setlist, setSetlist] = useState([])
 	const fetcher = useFetcher()
 
-	console.log('selectedArtist', selectedArtist)
-
 	const showOnJF = selectedArtist && dateFilter && filteredMusicalEntities.find((entity) => entity.entity === 'Show')
-
-	console.log('showOnJF', showOnJF)
 
 	const setsOnJF = selectedArtist && dateFilter && filteredMusicalEntities.filter((entity) => entity.entity === 'Set')
 
@@ -68,13 +65,11 @@ export default function AddEntity({
 			//create comment box for each entity that is on jam fans
 			//create sounds checkbox for each entity that is on jam fans
 			let urlToFetch = '/getSetlist?artist=' + JSON.parse(selectedArtist).artist + '&date=' + dateFilter
-			console.log('urlToFetch', urlToFetch)
 			fetcher.load(urlToFetch)
 		}
 	}, [selectedArtist, dateFilter])
 
 	if (fetcher && fetcher?.data && setlist.length === 0) {
-		console.log('fetcher.data', fetcher.data)
 		if (fetcher.data?.location) {
 			setLocation(fetcher.data?.location)
 		}
@@ -84,19 +79,16 @@ export default function AddEntity({
 	}
 
 	return (
-		<div className="m-4">
-			{selectedArtist ? (
-				<p>{JSON.parse(selectedArtist).artist}</p>
-			) : (
-				<select className="border-2" value={selectedArtist} onChange={(e) => setSelectedArtist(e.target.value)}>
-					<option value="">Select an artist</option>
-					{artists.map((art, index) => (
-						<option key={index} value={JSON.stringify(art)}>
-							{art.artist}
-						</option>
-					))}
-				</select>
-			)}
+		<div className="m-4 text-xl text-gray">
+			<select className="border-2" value={selectedArtist} onChange={(e) => setSelectedArtist(e.target.value)}>
+				<option value="">Select an artist</option>
+				{artists.map((art, index) => (
+					<option key={index} value={JSON.stringify(art)}>
+						{art.artist}
+					</option>
+				))}
+			</select>
+
 			{selectedArtist && (
 				<DatePicker
 					dateFilter={dateFilter}
@@ -107,14 +99,13 @@ export default function AddEntity({
 					artist={selectedArtist}
 				/>
 			)}
+			{selectedArtist && <p>{JSON.parse(selectedArtist).artist}</p>}
 			<p>{dateFilter}</p>
 			<p>{location}</p>
 			{showOnJF && (
 				<>
-					<p>
-						{JSON.parse(selectedArtist).artist}&apos;s show from {dateFilter} is on jam fans!
-					</p>
-					<button className="border-2 p-2 m-2">Rate show</button>
+					<p className="text-center">your rating</p>
+					<RatingButtons entity={showOnJF} entityType="Show" actionName="rate-show" />
 				</>
 			)}
 			{!showOnJF && dateFilter && selectedArtist && (
@@ -127,7 +118,7 @@ export default function AddEntity({
 					<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
 					<input type="hidden" name="location" value={location} />
 					<button type="submit" name="_action" value="add-show" className="border-2">
-						Add {JSON.parse(selectedArtist).artist}&apos;s show from {dateFilter}
+						Add {JSON.parse(selectedArtist).artist}&apos;s {dateFilter} show
 					</button>
 				</Form>
 			)}
@@ -166,12 +157,7 @@ export default function AddEntity({
 						</Form>
 					</>
 				))}
-			{selectedArtist && dateFilter && (
-				<>
-					<label htmlFor="festival">Festival</label>
-					<input type="checkbox" name="festival" />
-				</>
-			)}
+
 			{setlist && selectedArtist && dateFilter && (
 				<>
 					<p>setlist</p>

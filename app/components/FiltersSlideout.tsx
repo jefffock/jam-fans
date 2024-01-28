@@ -19,9 +19,9 @@ export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, 
 								leaveFrom="translate-x-0"
 								leaveTo="translate-x-full"
 							>
-								<Dialog.Panel className="pointer-events-auto w-screen max-w-md">
+								<Dialog.Panel className="pointer-events-auto w-screen">
 									<div
-										className={`flex h-full flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl ${
+										className={`flex h-full mx-auto flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl ${
 											showIframe ? 'pb-40' : 'pb-0'
 										} sm:pb-0`}
 									>

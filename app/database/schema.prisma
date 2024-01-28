@@ -632,9 +632,11 @@ model profiles {
   can_write             Boolean                 @default(true)
   points                Int                     @default(10)
   created_at            DateTime?               @default(now()) @db.Timestamptz(6)
+  favorites             favorites[]
   helpful_votes_ideas   helpful_votes_ideas[]
   helpful_votes_ratings helpful_votes_ratings[]
   ideas                 ideas[]
+  likes                 likes[]
   users                 users                   @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ratings               ratings[]
   sets                  sets[]
@@ -664,20 +666,21 @@ model ratings {
   rating                Int?                    @db.SmallInt
   comment               String?
   helpful               Int                     @default(0)
-  version_id            Int
+  version_id            Int?
   submitter_name        String?
-  profile_id            String?                 @db.Uuid
-  musical_entity        MusicalEntity           @default(Jam)
+  profile_id            String                  @db.Uuid
+  entity_type           MusicalEntity           @default(Jam)
+  entity_id             Int?
+  jam_id                Int?
   set_id                Int?
   show_id               Int?
-  jam_id                Int?
   helpful_votes_ratings helpful_votes_ratings[]
   jams                  jams?                   @relation(fields: [jam_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profiles              profiles?               @relation(fields: [profile_id], references: [id], onDelete: Cascade)
+  profiles              profiles                @relation(fields: [profile_id], references: [id], onDelete: Cascade)
   sets                  sets?                   @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows                 shows?                  @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  versions              versions                @relation(fields: [version_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([profile_id, entity_type, entity_id], map: "userid_entitytype_entityid")
   @@schema("public")
 }
 
@@ -714,12 +717,15 @@ model sets {
   festival       Boolean?         @default(false)
   set_number     SetNumber        @default(set_2)
   date           String
+  location       String?
+  venue_id       Int?
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
   artists        artists?         @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles       profiles?        @relation(fields: [profile_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows          shows?           @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venues         venues?          @relation(fields: [venue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   versions       versions[]
 
   @@schema("public")
@@ -744,6 +750,10 @@ model shows {
   location       String?
   entity         MusicalEntity    @default(Show)
   set_ids        Int[]
+  likes          Int?             @default(0)
+  favorites      Int?             @default(0)
+  avg_rating     Float?           @db.Real
+  num_ratings    Int              @default(0)
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -890,6 +900,7 @@ model venues {
   type           Venue?
   jams           jams[]
   jams_duplicate jams_duplicate[]
+  sets           sets[]
   shows          shows[]
   versions       versions[]
 
@@ -916,7 +927,6 @@ model versions {
   sound_ids           BigInt?
   venue_id            Int?
   add_link            add_link[]
-  ratings             ratings[]
   update_tags         update_tags[]
   sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -944,6 +954,28 @@ model versions_duplicate {
   ratings_duplicate   ratings_duplicate[]
   songs               songs               @relation(fields: [song_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users               users?              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model favorites {
+  id          Int            @id @default(autoincrement())
+  created_at  DateTime       @default(now()) @db.Timestamptz(6)
+  user_id     String?        @db.Uuid
+  entity_type MusicalEntity?
+  entity_id   Int?
+  profiles    profiles?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+model likes {
+  id          Int            @id @default(autoincrement())
+  created_at  DateTime       @default(now()) @db.Timestamptz(6)
+  user_id     String?        @db.Uuid
+  entity_type MusicalEntity?
+  entity_id   Int?
+  profiles    profiles?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }

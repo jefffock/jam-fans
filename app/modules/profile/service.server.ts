@@ -1,5 +1,6 @@
 import { db } from '../../database'
 import type { profiles } from '@prisma/client'
+import { getAuthSession } from '../auth'
 
 export async function addPoints(data: { user_id: string; points: number }) {
 	const { user_id, points } = data
@@ -37,9 +38,12 @@ export async function getProfile(user_id: string) {
 	return profile
 }
 
-// TODO: implement this
-export async function getProfileFromRequest(req: any) {
-	const { user_id } = req.session
-	const profile = await getProfile(user_id)
-	return profile
+export async function getProfileFromRequest(request) {
+	const authSession = await getAuthSession(request)
+
+	if (!authSession || !authSession.userId) {
+		return null
+	}
+
+	return getProfile(authSession.userId)
 }

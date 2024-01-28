@@ -73,8 +73,6 @@ export default function JamFiltersClientside({
 	const [activeTab, setActiveTab] = useState('explore')
 	const noFiltersSelected = musicalEntitiesLength === jamsCount + setsCount + showsCount
 
-	console.log('artist fitlers', artistFilters)
-
 	const dates = []
 	let currentYear = new Date().getFullYear()
 	for (var i = currentYear; i > 1959; i--) {

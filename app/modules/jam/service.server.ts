@@ -120,13 +120,37 @@ export async function getJamsByShow(data: { show_id: number }) {
 	return versions
 }
 
-export async function getJams() {
+export async function getJams(userId) {
 	const allJams = await db.jams.findMany({
 		include: {
 			artists: true,
 		},
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
+
+	let userRatings = {}
+
+	if (userId) {
+		const ratings = await db.ratings.findMany({
+			where: {
+				profile_id: userId,
+				entity_type: 'Jam',
+			},
+			select: {
+				entity_id: true,
+				rating: true,
+			},
+		})
+
+		userRatings = ratings.reduce((acc, rating) => {
+			acc[rating.jam_id] = rating.rating
+			return acc
+		}, {})
+
+		allJams.forEach((jam) => {
+			jam.userRating = userRatings[jam.id] || undefined
+		})
+	}
 
 	// Fetch all shows
 	const allShows = await db.shows.findMany()
@@ -288,4 +312,20 @@ export const getJamsCount = async (queryParams?: QueryParams) => {
 	const count = await db.jams.count(query)
 	console.log('count', count)
 	return count
+}
+
+export async function updateRatingForJam(jamId) {
+	const ratings = await db.ratings.findMany({
+		where: { entity_id: jamId, rating: { not: null } },
+		select: { rating: true },
+	})
+
+	const averageRating =
+		ratings.length > 0 ? ratings.reduce((sum, { rating }) => sum + rating, 0) / ratings.length : null // Set to null if there are no ratings
+
+	// Update the jam with the new average
+	await db.jams.update({
+		where: { id: jamId },
+		data: { avg_rating: averageRating, num_ratings: ratings.length },
+	})
 }

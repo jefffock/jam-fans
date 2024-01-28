@@ -2,7 +2,7 @@ import { Link, useFetcher, Form } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
 
 const JamCard = forwardRef((props, ref) => {
-	const { jam, user, showRatings, setShowIframe, setIframeUrl, addShowByJamId } = props
+	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
 	const ratingToShow = (jam.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
 	const fetcher = useFetcher()
@@ -43,16 +43,25 @@ const JamCard = forwardRef((props, ref) => {
 				{/* first row */}
 				<div className="flex justify-between">
 					<div className="flex items-center space-x-4">
-						{jam.show_id && <Link to={`/shows/${jam.show_id}`}>{jam.date}</Link>}
-
-						{!jam.show_id && (
+						{jam.show_id && (
+							<Link
+								to={`/shows/${jam.show_id}`}
+								className="mb-2 text-xl tracking-tight text-gray-900 underline"
+							>
+								{jam.date}
+							</Link>
+						)}
+						{fetcher?.state !== 'idle' && (
+							<p className="mb-2 text-xl tracking-tight text-gray-900">{`adding show...`}</p>
+						)}
+						{!jam.show_id && fetcher?.state === 'idle' && (
 							<fetcher.Form method="post" action="?index" preventScrollReset={true}>
 								<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
 								<input type="hidden" name="artist_id" value={jam.artist_id} />
 								<input type="hidden" name="date_text" value={jam.date} />
-								<input type="hidden" name="day" value={jam.date.slice(8, 10)} />
-								<input type="hidden" name="month" value={jam.date.slice(5, 7)} />
-								<input type="hidden" name="year" value={jam.date.slice(0, 4)} />
+								<input type="hidden" name="day" value={jam?.date?.slice(8, 10)} />
+								<input type="hidden" name="month" value={jam?.date?.slice(5, 7)} />
+								<input type="hidden" name="year" value={jam?.date?.slice(0, 4)} />
 								<input type="hidden" name="location" value={jam.location} />
 								<button
 									type="submit"

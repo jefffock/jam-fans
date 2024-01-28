@@ -53,6 +53,9 @@ async function getSession(request: Request) {
 
 export async function getAuthSession(request: Request): Promise<AuthSession | null> {
 	const session = await getSession(request)
+	if (!session) {
+		return null
+	}
 	return session.get(SESSION_KEY)
 }
 
