@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
-import ButtonSmall from './ButtonSmall'
+import Button from './Button'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -105,7 +105,7 @@ export default function SongPicker({
 			</Combobox>
 			{songFilter && (
 				<div className="flex justify-end">
-					<ButtonSmall
+					<Button
 						onClick={clearSong}
 						text="clear"
 						// className="rounded-md border border-gray-300 bg-white mt-4 py-2 px-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 text-right focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 ml-5 mr-0"

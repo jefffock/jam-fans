@@ -3,7 +3,7 @@ import { addShowConfig } from '~/config'
 import { useState } from 'react'
 import { openModal, closeModal } from '~/utils/modal'
 import { Link } from '@remix-run/react'
-import ButtonSmall from './ButtonSmall'
+import Button from './Button'
 
 // Function to format date from 'yyyy-mm-dd' to 'mm/dd/yyyy'
 const addSlashes = (dateStr) => {
@@ -70,7 +70,7 @@ export default function DatePicker({
 			</div>
 			{!inAdd && dateFilter && (
 				<div className="flex justify-center mb-4">
-					<ButtonSmall
+					<Button
 						onClick={() => {
 							setActiveTab('add')
 							setActiveAddTab('jamSetShow')

@@ -451,6 +451,8 @@ model jams {
   month               Int?          @db.SmallInt
   day                 Int?          @db.SmallInt
   entity              MusicalEntity @default(Jam)
+  likes               Int?          @default(0)
+  favorites           Int?          @default(0)
   artists             artists?      @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   sets                sets?         @relation(fields: [set_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   shows               shows?        @relation(fields: [show_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -719,6 +721,10 @@ model sets {
   date           String
   location       String?
   venue_id       Int?
+  avg_rating     Float?           @db.Real
+  num_ratings    Int?
+  likes          Int?             @default(0)
+  favorites      Int?             @default(0)
   jams           jams[]
   jams_duplicate jams_duplicate[]
   ratings        ratings[]
@@ -966,6 +972,7 @@ model favorites {
   entity_id   Int?
   profiles    profiles?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([user_id, entity_id, entity_type], map: "userid_entityid_entitytype_unique")
   @@schema("public")
 }
 

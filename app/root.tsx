@@ -6,7 +6,7 @@ import BottomNav from './components/BottomNav'
 import { AuthSession } from '@supabase/supabase-js'
 import { getAuthSession } from './modules/auth'
 import { json } from '@remix-run/node'
-import { getProfile } from './modules/profile/index.server'
+import { getProfile, getProfileFromRequest } from './modules/profile/index.server'
 
 // import type { LinksFunction } from "@remix-run/node";
 
@@ -58,19 +58,13 @@ export function ErrorBoundary() {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const authSession = await getAuthSession(request)
-	let profile = null
-	if (authSession) {
-		profile = await getProfile(authSession.userId)
-		return json({ profile })
-	}
-	if (!authSession) {
-		return json({})
-	}
-	return json({})
+	const profile = await getProfileFromRequest(request)
+
+	return json({ profile })
 }
 
-export default function Root() {
+export default function Root({}) {
+	const { profile } = useLoaderData()
 	return (
 		<html lang="en">
 			<head>
@@ -79,10 +73,9 @@ export default function Root() {
 				<Links />
 			</head>
 			<body>
-				{/* <div className="w-full h-full">
+				<div className="w-full h-full">
 					<TopNav profile={profile} />
-					<BottomNav />
-				</div> */}
+				</div>
 				<Outlet />
 				<ScrollRestoration />
 				<Scripts />

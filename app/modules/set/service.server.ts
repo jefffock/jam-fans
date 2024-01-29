@@ -2,7 +2,7 @@ import { db } from '../../database'
 import type { sets } from '@prisma/client'
 import { SetNumber } from '@prisma/client'
 
-export async function getSets() {
+export async function getSets(profileId: string) {
 	const sets = await db.sets.findMany({
 		include: {
 			artists: true,

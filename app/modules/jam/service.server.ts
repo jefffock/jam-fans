@@ -242,9 +242,7 @@ export const loadJams = async (queryParams: QueryParams) => {
 }
 
 export const getJamsCount = async (queryParams?: QueryParams) => {
-	console.log('queryParams', queryParams)
 	if (!queryParams) {
-		console.log('no query params')
 		const allJamsCount = await db.jams.count()
 		return allJamsCount
 	}

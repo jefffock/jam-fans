@@ -1,6 +1,5 @@
 export const handleRatingsVisibleChange = (event) => {
 	if (typeof localStorage === 'undefined') {
-		console.warn('localStorage is not available')
 		return
 	}
 
@@ -10,8 +9,7 @@ export const handleRatingsVisibleChange = (event) => {
 
 export const getRatingsVisible = () => {
 	if (typeof localStorage === 'undefined') {
-		console.warn('localStorage is not available')
-		return false // or a default value you prefer
+		return false
 	}
 
 	return localStorage.getItem('ratings-visible') === 'true'

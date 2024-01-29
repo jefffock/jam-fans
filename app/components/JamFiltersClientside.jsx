@@ -64,6 +64,7 @@ export default function JamFiltersClientside({
 	showsCount,
 	showsOnDate,
 	filteredMusicalEntities,
+	profile,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
@@ -267,6 +268,7 @@ export default function JamFiltersClientside({
 					filteredMusicalEntities={filteredMusicalEntities}
 					activeAddTab={activeAddTab}
 					setActiveAddTab={setActiveAddTab}
+					profile={profile}
 				/>
 			)}
 		</FiltersSlideout>

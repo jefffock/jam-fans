@@ -1,6 +1,6 @@
 import { Link, useFetcher, Form } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
-import ButtonSmall from '../ButtonSmall'
+import Button from '../Button'
 
 const JamCard = forwardRef((props, ref) => {
 	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
@@ -65,12 +65,7 @@ const JamCard = forwardRef((props, ref) => {
 								<input type="hidden" name="location" value={jam.location} />
 								<div className="flex justify-items-start gap-8 align-middle">
 									<p className="mb-2 text-xl tracking-tight text-gray-900">{jam.date}</p>
-									<ButtonSmall
-										text={'add show'}
-										type={'submit'}
-										name={'_action'}
-										value={'add-show'}
-									/>
+									<Button text={'add show'} type={'submit'} name={'_action'} value={'add-show'} />
 								</div>
 							</fetcher.Form>
 						)}

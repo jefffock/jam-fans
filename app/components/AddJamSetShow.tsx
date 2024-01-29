@@ -1,7 +1,9 @@
 import { Form } from '@remix-run/react'
 import DatePicker from './DatePicker'
 import RatingButtons from './RatingButtons'
-import ButtonSmall from './ButtonSmall'
+import Button from './Button'
+import LikeHeartRateComment from './LikeHeartRateComment'
+import InfoAlert from './alerts/InfoAlert'
 
 const setNumberMap = {
 	set_1: 'set 1',
@@ -23,7 +25,9 @@ export default function AddJamSetShow({
 	setsOnJF,
 	showOnJF,
 	availableSets,
+	profile,
 }) {
+	console.log('showOnJF', showOnJF)
 	return (
 		<div className="flex-col flex items-center">
 			<select
@@ -50,25 +54,35 @@ export default function AddJamSetShow({
 					showLabel={false}
 				/>
 			)}
+			{!profile && selectedArtist && dateFilter && (
+				<InfoAlert
+					title="you aren't logged in"
+					description="you can still add, like, and rate jams, sets, and shows, but you can't comment or favorite and your "
+				/>
+			)}
 			<div className="flex justify-center w-screen text-2xl m-2 space-x-5 p-2">
 				{selectedArtist && <p>{JSON.parse(selectedArtist).artist}</p>}
 				<p>{location}</p>
 				<p>{dateFilter}</p>
 			</div>
+			<p>Likes : {showOnJF?.likes}</p>
+			<p>Favorites : {showOnJF?.favorites}</p>
+			<p>Rating : {showOnJF?.avg_rating}</p>
+			<p>Comments : {showOnJF?.comments}</p>
+			<p>User rating: {showOnJF?.userRating?.rating}</p>
+			<p>User comment: {showOnJF?.userRating?.comment}</p>
+			<p>User favorite: {showOnJF?.isUserFavorite ? 'yes' : 'no'}</p>
+			<p>User like: {showOnJF?.isUserLiked ? 'yes' : 'no'}</p>
 			{showOnJF && (
-				<div className="flex flex-wrap justify-center space-x-5 space-y-2">
-					<p>👍</p>
-					<p>❤️</p>
-					<select>
-						<option value="">your rating</option>
-						<option value="10">10</option>
-						<option value="9">9</option>
-						<option value="8">8</option>
-						<option value="7">7</option>
-						<option value="6">6</option>
-					</select>
-					<textarea placeholder="comments (optional)" />
-				</div>
+				<LikeHeartRateComment
+					profile={profile}
+					entity={showOnJF}
+					entityType={'Show'}
+					actionName={undefined}
+					currentLike={showOnJF?.userLike}
+					currentFavorite={showOnJF?.userFavorite}
+					currentRating={showOnJF?.userRating}
+				/>
 			)}
 			{!showOnJF && dateFilter && selectedArtist && (
 				<Form method="post" preventScrollReset={true}>
@@ -79,7 +93,7 @@ export default function AddJamSetShow({
 					<input type="hidden" name="day" value={dateFilter.slice(8, 10)} />
 					<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
 					<input type="hidden" name="location" value={location} />
-					<ButtonSmall
+					<Button
 						text={`Add ${JSON.parse(selectedArtist).artist}'s ${dateFilter} show`}
 						type="submit"
 						name="_action"
@@ -88,6 +102,7 @@ export default function AddJamSetShow({
 				</Form>
 			)}
 			{selectedArtist && dateFilter && setsOnJF && <p>sets on jam fans</p>}
+			{/*  combine sets to be either a smallbutton to add it or a label and thumb, heart, rating, comment. similar for songs in setlistwhen adding entity, link it to others from the same show */}
 			{selectedArtist &&
 				dateFilter &&
 				setsOnJF &&
@@ -110,7 +125,7 @@ export default function AddJamSetShow({
 							<input type="hidden" name="set_number" value={set.value} />
 							<input type="hidden" name="date" value={dateFilter} />
 							<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
-							<ButtonSmall
+							<Button
 								type="submit"
 								name="_action"
 								value="add-set"

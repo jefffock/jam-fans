@@ -3,6 +3,7 @@ import { getAuthSession } from '~/modules/auth'
 import { getProfileFromRequest } from '~/modules/profile/service.server'
 
 export async function action({ request, params }) {
+	console.log('in resources/ratings')
 	//get userid from request
 	const profile = await getProfileFromRequest(request)
 	if (!profile) {

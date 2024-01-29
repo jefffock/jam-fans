@@ -5,10 +5,11 @@ export function buildTitle({
 	beforeDateFilter,
 	afterDateFilter,
 	dateFilter,
-	showJams,
-	showSets,
-	showShows,
+	musicalEntitiesFilters,
 }) {
+	console.log('musicalEntitiesFilters', musicalEntitiesFilters)
+	const musicalEntitiesToShow = Object.keys(musicalEntitiesFilters).filter((key) => musicalEntitiesFilters[key])
+
 	let title = '🔥 '
 
 	if (soundNames && soundNames.length > 0) {
@@ -19,24 +20,20 @@ export function buildTitle({
 		title += ` ${songName}`
 	}
 
-	if (showJams) {
-		title += ' jams'
-		if (showSets || showShows) {
-			title += ', '
-		}
+	switch (musicalEntitiesToShow.length) {
+		case 1:
+			title += musicalEntitiesToShow[0]
+			break
+		case 2:
+			title += `${musicalEntitiesToShow[0]} and ${musicalEntitiesToShow[1]}`
+			break
+		case 3:
+			title += 'jams, sets, and shows'
+			break
+		default:
+			title += ''
 	}
-	if (showSets) {
-		title += ' sets'
-		if (showShows) {
-			title += ', '
-		}
-	}
-	if (showShows) {
-		if (showJams || showSets) {
-			title += ' and '
-		}
-		title += ' shows'
-	}
+
 	if (artistNames && artistNames.length > 0) {
 		title += ' by '
 		title += artistNames

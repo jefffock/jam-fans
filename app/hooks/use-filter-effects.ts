@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { buildTitle } from '~/utils'
 
 const useFilterEffects = ({
 	dateFilter,
@@ -12,7 +13,6 @@ const useFilterEffects = ({
 	showJams,
 	showSets,
 	showShows,
-	buildTitle,
 	setTitle,
 	scrollToTopOfRef,
 	jamListRef,
@@ -21,8 +21,10 @@ const useFilterEffects = ({
 	filteredMusicalEntities,
 	allShows,
 	setShowsOnDate,
+	musicalEntitiesFilters,
 }) => {
 	useEffect(() => {
+		console.log('show jams', showJams)
 		const filters = {
 			dateFilter: dateFilter,
 			beforeDateFilter,
@@ -30,9 +32,7 @@ const useFilterEffects = ({
 			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
 			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
 			songName: songFilter,
-			showJams,
-			showSets,
-			showShows,
+			musicalEntitiesFilters,
 		}
 
 		const newTitle = buildTitle(filters)
@@ -53,15 +53,13 @@ const useFilterEffects = ({
 		soundFilters,
 		sounds,
 		songFilter,
-		showJams,
-		showSets,
-		showShows,
 		buildTitle,
 		setTitle,
 		scrollToTopOfRef,
 		jamListRef,
 		createFilterURL,
 		setAddJamLink,
+		musicalEntitiesFilters,
 	])
 }
 

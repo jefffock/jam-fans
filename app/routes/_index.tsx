@@ -6,7 +6,6 @@ import { createServerClient, parse, serialize } from '@supabase/ssr'
 import Hero from '../components/Hero'
 import { getJamsCount, getJams } from '../modules/jam/index.server'
 import {
-	buildTitle,
 	useWindowHeight,
 	useWindowWidth,
 	scrollToBottomOfWindow,
@@ -50,7 +49,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
-	console.log('queryParams', queryParams)
 
 	const profile = await getProfileFromRequest(request)
 	const jams = await getJams(profile?.id)
@@ -206,9 +204,6 @@ export default function Index() {
 	const windowWidth = useWindowWidth()
 	const scrollingDown = prevJamListRef.current < scrollTop
 	const [addJamLink, setAddJamLink] = useState('/add/jam')
-	const [showJams, setShowJams] = useState(true)
-	const [showSets, setShowSets] = useState(true)
-	const [showShows, setShowShows] = useState(true)
 	const [showsOnDate, setShowsOnDate] = useState([])
 
 	if (jamCardRef.current) {
@@ -262,10 +257,6 @@ export default function Index() {
 		soundFilters,
 		sounds,
 		songFilter,
-		showJams,
-		showSets,
-		showShows,
-		buildTitle,
 		setTitle,
 		scrollToTopOfRef,
 		jamListRef,
@@ -274,11 +265,11 @@ export default function Index() {
 		filteredMusicalEntities,
 		allShows,
 		setShowsOnDate,
+		musicalEntitiesFilters,
 	})
 
 	return (
 		<div className="w-full h-full" ref={pageRef}>
-			<TopNav profile={profile} />
 			<Hero />
 			<SiteStats
 				jamsCount={jamsCount}
@@ -329,6 +320,7 @@ export default function Index() {
 					showsCount={showsCount}
 					showsOnDate={showsOnDate}
 					filteredMusicalEntities={filteredMusicalEntities}
+					profile={profile}
 				/>
 				<VirtualJamList
 					jamListRef={jamListRef}

@@ -22,6 +22,7 @@ export default function AddEntity({
 	filteredMusicalEntities,
 	activeAddTab,
 	setActiveAddTab,
+	profile,
 }) {
 	const [selectedArtist, setSelectedArtist] = useState(
 		JSON.stringify(artists.find((art) => art.id === Number(artist))) || ''
@@ -40,12 +41,12 @@ export default function AddEntity({
 		setsOnJF && SETS.filter((set) => !setsOnJF?.some((setsOnJfItem) => setsOnJfItem.set_number === set.value))
 
 	useEffect(() => {
-		if (jamsOnJF) {
-			setLocation(jamsOnJF[0].location)
-		} else if (setsOnJF) {
-			setLocation(setsOnJF[0].location)
+		if (jamsOnJF && jamsOnJF.length > 0 && jamsOnJF[0]?.location) {
+			setLocation(jamsOnJF[0]?.location)
+		} else if (showOnJF && showOnJF.length > 0 && showOnJF[0]?.location) {
+			setLocation(showOnJF[0]?.location)
 		}
-	}, [jamsOnJF, setsOnJF])
+	}, [jamsOnJF, showOnJF])
 
 	useEffect(() => {
 		if (selectedArtist && dateFilter && setlist.length === 0) {
@@ -122,6 +123,7 @@ export default function AddEntity({
 					setlist={setlist}
 					location={location}
 					setSelectedArtist={setSelectedArtist}
+					profile={profile}
 				/>
 			)}
 		</div>
