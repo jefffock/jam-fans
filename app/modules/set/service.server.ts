@@ -2,15 +2,41 @@ import { db } from '../../database'
 import type { sets } from '@prisma/client'
 import { SetNumber } from '@prisma/client'
 
-export async function getSets(profileId: string) {
+export async function getSets(userId: string) {
 	const sets = await db.sets.findMany({
 		include: {
 			artists: true,
+			ratings: true,
 		},
 	})
+	let userRatings = {}
+
+	if (userId) {
+		const ratings = await db.ratings.findMany({
+			where: {
+				profile_id: userId,
+				entity_type: 'Set',
+			},
+			select: {
+				entity_id: true,
+				rating: true,
+				comment: true,
+				favorite: true,
+				likes: true,
+			},
+		})
+
+		userRatings = ratings.reduce((acc, rating) => {
+			acc[rating.entity_id] = rating
+			return acc
+		}, {})
+
+		sets.forEach((set) => {
+			set.userRating = userRatings[set.id] || undefined
+		})
+	}
 	return sets
 }
-
 export async function getSetsCount(): Promise<number> {
 	const count = await db.sets.count()
 	return count

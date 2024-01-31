@@ -76,7 +76,7 @@ export const loader = async ({ request, params }) => {
 	const date = queryParams?.date
 	console.log('artist, date', artist, date)
 	let jfVersions
-	const { data, error } = await supabase.from('versions').select('*').eq('artist', artist).eq('date', date)
+	const { data, error } = await supabase.from('jams').select('*').eq('artist', artist).eq('date', date)
 	if (error) {
 		return new Response(error.message, { status: 500 })
 	} else {
@@ -112,6 +112,7 @@ export const loader = async ({ request, params }) => {
 					return {
 						label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 						value: title,
+						jamId: alreadyAdded?.id,
 					}
 				})
 			setlist = titles
@@ -166,6 +167,7 @@ export const loader = async ({ request, params }) => {
 					return {
 						label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 						value: title,
+						jamId: alreadyAdded?.id,
 					}
 				})
 			console.log('titles: ', titles)
@@ -203,6 +205,7 @@ export const loader = async ({ request, params }) => {
 						return {
 							label: alreadyAdded ? '(Added) ' + name : name,
 							value: name,
+							jamId: alreadyAdded?.id,
 						}
 					})
 				)
@@ -210,6 +213,7 @@ export const loader = async ({ request, params }) => {
 			setlist = titles
 		}
 	}
+
 	return json(
 		{ setlist: setlist || [], location },
 		{

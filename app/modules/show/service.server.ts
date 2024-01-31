@@ -1,10 +1,11 @@
 import { db } from '../../database'
 
-export async function getShows(userId) {
+export async function getShows(userId: string) {
 	console.log('in getShows server', userId)
 	const shows = await db.shows.findMany({
 		include: {
 			artists: true,
+			ratings: true,
 		},
 		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
@@ -21,6 +22,8 @@ export async function getShows(userId) {
 				entity_id: true,
 				rating: true,
 				comment: true,
+				favorite: true,
+				likes: true,
 			},
 		})
 
@@ -29,51 +32,10 @@ export async function getShows(userId) {
 			return acc
 		}, {})
 
-		const favorites = await db.favorites.findMany({
-			where: {
-				user_id: userId,
-				entity_type: 'Show',
-			},
-			select: {
-				entity_id: true,
-			},
-		})
-
-		let userFavorites = favorites.reduce((acc, favorite) => {
-			acc[favorite.entity_id] = true
-			return acc
-		}, {})
-
-		// Get Likes
-		const likes = await db.likes.findMany({
-			where: {
-				user_id: userId,
-				entity_type: 'Show',
-			},
-			select: {
-				entity_id: true,
-			},
-		})
-
-		let userLikes = likes.reduce((acc, like) => {
-			acc[like.entity_id] = true
-			return acc
-		}, {})
-
-		console.log('userRatings', userRatings)
-		console.log('userFavorites', userFavorites)
-		console.log('userLikes', userLikes)
-		// Combine the data
 		shows.forEach((show) => {
 			show.userRating = userRatings[show.id] || undefined
-			show.isUserFavorite = !!userFavorites[show.id]
-			show.isUserLiked = !!userLikes[show.id]
 		})
 	}
-	console.log(
-		'12 show',
-		shows.find((show) => show.id === 12)
-	)
 
 	return shows
 }

@@ -1,6 +1,7 @@
 import { Link, useFetcher, Form } from '@remix-run/react'
 import { useState, forwardRef } from 'react'
 import Button from '../Button'
+import LikeHeartRateComment from '../LikeHeartRateComment'
 
 const JamCard = forwardRef((props, ref) => {
 	const { jam, user, showRatings, setShowIframe, setIframeUrl } = props
@@ -166,6 +167,7 @@ const JamCard = forwardRef((props, ref) => {
 					)}
 				</div>
 			</div>
+			<LikeHeartRateComment entity={jam} profile={user} entityType="Jam" />
 		</div>
 	)
 })

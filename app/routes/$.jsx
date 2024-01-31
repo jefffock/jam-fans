@@ -47,7 +47,6 @@ export const loader = async () => {
 		const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 		profile = data
 	}
-	console.log('user', user)
 	if (user && !profile) {
 		console.log('redirecting to /welcome')
 		return redirect('/welcome')

@@ -1,9 +1,9 @@
 import { Form } from '@remix-run/react'
 import DatePicker from './DatePicker'
-import RatingButtons from './RatingButtons'
 import Button from './Button'
 import LikeHeartRateComment from './LikeHeartRateComment'
 import InfoAlert from './alerts/InfoAlert'
+import JamCard from './cards/JamCard'
 
 const setNumberMap = {
 	set_1: 'set 1',
@@ -26,8 +26,8 @@ export default function AddJamSetShow({
 	showOnJF,
 	availableSets,
 	profile,
+	jamsOnJF,
 }) {
-	console.log('showOnJF', showOnJF)
 	return (
 		<div className="flex-col flex items-center">
 			<select
@@ -68,22 +68,16 @@ export default function AddJamSetShow({
 			<p>Likes : {showOnJF?.likes}</p>
 			<p>Favorites : {showOnJF?.favorites}</p>
 			<p>Rating : {showOnJF?.avg_rating}</p>
-			<p>Comments : {showOnJF?.comments}</p>
+			<p>Comments : {showOnJF?.ratings?.length}</p>
+			{/* {showOnJF?.ratings?.map((comment, index) => {
+				return <p key={`comment-${index}`}>{comment}</p>
+			})} */}
+
 			<p>User rating: {showOnJF?.userRating?.rating}</p>
 			<p>User comment: {showOnJF?.userRating?.comment}</p>
-			<p>User favorite: {showOnJF?.isUserFavorite ? 'yes' : 'no'}</p>
-			<p>User like: {showOnJF?.isUserLiked ? 'yes' : 'no'}</p>
-			{showOnJF && (
-				<LikeHeartRateComment
-					profile={profile}
-					entity={showOnJF}
-					entityType={'Show'}
-					actionName={undefined}
-					currentLike={showOnJF?.userLike}
-					currentFavorite={showOnJF?.userFavorite}
-					currentRating={showOnJF?.userRating}
-				/>
-			)}
+			<p>User favorite: {showOnJF?.userRating?.favorite ? 'yes' : 'no'}</p>
+			<p>User like: {showOnJF?.userRating?.likes ? 'yes' : 'no'}</p>
+			{showOnJF && <LikeHeartRateComment profile={profile} entity={showOnJF} entityType={'Show'} />}
 			{!showOnJF && dateFilter && selectedArtist && (
 				<Form method="post" preventScrollReset={true}>
 					<input type="hidden" name="entity" value="Show" />
@@ -94,7 +88,7 @@ export default function AddJamSetShow({
 					<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
 					<input type="hidden" name="location" value={location} />
 					<Button
-						text={`Add ${JSON.parse(selectedArtist).artist}'s ${dateFilter} show`}
+						text={`add ${JSON.parse(selectedArtist).artist}'s ${dateFilter} show`}
 						type="submit"
 						name="_action"
 						value="add-show"
@@ -102,19 +96,23 @@ export default function AddJamSetShow({
 				</Form>
 			)}
 			{selectedArtist && dateFilter && setsOnJF && <p>sets on jam fans</p>}
-			{/*  combine sets to be either a smallbutton to add it or a label and thumb, heart, rating, comment. similar for songs in setlistwhen adding entity, link it to others from the same show */}
 			{selectedArtist &&
 				dateFilter &&
 				setsOnJF &&
 				setsOnJF.map((set, index) => (
 					<>
 						<p key={index}>{setNumberMap[set.set_number]}</p>
-						<button className="border-2 p-2 m-2">Rate {setNumberMap[set.set_number]}</button>
-						<button className="border-2 p-2 m-2">Comment on {setNumberMap[set.set_number]}</button>
-						<button className="border-2 p-2 m-2">add rating and comment</button>
+						<p>rating: {set?.avg_rating}</p>
+						<p>comments: {set?.ratings?.length}</p>
+						<p>likes: {set?.likes}</p>
+						<p>favorites: {set?.favorites}</p>
+						<p>userRating: {set?.userRating?.rating}</p>
+						<p>userComment: {set?.userRating?.comment}</p>
+						<p>userFavorite: {set?.userRating?.favorite ? 'yes' : 'no'}</p>
+						<p>userLike: {set?.userRating?.likes ? 'yes' : 'no'}</p>
+						<LikeHeartRateComment profile={profile} entity={set} entityType={'Set'} />
 					</>
 				))}
-			{/* {selectedArtist && dateFilter && availableSets && <p>available sets to add to jam fans</p>} */}
 			{selectedArtist && dateFilter && availableSets && <p>add a set:</p>}
 			<div className="flex gap-2">
 				{selectedArtist &&
@@ -129,9 +127,7 @@ export default function AddJamSetShow({
 								type="submit"
 								name="_action"
 								value="add-set"
-								// className="border-2 p-2 m-2"
-
-								text={`add ${set.label}`}
+								text={`add ${set.label} ${set.label === 'set 3' || set.label === 'late set' ? '(if there was one)' : ''}`}
 							/>
 						</Form>
 					))}
@@ -140,20 +136,30 @@ export default function AddJamSetShow({
 			{setlist && selectedArtist && dateFilter && (
 				<>
 					<p>setlist</p>
-					{setlist.map((song, index) =>
-						song.label.indexOf('Added') === -1 ? (
-							<div className="flex" key={index}>
-								{/* <p key={index}>{song.label}</p> */}
-								<button className="border-2 p-2 m-2">Add {song.label}</button>
-							</div>
-						) : (
-							<div className="flex" key={index}>
-								<p key={index}>{song.label}</p>
-								<button className="border-2 p-2 m-2"> Rate </button>
-								<button className="border-2 p-2 m-2"> Comment </button>
-							</div>
-						)
-					)}
+					<div className="flex flex-col space-y-4">
+						{setlist.map((song, index) =>
+							song.label.indexOf('Added') === -1 ? (
+								<div className="flex" key={index}>
+									{/* <p key={index}>{song.label}</p> */}
+									<Button size="small" type="submit" text={`add this ${song.label}`} />
+								</div>
+							) : (
+								<JamCard key={index} jam={song.jam} user={profile} showRatings="false" />
+								// <div className="flex flex-wrap" key={index}>
+								// 	<p key={index}>{song.label}</p>
+								// 	<p>rating: {song.jam.avg_rating}</p>
+								// 	<p>comments: {song.jam.ratings?.length}</p>
+								// 	<p>likes: {song.jam.likes}</p>
+								// 	<p>favorites: {song.jam.favorites}</p>
+								// 	<p>userRating: {song.jam.userRating?.rating}</p>
+								// 	<p>userComment: {song.jam.userRating?.comment}</p>
+								// 	<p>userFavorite: {song.jam.userRating?.favorite ? 'yes' : 'no'}</p>
+								// 	<p>userLike: {song.jam.userRating?.likes ? 'yes' : 'no'}</p>
+								// 	<LikeHeartRateComment profile={profile} entity={song.jam} entityType={'Jam'} />
+								// </div>
+							)
+						)}
+					</div>
 				</>
 			)}
 		</div>

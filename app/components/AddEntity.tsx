@@ -52,13 +52,8 @@ export default function AddEntity({
 		if (selectedArtist && dateFilter && setlist.length === 0) {
 			//make sure each song is on jam fans
 			//get song id for each song
-			//get jamidfor jams
-			//get setid for sets
-			//get showid for show
 			//put each entity in an accordion, especially the setlist
 			//add sounds, link, location in dropdown
-			//create rating dropdown for each entity that is on jam fans
-			//create comment box for each entity that is on jam fans
 			//create sounds checkbox for each entity that is on jam fans
 			let urlToFetch = '/getSetlist?artist=' + JSON.parse(selectedArtist).artist + '&date=' + dateFilter
 			fetcher.load(urlToFetch)
@@ -66,11 +61,30 @@ export default function AddEntity({
 	}, [selectedArtist, dateFilter])
 
 	if (fetcher && fetcher?.data && setlist.length === 0) {
+		console.log('fetcher.data', fetcher.data)
 		if (fetcher.data?.location) {
 			setLocation(fetcher.data?.location)
 		}
 		if (fetcher.data?.setlist) {
-			setSetlist(fetcher.data?.setlist)
+			let modifiedSetlist = []
+			fetcher.data?.setlist.forEach((item) => {
+				if (!item.jamId) {
+					modifiedSetlist.push(item)
+				}
+				if (item.jamId !== undefined) {
+					// Find the jam with the matching ID in jamOnJF
+					const matchingJam = jamsOnJF.find((jam) => jam.id === item.jamId)
+
+					if (matchingJam) {
+						// Perform the connection logic here
+						// For example, you might want to add the matching jam details to the item
+						item.jam = matchingJam
+						modifiedSetlist.push(item)
+					}
+				}
+			})
+			console.log('modifiedSetlist', modifiedSetlist)
+			setSetlist(modifiedSetlist)
 		}
 	}
 
@@ -119,6 +133,7 @@ export default function AddEntity({
 					handleDateInputChange={handleDateInputChange}
 					showOnJF={showOnJF}
 					setsOnJF={setsOnJF}
+					jamsOnJF={jamsOnJF}
 					availableSets={availableSets}
 					setlist={setlist}
 					location={location}
