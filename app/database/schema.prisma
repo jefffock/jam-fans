@@ -321,8 +321,9 @@ model artists {
   name_for_order String?          @default("")
   jam_count      Int?             @default(0)
   data_source    DataSource?
-  musicbrainz_id String?          @db.Uuid
+  mbid           String?          @db.Uuid
   sites          String[]
+  api_base_url   String?
   jams           jams[]
   jams_duplicate jams_duplicate[]
   sets           sets[]

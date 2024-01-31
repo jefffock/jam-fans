@@ -1,7 +1,6 @@
 import { db } from '../../database'
 
 export async function getSetlist({ artist, date }) {
-	const parsedArtist = JSON.parse(artist)
 	const jfVersions = await db.jams.findMany({
 		where: {
 			artist: artist.artist,
@@ -9,16 +8,16 @@ export async function getSetlist({ artist, date }) {
 		},
 	})
 	console.log('jfVersions', jfVersions)
-	console.log('parsedArtist', parsedArtist)
 	console.log('date', date)
+	console.log('artist', artist)
 	if (artist.data_source === 'Phishnet') {
-		const { setlist, location } = await getPhishnetSetlist({ artist: parsedArtist, date, jfVersions })
+		const { setlist, location } = await getPhishnetSetlist({ artist, date, jfVersions })
 		return { setlist, location }
 	} else if (artist.date_source === 'Songfish') {
-		const { setlist, location } = await getSongfishSetlist({ artist: parsedArtist, date, jfVersions })
+		const { setlist, location } = await getSongfishSetlist({ artist, date, jfVersions })
 		return { setlist, location }
 	} else if (artist.data_source === 'SetlistFM') {
-		const { setlist, location } = await getSetlistFMSetlist({ artist: parsedArtist, date, jfVersions })
+		const { setlist, location } = await getSetlistFMSetlist({ artist, date, jfVersions })
 		return { setlist, location }
 	}
 }

@@ -55,7 +55,13 @@ export default function AddEntity({
 			//put each entity in an accordion, especially the setlist
 			//add sounds, link, location in dropdown
 			//create sounds checkbox for each entity that is on jam fans
-			let urlToFetch = '/getSetlist?artist=' + JSON.parse(selectedArtist).artist + '&date=' + dateFilter
+			const selectedArtistFields = {
+				artist: JSON.parse(selectedArtist).artist,
+				mbid: JSON.parse(selectedArtist).mbid,
+				baseUrl: JSON.parse(selectedArtist).api_base_url,
+				data_source: JSON.parse(selectedArtist).data_source,
+			}
+			let urlToFetch = '/resources/setlist?artist=' + JSON.stringify(selectedArtistFields) + '&date=' + dateFilter
 			fetcher.load(urlToFetch)
 		}
 	}, [selectedArtist, dateFilter])
