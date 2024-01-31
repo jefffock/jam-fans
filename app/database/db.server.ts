@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client'
+import { createClient } from 'redis'
 import { NODE_ENV } from '../utils/env'
 export type {
 	users,
@@ -19,6 +20,11 @@ export type {
 	update_tags,
 	versions,
 } from '@prisma/client'
+
+const redis = createClient()
+
+redis.on('error', (err) => console.log('Redis Client Error', err))
+
 let db: PrismaClient
 
 declare global {
@@ -41,4 +47,4 @@ if (NODE_ENV === 'production') {
 	console.log('Connected to DB')
 }
 
-export { db, Prisma }
+export { db, Prisma, redis }
