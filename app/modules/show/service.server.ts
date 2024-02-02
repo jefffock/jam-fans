@@ -1,13 +1,12 @@
 import { db } from '../../database'
 
 export async function getShows(userId: string) {
-	console.log('in getShows server', userId)
 	const shows = await db.shows.findMany({
 		include: {
 			artists: true,
 			ratings: true,
 		},
-		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
+		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
 
 	let userRatings = {}

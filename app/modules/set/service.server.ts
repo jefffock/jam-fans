@@ -8,6 +8,7 @@ export async function getSets(userId: string) {
 			artists: true,
 			ratings: true,
 		},
+		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
 	let userRatings = {}
 

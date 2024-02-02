@@ -40,6 +40,7 @@ import { db } from '../database'
 import { getAuthSession } from '~/modules/auth'
 import TopNav from '~/components/TopNav'
 import BottomNav from '~/components/BottomNav'
+import { set } from 'zod'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// console.log('request', request)
@@ -193,46 +194,17 @@ export default function Index() {
 	const [youtubeFilter, setYoutubeFilter] = useState(false)
 	const [appleFilter, setAppleFilter] = useState(false)
 	const [scrollTop, setScrollTop] = useState(0)
-	const jamListRef = useRef(null)
-	const jamCardRef = useRef(null)
 	const [jamCardHeight, setJamCardHeight] = useState(0)
-	const prevJamListRef = useRef(null)
 	const [title, setTitle] = useState('🔥 jams, sets, and shows')
 	const [query, setQuery] = useState('')
 	// const debouncedQuery = useDebounce(query, 300)
 	const windowHeight = useWindowHeight()
 	const windowWidth = useWindowWidth()
-	const scrollingDown = prevJamListRef.current < scrollTop
-	const [addJamLink, setAddJamLink] = useState('/add/jam')
 	const [showsOnDate, setShowsOnDate] = useState([])
-
-	if (jamCardRef.current) {
-		if (jamCardHeight !== jamCardRef.current?.clientHeight) {
-			setJamCardHeight(jamCardRef.current?.clientHeight)
-		}
-	}
 
 	useEffect(() => {
 		setQuery('')
 	}, [songFilter])
-
-	// useEffect(() => {
-	// 	if (headerRef.current) {
-	// 		setHeaderHeight(headerRef.current.clientHeight)
-	// 	}
-	// }, [])
-
-	// if (jamListRef.current && scrollTop > 100 && scrollingDown) {
-	// 	if (window) {
-	// 		scrollToBottomOfWindow()
-	// 	}
-	// }
-
-	// if (jamListRef.current && scrollTop < 10 && !scrollingDown) {
-	// 	if (window) {
-	// 		scrollToTopOfWindow()
-	// 	}
-	// }
 
 	const filteredMusicalEntities = useFilteredMusicalEntities({
 		allJams,
@@ -259,9 +231,7 @@ export default function Index() {
 		songFilter,
 		setTitle,
 		scrollToTopOfRef,
-		jamListRef,
 		createFilterURL,
-		setAddJamLink,
 		filteredMusicalEntities,
 		allShows,
 		setShowsOnDate,
@@ -323,7 +293,6 @@ export default function Index() {
 					profile={profile}
 				/>
 				<VirtualJamList
-					jamListRef={jamListRef}
 					items={filteredMusicalEntities}
 					user={user}
 					setShowIframe={setShowIframe}
@@ -335,17 +304,7 @@ export default function Index() {
 					scrollTop={scrollTop}
 					setScrollTop={setScrollTop}
 					jamCardHeight={jamCardHeight}
-					prevJamListRef={prevJamListRef}
 				/>
-				{filteredMusicalEntities.length > 0 && (
-					<JamCard
-						jam={filteredMusicalEntities[0]}
-						user={user}
-						showRatings={showRatings}
-						className="measure-div"
-						ref={jamCardRef}
-					/>
-				)}
 			</EntityListContainer>
 			{/* <BottomNav /> */}
 		</div>

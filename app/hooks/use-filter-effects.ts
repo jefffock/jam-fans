@@ -15,7 +15,6 @@ const useFilterEffects = ({
 	showShows,
 	setTitle,
 	scrollToTopOfRef,
-	jamListRef,
 	createFilterURL,
 	setAddJamLink,
 	filteredMusicalEntities,
@@ -38,10 +37,7 @@ const useFilterEffects = ({
 		const newTitle = buildTitle(filters)
 		setTitle(newTitle)
 
-		scrollToTopOfRef(jamListRef)
-
 		const showsOnDate = allShows.filter((show) => show.date_text === dateFilter)
-
 		setShowsOnDate(showsOnDate)
 	}, [
 		filteredMusicalEntities,
@@ -56,7 +52,7 @@ const useFilterEffects = ({
 		buildTitle,
 		setTitle,
 		scrollToTopOfRef,
-		jamListRef,
+		// jamListRef,
 		createFilterURL,
 		setAddJamLink,
 		musicalEntitiesFilters,

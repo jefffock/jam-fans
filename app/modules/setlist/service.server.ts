@@ -1,4 +1,4 @@
-import { db, redis } from '../../database'
+import { db,} from '../../database'
 
 export async function getSetlist({ artist, date }) {
 	const jfVersions = await db.jams.findMany({
@@ -7,10 +7,7 @@ export async function getSetlist({ artist, date }) {
 			date: date,
 		},
 	})
-	await redis.connect()
-	await redis.set('key', 'jams')
-	const value = await redis.get('key')
-	console.log('value from redis', value)
+
 	console.log('jfVersions', jfVersions)
 	console.log('date', date)
 	console.log('artist', artist)

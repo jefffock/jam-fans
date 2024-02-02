@@ -60,12 +60,6 @@ export default function JamList({ jams, sounds, title, user, profile, search, sh
 		return classes.filter(Boolean).join(' ')
 	}
 
-	useEffect(() => {
-		if (localStorage.getItem('jf-show-ratings') === 'false') {
-			setShowRatings(false)
-		}
-	}, [])
-
 	return (
 		<div className="pb-60">
 			{jams?.length > 0 && (

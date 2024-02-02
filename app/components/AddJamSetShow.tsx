@@ -141,22 +141,16 @@ export default function AddJamSetShow({
 							song.label.indexOf('Added') === -1 ? (
 								<div className="flex" key={index}>
 									{/* <p key={index}>{song.label}</p> */}
-									<Button size="small" type="submit" text={`add this ${song.label}`} />
+									<Button size="small" type="submit" text={`add ${song.label}`} />
 								</div>
 							) : (
-								<JamCard key={index} jam={song.jam} user={profile} showRatings="false" />
-								// <div className="flex flex-wrap" key={index}>
-								// 	<p key={index}>{song.label}</p>
-								// 	<p>rating: {song.jam.avg_rating}</p>
-								// 	<p>comments: {song.jam.ratings?.length}</p>
-								// 	<p>likes: {song.jam.likes}</p>
-								// 	<p>favorites: {song.jam.favorites}</p>
-								// 	<p>userRating: {song.jam.userRating?.rating}</p>
-								// 	<p>userComment: {song.jam.userRating?.comment}</p>
-								// 	<p>userFavorite: {song.jam.userRating?.favorite ? 'yes' : 'no'}</p>
-								// 	<p>userLike: {song.jam.userRating?.likes ? 'yes' : 'no'}</p>
-								// 	<LikeHeartRateComment profile={profile} entity={song.jam} entityType={'Jam'} />
-								// </div>
+								<JamCard
+									key={index}
+									jam={song.jam}
+									user={profile}
+									showRatings={false}
+									showDateArtistLocation={false}
+								/>
 							)
 						)}
 					</div>

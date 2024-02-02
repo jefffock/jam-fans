@@ -12,7 +12,9 @@ export async function action({ request, params }) {
 
 	let formData = await request.formData()
 	let { _action, ...values } = Object.fromEntries(formData)
+	console.log(_action)
 	console.log('values in resources.ratings', values)
+	console.log(typeof values.like)
 	const rating = await upsertRating({
 		userId: profile.id,
 		entityType: values.entity_type,
@@ -21,7 +23,7 @@ export async function action({ request, params }) {
 		ratingChange: values.rating !== values.current_rating,
 		comment: values.comment,
 		favorite: _action === 'favorite' && values.is_favorite === 'false',
-		like: _action === 'like',
+		like: values.like,
 	})
 	console.log('rating in resources.rating', rating)
 	return null

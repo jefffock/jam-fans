@@ -125,7 +125,7 @@ export async function getJams(userId) {
 		include: {
 			artists: true,
 		},
-		orderBy: [{ avg_rating: 'desc' }, { num_ratings: 'desc' }],
+		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
 	})
 
 	let userRatings = {}

@@ -1,11 +1,50 @@
 :root {
 	--mondegreen: #20665f;
+	--mondegreen-darker: #1d5d57;
 	--lime: #7cf680;
+	--lime-darker: #6fcf73;
 	--pink: #db8ef1;
+	--pink-darker: #d37de8;
 	--cyan: #db8ef1;
+	--cyan-darker: #d37de8;
     --font-size: 16px;
     --spacing-unit: 10px;
 }
+
+.mondegreen {
+	color: var(--mondegreen);
+}
+
+.mondegreen:hover {
+	/* color: var(--mondegreen-darker); */
+	/* color: var(--lime) */
+	color: var(--pink)
+}
+
+.lime {
+	color: var(--lime);
+}
+
+.lime:hover {
+	color: var(--lime-darker);
+}
+
+.pink {
+	color: var(--pink);
+}
+
+.pink:hover {
+	color: var(--pink-darker);
+}
+
+.cyan {
+	color: var(--cyan);
+}
+
+.cyan:hover {
+	color: var(--cyan-darker);
+}
+
 
 .measure-div {
 	position: absolute;
@@ -21,4 +60,4 @@
 
 .grid-max-content {
 	grid-template-columns: max-content auto;
-  }
+}

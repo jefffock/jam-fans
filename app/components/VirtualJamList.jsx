@@ -4,22 +4,16 @@ import SetCard from './cards/SetCard'
 // import SetCard from './cards/SetCard'
 import React, { useState, useRef, useEffect } from 'react'
 import { Iframe } from './IFrame'
-import { getRatingsVisible } from '~/utils'
+import { getOnlyShowVerifiedRatings, getRatingsVisible } from '~/utils'
 
 export default function VirtualEntityList({
 	items,
 	user,
 	setShowIframe,
 	setIframeUrl,
-	showRatings,
 	headerHeight,
 	windowHeight,
-	windowWidth,
 	scrollTop,
-	setScrollTop,
-	jamListRef,
-	prevJamListRef,
-	jamCardHeight,
 }) {
 	// let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
 	let cardHeight = 322
@@ -32,19 +26,15 @@ export default function VirtualEntityList({
 	// const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
 	// TODO: re-implement virtual list
 	const itemsToRender = items
-	const handleScroll = (event) => {
-		prevJamListRef.current = scrollTop
-		setScrollTop(event.currentTarget.scrollTop)
-	}
 	const ratingsVisible = getRatingsVisible()
+	const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
+
+	useEffect(() => {
+		console.log('in use effect')
+	}, [])
 
 	return (
-		<div
-			ref={jamListRef}
-			// className=" overflow-y-scroll pb-20"
-			// style={{ height: `${windowHeight - (headerHeight || 200)}px`, overflowY: 'scroll' }}
-			// onScroll={handleScroll}
-		>
+		<div>
 			<div>
 				{/* <div style={{ height: `${totalHeight}px`, position: 'relative' }}> */}
 				{/* <div style={{ position: 'absolute', top: `${offsetTop}px` }}> */}
@@ -53,21 +43,19 @@ export default function VirtualEntityList({
 						if (item?.entity === 'Jam') {
 							return (
 								<JamCard
-									key={`visibile-${index}`}
+									key={`${item?.entity}-${item?.id}`}
 									jam={item}
 									user={user}
 									setShowIframe={setShowIframe}
 									setIframeUrl={setIframeUrl}
 									showRatings={ratingsVisible}
+									onlyShowVerifiedRatings={onlyShowVerifiedRatings}
 								/>
 							)
 						} else if (item?.entity === 'Show') {
-							return <ShowCard key={`visibile-${index}`} show={item} user={user} />
+							return <ShowCard key={`${item?.entity}-${item?.id}`} show={item} user={user} />
 						}
-						// else if (item?.entity === 'Set') {
-						// 	return <SetCard key={`visibile-${index}`} set={item} user={user} />
-						// }
-						return <SetCard key={`visible-${index}`} set={item} user={user} />
+						return <SetCard key={`${item?.entity}-${item?.id}`} set={item} user={user} />
 					})}
 				</div>
 			</div>
