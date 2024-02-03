@@ -1,5 +1,5 @@
 import { getSupabaseAdmin } from '~/integrations/supabase'
-import { SERVER_URL } from '~/utils/env'
+import { SERVER_URL } from '../../utils/env'
 
 import { mapAuthSession } from './mappers'
 import type { AuthSession } from './types'

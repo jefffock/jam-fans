@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { buildTitle } from '~/utils'
+import { buildTitle } from '../utils'
 
 const useFilterEffects = ({
 	dateFilter,

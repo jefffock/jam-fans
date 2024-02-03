@@ -1,12 +1,11 @@
-import { Link, useFetcher, Form } from '@remix-run/react'
-import { useState, forwardRef } from 'react'
+import { Link, useFetcher } from '@remix-run/react'
+import { forwardRef, useState } from 'react'
 import Button from '../Button'
 import LikeHeartRateComment from '../LikeHeartRateComment'
-import ThumbIcon from 'app/assets/icons/thumb-up-outline.svg'
-import PlusCircleIcon from '../icons/plus-circle'
-import ThumbUpOutline from '../icons/thumb-up-outline'
 import SoundIcon from '../icons/SoundIcon'
 import ThumbSolidIcon from '../icons/ThumbSolidIcon'
+import PlusCircleIcon from '../icons/plus-circle'
+import ThumbUpOutline from '../icons/thumb-up-outline'
 
 const JamCard = forwardRef((props, ref) => {
 	const {

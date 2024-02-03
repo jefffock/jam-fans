@@ -1,10 +1,9 @@
 import JamCard from './cards/JamCard'
-import ShowCard from './cards/ShowCard'
 import SetCard from './cards/SetCard'
+import ShowCard from './cards/ShowCard'
 // import SetCard from './cards/SetCard'
-import React, { useState, useRef, useEffect } from 'react'
-import { Iframe } from './IFrame'
-import { getOnlyShowVerifiedRatings, getRatingsVisible } from '~/utils'
+import { useEffect } from 'react'
+import { getOnlyShowVerifiedRatings, getRatingsVisible } from '../utils'
 
 export default function VirtualEntityList({
 	items,

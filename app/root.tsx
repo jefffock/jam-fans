@@ -1,23 +1,18 @@
-import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useRouteError, useLoaderData } from '@remix-run/react'
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
-import { createBrowserClient, createServerClient } from '@supabase/ssr'
-import TopNav from './components/TopNav'
-import BottomNav from './components/BottomNav'
-import { AuthSession } from '@supabase/supabase-js'
-import { getAuthSession } from './modules/auth'
 import { json } from '@remix-run/node'
-import { getProfile, getProfileFromRequest } from './modules/profile/index.server'
+import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useLoaderData, useRouteError } from '@remix-run/react'
+import TopNav from './components/TopNav'
+import { getProfileFromRequest } from './modules/profile/index.server'
 
+import './tailwind.css'
+// import './customStyles.css'
 // import type { LinksFunction } from "@remix-run/node";
 
-import styles from './tailwind.css'
-import otherStyles from './customStyles.css'
-
-export const links = () => [
-	{ rel: 'stylesheet', href: styles },
-	{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css' },
-	{ rel: 'stylesheet', href: otherStyles },
-]
+// export const links = () => [
+// 	{ rel: 'stylesheet', href: styles },
+// 	{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css' },
+// 	{ rel: 'stylesheet', href: otherStyles },
+// ]
 
 export const meta: MetaFunction = () => {
 	return [

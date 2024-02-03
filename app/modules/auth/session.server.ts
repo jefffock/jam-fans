@@ -1,6 +1,6 @@
 import { createCookieSessionStorage, redirect } from '@remix-run/node'
 
-import { NODE_ENV, SESSION_SECRET } from '~/utils'
+import { NODE_ENV, SESSION_SECRET } from '../../utils'
 import { getCurrentPath, isGet, makeRedirectToFromHere, safeRedirect } from '../.server/http.server'
 
 import { refreshAccessToken, verifyAuthSession } from './service.server'

@@ -1,10 +1,10 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-module.exports = {
+export default {
 	// serverBuildTarget: "vercel",
 	// publicPath: '/public/',
 	// serverBuildPath: 'api/index.js',
 	//   serverMainFields: ["main, module"],
-	serverModuleFormat: 'cjs',
+	// serverModuleFormat: 'cjs',
 	// appDirectory: 'app',
 	// assetsBuildDirectory: 'public/build',
 	// serverPlatform: 'node',

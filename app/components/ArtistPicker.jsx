@@ -1,10 +1,5 @@
 import { useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/solid'
-import ConfigurableAddItemModal from './ConfigurableAddItemModal'
-import { addArtistConfig } from '~/config'
 import Accordion from './Accordion'
-import { openModal, closeModal } from '~/utils/modal'
 import Button from './Button'
 
 export default function ArtistPicker({ artists, handleArtistsChange, artistFilters, onClick }) {

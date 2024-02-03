@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme')
+import defaultTheme from 'tailwindcss/defaultTheme'
 
-module.exports = {
+export default {
 	content: ['./app/**/*.{js,ts,jsx,tsx}'],
 	theme: {
 		extend: {
@@ -20,7 +20,6 @@ module.exports = {
 				20000: '20000ms',
 			},
 			spacing: {
-				
 				72: '18rem',
 				84: '21rem',
 				112: '28rem',

@@ -1,9 +1,9 @@
 import {
-	getRatingsVisible,
-	handleRatingsVisibleChange,
 	getOnlyShowVerifiedRatings,
+	getRatingsVisible,
 	handleOnlyShowVerifiedRatingsChange,
-} from '~/utils'
+	handleRatingsVisibleChange,
+} from '../utils'
 import Checkbox from './Checkbox'
 
 export default function EntityDisplayPreferences({ handleLinkChange, linkFilter }) {

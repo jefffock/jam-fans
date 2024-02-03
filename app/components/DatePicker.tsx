@@ -1,7 +1,6 @@
 import ConfigurableAddItemModal from './ConfigurableAddItemModal'
 import { addShowConfig } from '~/config'
 import { useState } from 'react'
-import { openModal, closeModal } from '~/utils/modal'
 import { Link } from '@remix-run/react'
 import Button from './Button'
 
