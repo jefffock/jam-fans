@@ -6,7 +6,7 @@ export async function getShows(userId: string) {
 			artists: true,
 			ratings: true,
 		},
-		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
+		orderBy: [{ likes: 'desc' }],
 	})
 
 	let userRatings = {}
@@ -32,7 +32,13 @@ export async function getShows(userId: string) {
 		}, {})
 
 		shows.forEach((show) => {
+			show.key = 'show-' + show.id
 			show.userRating = userRatings[show.id] || undefined
+		})
+	}
+	if (!userId) {
+		shows.forEach((show) => {
+			show.key = 'show-' + show.id
 		})
 	}
 

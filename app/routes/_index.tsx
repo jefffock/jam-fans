@@ -1,46 +1,23 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
-import type { ClientActionFunctionArgs, ClientLoaderFunctionArgs } from '@remix-run/react'
-import { useLoaderData, useFetcher, Outlet, Link } from '@remix-run/react'
-import { json, redirect } from '@remix-run/node'
-import { createServerClient, parse, serialize } from '@supabase/ssr'
-import Hero from '../components/Hero'
-import { getJamsCount, getJams } from '../modules/jam/index.server'
-import {
-	useWindowHeight,
-	useWindowWidth,
-	scrollToBottomOfWindow,
-	scrollToTopOfWindow,
-	scrollToTopOfRef,
-	createFilterURL,
-	slugify,
-	emojiToUnicode,
-} from '../utils'
-import { getSets, getSetsCount, addSet } from '../modules/set/index.server'
-import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
-import { getArtistsCount, getArtists, addArtist } from '../modules/artist/index.server'
-import { getSoundsCount, getSounds, filterSounds } from '../modules/sound/index.server'
-import { getSongsCount, getSongById, getSongs } from '../modules/song/index.server'
-import { useState, useEffect, useRef, useMemo } from 'react'
-import JamsHome from '../components/JamsHome'
-import { getProfile, getProfileFromRequest } from '../modules/profile/index.server'
-import JamList from '../components/JamList'
-import JamFiltersSlideout from '../components/JamFilters'
-import FiltersButton from '../components/FiltersButton'
-import JamsTitle from '../components/JamsTitle'
-import VirtualJamList from '../components/VirtualJamList'
-import JamFiltersClientside from '../components/JamFiltersClientside'
-import JamCard from '../components/cards/JamCard'
-import { useDebounce } from '~/hooks'
-import SiteStats from '~/components/SiteStats'
-import useFilteredMusicalEntities from '~/hooks/use-filtered-musical-entities'
-import useFilterEffects from '~/hooks/use-filter-effects'
-import EntityListHeader from '~/components/EntityListHeader'
+import { json } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
+import { useEffect, useRef, useState } from 'react'
 import EntityListContainer from '~/components/EntityListContainer'
-import { db } from '../database'
-import { getAuthSession } from '~/modules/auth'
-import TopNav from '~/components/TopNav'
-import BottomNav from '~/components/BottomNav'
-import { set } from 'zod'
+import EntityListHeader from '~/components/EntityListHeader'
+import SiteStats from '~/components/SiteStats'
+import useFilterEffects from '~/hooks/use-filter-effects'
+import useFilteredMusicalEntities from '~/hooks/use-filtered-musical-entities'
+import Hero from '../components/Hero'
+import JamFiltersClientside from '../components/JamFiltersClientside'
+import VirtualJamList from '../components/VirtualJamList'
+import { addArtist, getArtists, getArtistsCount } from '../modules/artist/index.server'
+import { getJams, getJamsCount } from '../modules/jam/index.server'
+import { getProfileFromRequest } from '../modules/profile/index.server'
+import { addSet, getSets, getSetsCount } from '../modules/set/index.server'
+import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
+import { getSongs, getSongsCount } from '../modules/song/index.server'
+import { getSounds, getSoundsCount } from '../modules/sound/index.server'
+import { createFilterURL, scrollToTopOfRef, useWindowHeight, useWindowWidth } from '../utils'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// console.log('request', request)
@@ -156,7 +133,6 @@ export default function Index() {
 		sounds,
 		count,
 		search,
-		user,
 		song,
 		allJams,
 		allShows,
@@ -294,9 +270,9 @@ export default function Index() {
 				/>
 				<VirtualJamList
 					items={filteredMusicalEntities}
-					user={user}
+					profile={profile}
+					showIframe={showIframe}
 					setShowIframe={setShowIframe}
-					setIframeUrl={setIframeUrl}
 					showRatings={showRatings}
 					headerHeight={headerHeight}
 					windowHeight={windowHeight}

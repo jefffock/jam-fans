@@ -23,7 +23,6 @@ const useFilterEffects = ({
 	musicalEntitiesFilters,
 }) => {
 	useEffect(() => {
-		console.log('show jams', showJams)
 		const filters = {
 			dateFilter: dateFilter,
 			beforeDateFilter,
@@ -52,10 +51,11 @@ const useFilterEffects = ({
 		buildTitle,
 		setTitle,
 		scrollToTopOfRef,
-		// jamListRef,
 		createFilterURL,
 		setAddJamLink,
 		musicalEntitiesFilters,
+		allShows,
+		setShowsOnDate,
 	])
 }
 

@@ -125,7 +125,7 @@ export async function getJams(userId) {
 		include: {
 			artists: true,
 		},
-		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
+		orderBy: [{ likes: 'desc' }],
 	})
 
 	let userRatings = {}
@@ -160,7 +160,7 @@ export async function getJams(userId) {
 	const allShows = await db.shows.findMany()
 
 	// Create a map of jams with show_id added
-	const jamMap = new Map(allJams.map((jam) => [jam.id, { ...jam, show_id: null }]))
+	const jamMap = new Map(allJams.map((jam) => [jam.id, { ...jam, show_id: null, key: `jam-${jam.id}` }]))
 
 	// Iterate over each show and update corresponding jams
 	allShows.forEach((show) => {

@@ -1,4 +1,6 @@
-export default function IFrame({ formattedIframeUrl, closeIframe, isRelisten }: { src: string }) {
+export default function IFrame({ formattedIframeUrl, closeIframe }: { src: string }) {
+	console.log('formattedIframeUrl in IFrame', formattedIframeUrl)
+	const isRelisten = formattedIframeUrl?.includes('relist')
 	return (
 		<div
 			className={`z-20 fixed bottom-0 left-0 pt-1 pr-1 m-0 ${

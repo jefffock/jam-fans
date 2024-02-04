@@ -4,9 +4,10 @@ export default function SoundIcon({
 	color = 'currentColor',
 	strokeWidth = '1.5',
 	animationClass = '',
+	onClick,
 }) {
 	return (
-		<div className="mondegreen">
+		<div className="mondegreen" onClick={onClick}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"

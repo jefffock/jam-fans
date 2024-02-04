@@ -58,7 +58,7 @@ export async function upsertRating({ userId, rating, entityType, entityId, comme
 		let createData = {
 			rating: parsedRating,
 			comment,
-			favorite,
+			favorite: favorite === 'add',
 			entity_type: entityType,
 			entity_id: parsedEntityId,
 			profiles: { connect: { id: userId } },
@@ -70,14 +70,19 @@ export async function upsertRating({ userId, rating, entityType, entityId, comme
 		} else if (entityType === 'Show') {
 			createData.shows = { connect: { id: parsedEntityId } }
 		}
-		let updateData = {
-			rating: parsedRating,
-			comment,
-			favorite,
-		}
+		let updateData = {}
 		if (like) {
 			updateData.likes = { increment: 1 }
 			createData.likes = 1
+		}
+		if (parsedRating) {
+			updateData.rating = parsedRating
+		}
+		if (comment) {
+			updateData.comment = comment
+		}
+		if (favorite) {
+			updateData.favorite = favorite === 'add'
 		}
 		const upsertedRating = await db.ratings.upsert({
 			where: {

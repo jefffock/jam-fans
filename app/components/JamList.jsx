@@ -1,9 +1,7 @@
-import JamCard from './cards/JamCard'
 import { Link, useFetcher } from '@remix-run/react'
+import { useEffect, useState } from 'react'
 import InfoAlert from './alerts/InfoAlert'
-import { useState, useEffect, useCallback } from 'react'
-import { Switch } from '@headlessui/react'
-import Sorter from './Sorter'
+import JamCard from './cards/EntityCard'
 
 export default function JamList({ jams, sounds, title, user, profile, search, showIframe, setShowIframe }) {
 	const artistStartIndex = search?.indexOf('artists-') + 'artists-'.length

@@ -1,6 +1,5 @@
-import { db } from '../../database'
 import type { sets } from '@prisma/client'
-import { SetNumber } from '@prisma/client'
+import { db } from '../../database'
 
 export async function getSets(userId: string) {
 	const sets = await db.sets.findMany({
@@ -8,7 +7,7 @@ export async function getSets(userId: string) {
 			artists: true,
 			ratings: true,
 		},
-		orderBy: [{ likes: 'desc' }, { avg_rating: 'desc' }, { num_ratings: 'desc' }],
+		orderBy: [{ likes: 'desc' }],
 	})
 	let userRatings = {}
 
@@ -34,6 +33,12 @@ export async function getSets(userId: string) {
 
 		sets.forEach((set) => {
 			set.userRating = userRatings[set.id] || undefined
+			set.key = 'set-' + set.id
+		})
+	}
+	if (!userId) {
+		sets.forEach((set) => {
+			set.key = 'set-' + set.id
 		})
 	}
 	return sets

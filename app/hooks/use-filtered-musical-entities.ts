@@ -38,7 +38,7 @@ const useFilteredMusicalEntities = ({
 					(!afterDateFilter || item.year >= Number(afterDateFilter))
 				)
 			})
-			.sort((a, b) => b.avg_rating - a.avg_rating)
+			.sort((a, b) => b.likes - a.likes)
 	}, [
 		allJams,
 		allSets,

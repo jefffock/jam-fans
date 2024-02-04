@@ -1,9 +1,9 @@
 import { Form } from '@remix-run/react'
-import DatePicker from './DatePicker'
 import Button from './Button'
-import LikeHeartRateComment from './LikeHeartRateComment'
+import DatePicker from './DatePicker'
+import LikeHeartRateComment from './RateComment'
 import InfoAlert from './alerts/InfoAlert'
-import JamCard from './cards/JamCard'
+import JamCard from './cards/EntityCard'
 
 const setNumberMap = {
 	set_1: 'set 1',
