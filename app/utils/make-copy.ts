@@ -14,11 +14,11 @@ export function buildTitle({
 	let title = '🔥 '
 
 	if (soundFiltersLabels && soundFiltersLabels.length > 0) {
-		title += soundFiltersLabels.join(', ').replace(/, ([^,]*)$/, ' and $1 ')
+		title += soundFiltersLabels.join(', ').replace(/, ([^,]*)$/, ' and $1')
 	}
 
 	if (songName) {
-		title += ` ${songName} `
+		title += ` ${songName}`
 	}
 
 	switch (musicalEntitiesToShow.length) {
@@ -29,7 +29,7 @@ export function buildTitle({
 			title += `${musicalEntitiesToShow[0]} and ${musicalEntitiesToShow[1]}`
 			break
 		case 3:
-			title += 'jams, sets and shows'
+			title += ' jams, sets and shows'
 			break
 		default:
 			title += ''

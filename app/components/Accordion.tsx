@@ -8,7 +8,6 @@ export default function Accordion({ title, children, isPreviewEnabled, previewIt
 		setIsOpen(!isOpen)
 	}
 
-	console.log('previewItems', previewItems)
 	return (
 		<div>
 			<div className="flex justify-between items-center cursor-pointer p-4" onClick={toggleOpen}>
@@ -19,7 +18,7 @@ export default function Accordion({ title, children, isPreviewEnabled, previewIt
 				<div className="mt-1 flex rounded-md shadow-sm">{children}</div>
 			) : (
 				isPreviewEnabled && (
-					<div className="pb-4 px-4">{previewItems.map((item) => item[previewItemLabelKey]).join(', ')}</div>
+					<div className="pb-4 px-4">{previewItems?.map((item) => item[previewItemLabelKey]).join(', ')}</div>
 				)
 			)}
 		</div>

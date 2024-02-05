@@ -290,6 +290,7 @@ export default function Index() {
 					setOpen={setOpen}
 					setActiveAddTab={setActiveAddTab}
 					setActiveTab={setActiveTab}
+					attributes={attributes}
 				/>
 			</EntityListContainer>
 			{/* <BottomNav /> */}

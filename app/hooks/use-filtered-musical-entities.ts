@@ -49,7 +49,7 @@ const useFilteredMusicalEntities = ({
 
 		setFilteredEntitiesLengthUntrimmed(combinedArray.length)
 
-		return combinedArray?.slice(0, 100)
+		return combinedArray?.slice(0, 1)
 	}, [
 		allJams,
 		allSets,

@@ -24,7 +24,7 @@ export default function ArtistPicker({
 			<div className="sm:col-span-4 mx-4">
 				<fieldset>
 					{/* <legend className="text-2xl text-gray-900 pt-4">Bands</legend> */}
-					<div className="divide-y divide-gray-200 border-t border-b border-gray-200 max-h-60 overflow-y-scroll mb-4">
+					<div className="divide-y divide-gray-200 border-t border-b border-gray-200 max-h-72 overflow-y-scroll mb-4">
 						{artists &&
 							artists?.map((artist) => {
 								const entityCounts = [
@@ -79,9 +79,9 @@ export default function ArtistPicker({
 								)
 							})}
 					</div>
-					<div className="flex justify-center pb-4">
+					{/* <div className="flex justify-center pb-4">
 						<Button onClick={onClick} text="add an artist" />
-					</div>
+					</div> */}
 				</fieldset>
 			</div>
 		</Accordion>

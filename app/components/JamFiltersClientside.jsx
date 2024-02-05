@@ -1,7 +1,6 @@
 import { useFetcher, useSubmit } from '@remix-run/react'
 import { useMemo, useState } from 'react'
 import { buildFiltersButtonText } from '~/utils'
-import Accordion from './Accordion'
 import AddEntity from './AddEntity'
 import ArtistPicker from './ArtistPicker'
 import AttributePicker from './AttributePicker'
@@ -113,7 +112,7 @@ export default function JamFiltersClientside({
 
 	function handleAttributesChange(e) {
 		let attribute = e.target.value
-		console.log('attribute', attribute)
+		console.log('attribute in handleAttributesChanges', attribute)
 		if (e.target.checked) {
 			setAttributeFilters((prev) => [...prev, attribute])
 		} else {
@@ -217,19 +216,16 @@ export default function JamFiltersClientside({
 							jamsCount={filteredJamsCount}
 							setsCount={filteredSetsCount}
 						/>
-						<Accordion
+
+						<AttributePicker
+							attributes={sounds}
+							handleAttributesChange={handleAttributesChange}
+							defaults={attributeFilters}
+							open={attributeFilters.length > 0}
+							parsedSelectedAttributes={parsedSelectedSounds}
 							title="sounds"
-							isPreviewEnabled={true}
-							previewItems={parsedSelectedSounds}
-							previewItemLabelKey="label"
-						>
-							<AttributePicker
-								attributes={sounds}
-								handleAttributesChange={handleAttributesChange}
-								attributeFilters={attributeFilters}
-								open={attributeFilters.length > 0}
-							/>
-						</Accordion>
+							inCard={false}
+						/>
 						<SongPicker
 							setQuery={setQuery}
 							songSelected={songSelected}

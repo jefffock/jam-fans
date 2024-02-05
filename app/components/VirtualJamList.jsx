@@ -15,6 +15,7 @@ export default function VirtualEntityList({
 	setOpen,
 	setActiveAddTab,
 	setActiveTab,
+	attributes,
 }) {
 	// let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
 	// let cardHeight = 322
@@ -73,6 +74,7 @@ export default function VirtualEntityList({
 				setOpen={setOpen}
 				setActiveAddTab={setActiveAddTab}
 				setActiveTab={setActiveTab}
+				attributes={attributes}
 			/>
 		)
 	})

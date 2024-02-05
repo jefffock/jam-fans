@@ -1,5 +1,6 @@
 import { useFetcher } from '@remix-run/react'
 import { useState } from 'react'
+import AttributePicker from '../AttributePicker'
 import Button from '../Button'
 import RateComment from '../RateComment'
 import HeartOutline from '../icons/HeartOutlineIcon'
@@ -24,12 +25,26 @@ export default function EntityCard({
 	setOpen,
 	setActiveAddTab,
 	setActiveTab,
+	attributes,
 }) {
 	const verifiedRating = (item?.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const unverifiedRating = (item?.avg_unverified_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
 	const [showCurateOptions, setShowCurateOptions] = useState(false)
 	const fetcher = useFetcher()
+	const previousAttributes =
+		item?.attribute_ids?.map((attributeId) =>
+			JSON.stringify(attributes.find((attribute) => attribute.id === attributeId))
+		) || []
+	const [stringifiedSelectedAttributes, setStringifiedSelectedAttributes] = useState([
+		...previousAttributes.map((item) => item),
+	])
+
+	console.log('previousAttributes in card', previousAttributes)
+
+	const parsedSelectedAttributes = stringifiedSelectedAttributes.map((item) => JSON.parse(item)).filter(Boolean)
+
+	console.log('parsedSelectedAttributes in card', parsedSelectedAttributes)
 
 	function handleListenClick() {
 		console.log('listen clicked', item?.listen_link)
@@ -71,6 +86,22 @@ export default function EntityCard({
 		setActiveAddTab('jamSetShow')
 		setOpen(true)
 	}
+
+	function handleAttributesChange(e) {
+		const newAttribute = e.target.value
+		console.log('newAttribute', newAttribute)
+		console.log('stringifiedSelectedAttributes', stringifiedSelectedAttributes)
+		let updatedAttributes = []
+		if (e.target.checked) {
+			updatedAttributes = [...stringifiedSelectedAttributes, newAttribute]
+		} else {
+			updatedAttributes = stringifiedSelectedAttributes.filter(
+				(attribute) => JSON.parse(attribute).id !== JSON.parse(newAttribute).id
+			)
+		}
+		setStringifiedSelectedAttributes(updatedAttributes)
+	}
+
 	const likesToShow = fetcher?.state === 'idle' ? item?.likes || '' : Number(item?.likes) + 1
 
 	return (
@@ -166,7 +197,20 @@ export default function EntityCard({
 				)}
 				{/* third row */}
 				{showDateArtistLocation && <p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>}
-				{item?.attributes && <p className="mb-2 font-normal text-gray-700">{item?.attributes.join(', ')}</p>}
+				{!showCurateOptions && item?.attributes && (
+					<p className="mb-2 font-normal text-gray-700">{item?.attributes.join(', ')}</p>
+				)}
+				{showCurateOptions && (
+					<AttributePicker
+						attributes={attributes}
+						cantUncheckDefaults={true}
+						defaults={stringifiedSelectedAttributes}
+						handleAttributesChange={handleAttributesChange}
+						title="add sounds, where to listen"
+						parsedSelectedAttributes={parsedSelectedAttributes}
+						previousAttributes={previousAttributes}
+					/>
+				)}
 				{item?.name && <p className="font-normal text-gray-700">{`added by ${item.name} (${item?.points})`}</p>}
 				{comments && comments.length > 0 && (
 					<button
@@ -243,7 +287,6 @@ export default function EntityCard({
 			{showCurateOptions && (
 				<div className="w-100">
 					<RateComment entity={item} profile={profile} entityType={item.entity} />
-					<AttributePicker attributes={attributes} cantUncheckDefaults={true} />
 				</div>
 			)}
 		</div>
