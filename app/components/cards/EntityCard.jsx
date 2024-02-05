@@ -1,4 +1,4 @@
-import { Link, useFetcher } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import { useState } from 'react'
 import Button from '../Button'
 import RateComment from '../RateComment'
@@ -19,6 +19,11 @@ export default function EntityCard({
 	showDateArtistLocation = true,
 	onlyShowVerifiedRatings,
 	ref,
+	setDateFilter,
+	setArtistFilters,
+	setOpen,
+	setActiveAddTab,
+	setActiveTab,
 }) {
 	const verifiedRating = (item?.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
 	const unverifiedRating = (item?.avg_unverified_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
@@ -58,40 +63,63 @@ export default function EntityCard({
 
 	const ratingToShow = onlyShowVerifiedRatings ? verifiedRating : unverifiedRating
 
+	function handleDateClick() {
+		console.log('date clicked', item)
+		setDateFilter(item.date)
+		setArtistFilters([item?.artist_id])
+		setActiveTab('add')
+		setActiveAddTab('jamSetShow')
+		setOpen(true)
+	}
+	const likesToShow = fetcher?.state === 'idle' ? item?.likes || '' : Number(item?.likes) + 1
+
 	return (
 		<div
-			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p my-6 mx-auto flex flex-col justify-between h-90 ${ref ? 'measure-div' : ''}`}
-			tabIndex={item?.id}
+			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p my-6 mx-auto flex flex-col justify-between h-90`}
 		>
 			<div className="overflow-y-auto">
-				{item?.entity === 'Jam' && (
-					<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
-						{item.song_name} {songEmojis && songEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
-					</h5>
-				)}
-				{item?.entity === 'Set' && (
-					<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{item.date}</h5>
-				)}
-				{item?.entity === 'Show' && (
-					<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{item.date_text}</h5>
-				)}
-				{/* first row */}
+				<div className="flex justify-between">
+					{item?.entity === 'Jam' && (
+						<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+							{item.song_name}{' '}
+							{songEmojis && songEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
+						</h5>
+					)}
+					{item?.entity === 'Set' && (
+						<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900" onClick={handleDateClick}>
+							{item.date}
+						</h5>
+					)}
+					{item?.entity === 'Show' && (
+						<h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900" onClick={handleDateClick}>
+							{item.date_text}
+						</h5>
+					)}
+					{fetcher?.state !== 'idle' && (
+						<p className="mb-2 text-xl tracking-tight text-gray-900">{`updating...`}</p>
+					)}
+					{/* first row */}
+					{item.entity === 'Show' && <h5 className="mb-2 text-xl tracking-tight text-gray-900 ">show</h5>}
+					{item.entity === 'Set' && (
+						<h5 className="mb-2 text-xl tracking-tight text-gray-900 ">
+							{item.set_number.replace('_', ' ')}
+						</h5>
+					)}
+					{item.entity === 'Jam' && <h5 className="mb-2 text-xl tracking-tight text-gray-900 ">jam</h5>}
+				</div>
 				{showDateArtistLocation && (
 					<div className="flex justify-between">
 						{/* left */}
 						<div className="flex items-center space-x-4">
 							{item.entity === 'Jam' && item.show_id && (
-								<Link
-									to={`/shows/${item.show_id}`}
-									className="mb-2 text-xl tracking-tight text-gray-900 underline"
+								<h5
+									className="mb-2 text-xl tracking-tight text-gray-900 underline cursor-pointer"
+									onClick={handleDateClick}
 								>
 									{item.date}
-								</Link>
+								</h5>
 							)}
-							{fetcher?.state !== 'idle' && (
-								<p className="mb-2 text-xl tracking-tight text-gray-900">{`updating...`}</p>
-							)}
-							{item.entity === 'Jam' && !item.show_id && fetcher?.state === 'idle' && (
+							{item.entity === 'Jam' && !item.show_id && (
 								<fetcher.Form method="post" action="?index" preventScrollReset={true}>
 									<input type="hidden" name="artist_id" value={item.artist_id} />
 									<input type="hidden" name="date_text" value={item.date} />
@@ -104,22 +132,6 @@ export default function EntityCard({
 										<Button text={'add show'} type={'submit'} name={'_action'} value={'add-show'} />
 									</div>
 								</fetcher.Form>
-							)}
-							{item.entity === 'Show' && (
-								<Link
-									to={`/shows/${item.id}`}
-									className="mb-2 text-xl tracking-tight text-gray-900 underline"
-								>
-									full show
-								</Link>
-							)}
-							{item.entity === 'Set' && (
-								<Link
-									to={`/sets/${item.id}`}
-									className="mb-2 text-xl tracking-tight text-gray-900 underline"
-								>
-									{item.set_number}
-								</Link>
 							)}
 						</div>
 						{/* right */}
@@ -144,17 +156,17 @@ export default function EntityCard({
 				{showDateArtistLocation && (
 					<div className="flex justify-between">
 						<h6 className="mb-2 text-xl tracking-tight text-gray-900">
-							{item.artist}{' '}
+							{item.artists.artist}{' '}
 							{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
 						</h6>
 						<p className={`${!showRatings || item.num_ratings === 0 ? 'hidden' : 'flex float-right'}`}>
-							{item.num_ratings} fan{item.num_ratings != 1 ? 's' : ''}
+							{item.num_ratings} rating{item.num_ratings != 1 ? 's' : ''}
 						</p>
 					</div>
 				)}
 				{/* third row */}
 				{showDateArtistLocation && <p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>}
-				{item?.sounds && <p className="mb-2 font-normal text-gray-700">{item?.sounds.join(', ')}</p>}
+				{item?.attributes && <p className="mb-2 font-normal text-gray-700">{item?.attributes.join(', ')}</p>}
 				{item?.name && <p className="font-normal text-gray-700">{`added by ${item.name} (${item?.points})`}</p>}
 				{comments && comments.length > 0 && (
 					<button
@@ -185,9 +197,11 @@ export default function EntityCard({
 					</button>
 				)}
 			</div>
-			<div className="flex justify-between items-center">
-				{item?.listen_link && (
+			<div className="flex justify-between">
+				{item?.listen_link ? (
 					<SoundIcon height="h-10" width="w-10" strokeWidth="2" onClick={handleListenClick} />
+				) : (
+					<SoundIcon height="h-10" width="w-10" strokeWidth="2" color="#CCC6C6" />
 				)}
 				{showCurateOptions ? (
 					<PlusCircleSolid height="h-10" width="w-10" onClick={handlePlusClick} />
@@ -200,33 +214,36 @@ export default function EntityCard({
 						<input type="hidden" name="entity_type" value={item.entity} />
 						<input type="hidden" name="is_favorite" value={item?.userRating?.favorite} />
 
-						<button type="submit" name="_action" value="favorite" className="mondegreen">
-							{item?.userRating?.favorite ? (
-								<HeartSolid height="h-10" width="w-10" strokeWidth="2" />
-							) : (
-								<HeartOutline height="h-10" width="w-10" strokeWidth="2" />
-							)}
+						<button type="submit" name="_action" value="favorite" className="mondegreen my-auto">
+							<div className="flex items-center align-middle">
+								{item?.userRating?.favorite ? (
+									<HeartSolid height="h-10" width="w-10" strokeWidth="2" className="my-auto" />
+								) : (
+									<HeartOutline height="h-10" width="w-10" strokeWidth="2" className="my-auto" />
+								)}
+							</div>
 						</button>
 					</fetcher.Form>
 				)}
-				<div className="flex text-right items-center mondegreen">
-					<fetcher.Form method="post" action="/resources/ratings">
-						<input type="hidden" name="entity_id" value={item?.id} />
-						<input type="hidden" name="entity_type" value={item.entity} />
-						<button type="submit" name="_action" value="like">
+				<fetcher.Form method="post" action="/resources/ratings">
+					<input type="hidden" name="entity_id" value={item?.id} />
+					<input type="hidden" name="entity_type" value={item.entity} />
+					<button type="submit" name="_action" value="like">
+						<div className="flex text-right items-center align-middle mondegreen">
 							{item?.userRating?.likes > 0 ? (
 								<ThumbSolidIcon height="h-10" width="w-10" strokeWidth="2" />
 							) : (
 								<ThumbUpOutline height="h-10" width="w-10" strokeWidth="2" />
 							)}
-						</button>
-					</fetcher.Form>
-					{item?.likes > 0 ? `${item?.likes}` : ''}
-				</div>
+							{likesToShow}
+						</div>
+					</button>
+				</fetcher.Form>
 			</div>
 			{showCurateOptions && (
 				<div className="w-100">
 					<RateComment entity={item} profile={profile} entityType={item.entity} />
+					<AttributePicker attributes={attributes} cantUncheckDefaults={true} />
 				</div>
 			)}
 		</div>

@@ -1,5 +1,4 @@
 //create loader function
-import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { json } from '@remix-run/node'
 import { getSetlist } from '~/modules/setlist/service.server'
 
@@ -10,8 +9,8 @@ export const loader = async ({ request, params }) => {
 	const date = queryParams?.date
 	console.log('artist, date', artist, date)
 	try {
-		const { setlist, location } = await getSetlist({ artist, date })
-		return json({ setlist, location })
+		const enrichedSetlist = await getSetlist({ artist, date })
+		return json({ enrichedSetlist })
 	} catch (error) {
 		console.error('error in loader', error)
 		return json({ error: error.message })

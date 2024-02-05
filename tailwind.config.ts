@@ -37,6 +37,8 @@ export default {
 			colors: {},
 			fontSize: {
 				base: 'var(--font-base-size)',
+				med: '0.8rem',
+				md: '0.7rem',
 			},
 		},
 	},

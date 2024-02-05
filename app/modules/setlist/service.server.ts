@@ -1,4 +1,4 @@
-import { db,} from '../../database'
+import { db } from '../../database'
 
 export async function getSetlist({ artist, date }) {
 	const jfVersions = await db.jams.findMany({
@@ -8,18 +8,21 @@ export async function getSetlist({ artist, date }) {
 		},
 	})
 
-	console.log('jfVersions', jfVersions)
-	console.log('date', date)
-	console.log('artist', artist)
 	if (artist.data_source === 'Phishnet') {
-		const { setlist, location } = await getPhishnetSetlist({ artist, date, jfVersions })
-		return { setlist, location }
-	} else if (artist.date_source === 'Songfish') {
-		const { setlist, location } = await getSongfishSetlist({ artist, date, jfVersions })
-		return { setlist, location }
+		console.log('getting phishnet setlist')
+		const enrichedSetlist = await getPhishnetSetlist({ artist, date, jfVersions })
+		console.log('enrichedSetlist', enrichedSetlist)
+		return enrichedSetlist
+	} else if (artist.data_source === 'Songfish') {
+		console.log('getting songfish setlist')
+		const enrichedSetlist = await getSongfishSetlist({ artist, date, jfVersions })
+		console.log('enrichedSetlist', enrichedSetlist)
+		return enrichedSetlist
 	} else if (artist.data_source === 'SetlistFM') {
-		const { setlist, location } = await getSetlistFMSetlist({ artist, date, jfVersions })
-		return { setlist, location }
+		console.log('getting setlistfm setlist')
+		const enrichedSetlist = await getSetlistFMSetlist({ artist, date, jfVersions })
+		console.log('enrichedSetlist', enrichedSetlist)
+		return enrichedSetlist
 	}
 }
 
@@ -50,15 +53,18 @@ async function getPhishnetSetlist({ artist, date, jfVersions }) {
 				return {
 					label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 					value: title,
-					jamId: alreadyAdded?.id,
+					jam: alreadyAdded,
 				}
 			})
 		setlist = titles
+		console.log('setlist', setlist)
+		console.log('titles', titles)
 		return { setlist, location }
 	}
 }
 
 async function getSongfishSetlist({ artist, date, jfVersions }) {
+	console.log('in get songfish setlist', artist, date, jfVersions)
 	const url = `${artist.baseUrl}/setlists/showdate/${date}`
 	const setlistData = await fetch(url)
 	let setlist = await setlistData.json()
@@ -74,7 +80,7 @@ async function getSongfishSetlist({ artist, date, jfVersions }) {
 				return {
 					label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 					value: title,
-					jamId: alreadyAdded?.id,
+					jam: alreadyAdded,
 				}
 			})
 
@@ -109,7 +115,7 @@ async function getSetlistFMSetlist({ artist, date, jfVersions }) {
 					return {
 						label: alreadyAdded ? '(Added) ' + name : name,
 						value: name,
-						jamId: alreadyAdded?.id,
+						jam: alreadyAdded,
 					}
 				})
 			)

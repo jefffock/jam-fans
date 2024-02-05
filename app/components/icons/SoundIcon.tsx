@@ -13,8 +13,8 @@ export default function SoundIcon({
 				fill="none"
 				viewBox="0 0 24 24"
 				strokeWidth={strokeWidth}
-				stroke="currentColor"
-				className={`${width} ${height} ${animationClass} color-cyan-700`}
+				stroke={color}
+				className={`${width} ${height} ${animationClass}`}
 			>
 				<path
 					strokeLinecap="round"

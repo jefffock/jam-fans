@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import DatePicker from './DatePicker'
-import { Form, useFetcher } from '@remix-run/react'
-import { fetchEnsResolver } from 'wagmi/actions'
-import RatingButtons from './RatingButtons'
+import { useFetcher } from '@remix-run/react'
+import { useEffect, useState } from 'react'
 import AddJamSetShow from './AddJamSetShow'
 
 const SETS = [
@@ -41,14 +38,16 @@ export default function AddEntity({
 		setsOnJF && SETS.filter((set) => !setsOnJF?.some((setsOnJfItem) => setsOnJfItem.set_number === set.value))
 
 	useEffect(() => {
-		if (jamsOnJF && jamsOnJF.length > 0 && jamsOnJF[0]?.location) {
+		if (!location && jamsOnJF && jamsOnJF.length > 0 && jamsOnJF[0]?.location) {
 			setLocation(jamsOnJF[0]?.location)
-		} else if (showOnJF && showOnJF.length > 0 && showOnJF[0]?.location) {
+		} else if (!location && showOnJF && showOnJF.length > 0 && showOnJF[0]?.location) {
 			setLocation(showOnJF[0]?.location)
 		}
 	}, [jamsOnJF, showOnJF])
 
 	useEffect(() => {
+		console.log('selectedArtist or dateFilter changed')
+		setSetlist([])
 		if (selectedArtist && dateFilter && setlist.length === 0) {
 			//make sure each song is on jam fans
 			//get song id for each song
@@ -66,34 +65,6 @@ export default function AddEntity({
 		}
 	}, [selectedArtist, dateFilter])
 
-	if (fetcher && fetcher?.data && setlist.length === 0) {
-		console.log('fetcher.data', fetcher.data)
-		if (fetcher.data?.location) {
-			setLocation(fetcher.data?.location)
-		}
-		if (fetcher.data?.setlist) {
-			let modifiedSetlist = []
-			fetcher.data?.setlist.forEach((item) => {
-				if (!item.jamId) {
-					modifiedSetlist.push(item)
-				}
-				if (item.jamId !== undefined) {
-					// Find the jam with the matching ID in jamOnJF
-					const matchingJam = jamsOnJF.find((jam) => jam.id === item.jamId)
-
-					if (matchingJam) {
-						// Perform the connection logic here
-						// For example, you might want to add the matching jam details to the item
-						item.jam = matchingJam
-						modifiedSetlist.push(item)
-					}
-				}
-			})
-			console.log('modifiedSetlist', modifiedSetlist)
-			setSetlist(modifiedSetlist)
-		}
-	}
-
 	return (
 		<div className="m-4 text-lg text-gray">
 			<div className="flex space-x-10 mx-auto text-center max-w-fit mb-4">
@@ -105,14 +76,14 @@ export default function AddEntity({
 				>
 					jams, sets, shows
 				</button>
-				<button
+				{/* <button
 					type="button"
 					className={`${activeAddTab === 'artist' ? 'text-cyan-700' : 'text-neutral-500'}`}
 					disabled={activeAddTab === 'artist'}
 					onClick={() => setActiveAddTab('artist')}
 				>
 					bands
-				</button>
+				</button> */}
 				<button
 					type="button"
 					className={`${activeAddTab === 'song' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
@@ -121,14 +92,14 @@ export default function AddEntity({
 				>
 					songs
 				</button>
-				<button
+				{/* <button
 					type="button"
 					className={`${activeAddTab === 'sound' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
 					disabled={activeAddTab === 'sound'}
 					onClick={() => setActiveAddTab('sound')}
 				>
 					sounds
-				</button>
+				</button> */}
 			</div>
 			{activeAddTab === 'jamSetShow' && (
 				<AddJamSetShow
@@ -141,8 +112,8 @@ export default function AddEntity({
 					setsOnJF={setsOnJF}
 					jamsOnJF={jamsOnJF}
 					availableSets={availableSets}
-					setlist={setlist}
-					location={location}
+					setlist={fetcher?.data?.enrichedSetlist?.setlist || setlist}
+					location={fetcher?.data?.enrichedSetlist?.location || location}
 					setSelectedArtist={setSelectedArtist}
 					profile={profile}
 				/>

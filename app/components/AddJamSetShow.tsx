@@ -1,9 +1,8 @@
-import { Form } from '@remix-run/react'
+import { useFetcher } from '@remix-run/react'
 import Button from './Button'
 import DatePicker from './DatePicker'
-import LikeHeartRateComment from './RateComment'
 import InfoAlert from './alerts/InfoAlert'
-import JamCard from './cards/EntityCard'
+import EntityCard from './cards/EntityCard'
 
 const setNumberMap = {
 	set_1: 'set 1',
@@ -28,6 +27,8 @@ export default function AddJamSetShow({
 	profile,
 	jamsOnJF,
 }) {
+	const fetcher = useFetcher()
+
 	return (
 		<div className="flex-col flex items-center">
 			<select
@@ -51,7 +52,7 @@ export default function AddJamSetShow({
 					showsOnDate={null}
 					inAdd={true}
 					artist={selectedArtist}
-					showLabel={false}
+					showLabel={true}
 				/>
 			)}
 			{!profile && selectedArtist && dateFilter && (
@@ -65,21 +66,12 @@ export default function AddJamSetShow({
 				<p>{location}</p>
 				<p>{dateFilter}</p>
 			</div>
-			<p>Likes : {showOnJF?.likes}</p>
-			<p>Favorites : {showOnJF?.favorites}</p>
-			<p>Rating : {showOnJF?.avg_rating}</p>
-			<p>Comments : {showOnJF?.ratings?.length}</p>
-			{/* {showOnJF?.ratings?.map((comment, index) => {
-				return <p key={`comment-${index}`}>{comment}</p>
-			})} */}
 
-			<p>User rating: {showOnJF?.userRating?.rating}</p>
-			<p>User comment: {showOnJF?.userRating?.comment}</p>
-			<p>User favorite: {showOnJF?.userRating?.favorite ? 'yes' : 'no'}</p>
-			<p>User like: {showOnJF?.userRating?.likes ? 'yes' : 'no'}</p>
-			{showOnJF && <LikeHeartRateComment profile={profile} entity={showOnJF} entityType={'Show'} />}
+			{showOnJF && (
+				<EntityCard item={showOnJF} profile={profile} showRatings={false} showDateArtistLocation={false} />
+			)}
 			{!showOnJF && dateFilter && selectedArtist && (
-				<Form method="post" preventScrollReset={true}>
+				<fetcher.Form method="post" preventScrollReset={true} action="resources/shows">
 					<input type="hidden" name="entity" value="Show" />
 					<input type="hidden" name="date_text" value={dateFilter} />
 					<input type="hidden" name="year" value={dateFilter.slice(0, 4)} />
@@ -93,32 +85,27 @@ export default function AddJamSetShow({
 						name="_action"
 						value="add-show"
 					/>
-				</Form>
+				</fetcher.Form>
 			)}
 			{selectedArtist && dateFilter && setsOnJF && <p>sets on jam fans</p>}
 			{selectedArtist &&
 				dateFilter &&
 				setsOnJF &&
-				setsOnJF.map((set, index) => (
-					<>
-						<p key={index}>{setNumberMap[set.set_number]}</p>
-						<p>rating: {set?.avg_rating}</p>
-						<p>comments: {set?.ratings?.length}</p>
-						<p>likes: {set?.likes}</p>
-						<p>favorites: {set?.favorites}</p>
-						<p>userRating: {set?.userRating?.rating}</p>
-						<p>userComment: {set?.userRating?.comment}</p>
-						<p>userFavorite: {set?.userRating?.favorite ? 'yes' : 'no'}</p>
-						<p>userLike: {set?.userRating?.likes ? 'yes' : 'no'}</p>
-						<LikeHeartRateComment profile={profile} entity={set} entityType={'Set'} />
-					</>
+				setsOnJF.map((set) => (
+					<EntityCard
+						key={set.key}
+						item={set}
+						profile={profile}
+						showRatings={false}
+						showDateArtistLocation={false}
+					/>
 				))}
 			{selectedArtist && dateFilter && availableSets && <p>add a set:</p>}
 			<div className="flex gap-2">
 				{selectedArtist &&
 					dateFilter &&
-					availableSets.map((set, index) => (
-						<Form method="post" preventScrollReset={true} key={index}>
+					availableSets.map((set) => (
+						<fetcher.Form method="post" preventScrollReset={true} key={set.key} action="resources/sets">
 							<input type="hidden" name="entity" value="Set" />
 							<input type="hidden" name="set_number" value={set.value} />
 							<input type="hidden" name="date" value={dateFilter} />
@@ -129,25 +116,33 @@ export default function AddJamSetShow({
 								value="add-set"
 								text={`add ${set.label} ${set.label === 'set 3' || set.label === 'late set' ? '(if there was one)' : ''}`}
 							/>
-						</Form>
+						</fetcher.Form>
 					))}
 			</div>
 
-			{setlist && selectedArtist && dateFilter && (
+			{setlist && setlist.length > 0 && selectedArtist && dateFilter && (
 				<>
 					<p>setlist</p>
 					<div className="flex flex-col space-y-4">
-						{setlist.map((song, index) =>
+						{setlist.map((song) =>
 							song.label.indexOf('Added') === -1 ? (
-								<div className="flex" key={index}>
-									{/* <p key={index}>{song.label}</p> */}
-									<Button size="small" type="submit" text={`add ${song.label}`} />
-								</div>
+								<fetcher.Form
+									method="post"
+									preventScrollReset={true}
+									key={song.label}
+									action="resources/jams"
+								>
+									<input type="hidden" name="entity" value="Jam" />
+									<input type="hidden" name="date" value={dateFilter} />
+									<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
+									<input type="hidden" name="song" value={song.label} />
+									<Button size="small" type="submit" text={`add ${song.label}`} value="add-jam" />
+								</fetcher.Form>
 							) : (
-								<JamCard
-									key={index}
-									jam={song.jam}
-									user={profile}
+								<EntityCard
+									key={song.jam.key}
+									item={song.jam}
+									profile={profile}
 									showRatings={false}
 									showDateArtistLocation={false}
 								/>

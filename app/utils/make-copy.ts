@@ -6,18 +6,19 @@ export function buildTitle({
 	afterDateFilter,
 	dateFilter,
 	musicalEntitiesFilters,
+	soundFiltersLabels,
+	platformAttributesLabels,
 }) {
-	console.log('musicalEntitiesFilters', musicalEntitiesFilters)
 	const musicalEntitiesToShow = Object.keys(musicalEntitiesFilters).filter((key) => musicalEntitiesFilters[key])
 
 	let title = '🔥 '
 
-	if (soundNames && soundNames.length > 0) {
-		title += soundNames.join(', ').replace(/, ([^,]*)$/, ' and $1')
+	if (soundFiltersLabels && soundFiltersLabels.length > 0) {
+		title += soundFiltersLabels.join(', ').replace(/, ([^,]*)$/, ' and $1 ')
 	}
 
 	if (songName) {
-		title += ` ${songName}`
+		title += ` ${songName} `
 	}
 
 	switch (musicalEntitiesToShow.length) {
@@ -28,7 +29,7 @@ export function buildTitle({
 			title += `${musicalEntitiesToShow[0]} and ${musicalEntitiesToShow[1]}`
 			break
 		case 3:
-			title += 'jams, sets, and shows'
+			title += 'jams, sets and shows'
 			break
 		default:
 			title += ''
@@ -52,6 +53,10 @@ export function buildTitle({
 		} else if (afterDateFilter) {
 			title += ' from ' + afterDateFilter + ' and later'
 		}
+	}
+
+	if (platformAttributesLabels && platformAttributesLabels.length > 0) {
+		title += ' on ' + platformAttributesLabels.join(', ').replace(/, ([^,]*)$/, ' or $1')
 	}
 
 	return title.trim()

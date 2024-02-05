@@ -7,12 +7,9 @@ const useFilterEffects = ({
 	afterDateFilter,
 	artistFilters,
 	artists,
-	soundFilters,
-	sounds,
+	attributeFilters,
+	attributes,
 	songFilter,
-	showJams,
-	showSets,
-	showShows,
 	setTitle,
 	scrollToTopOfRef,
 	createFilterURL,
@@ -22,13 +19,21 @@ const useFilterEffects = ({
 	setShowsOnDate,
 	musicalEntitiesFilters,
 }) => {
+	const soundFiltersLabels = attributeFilters
+		.filter((filter) => JSON.parse(filter).is_sound)
+		.map((filter) => JSON.parse(filter).label)
+
+	const platformAttributesLabels = attributeFilters
+		.filter((filter) => !JSON.parse(filter).is_sound)
+		.map((filter) => JSON.parse(filter).label)
 	useEffect(() => {
 		const filters = {
 			dateFilter: dateFilter,
 			beforeDateFilter,
 			afterDateFilter,
 			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
-			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
+			soundFiltersLabels,
+			platformAttributesLabels,
 			songName: songFilter,
 			musicalEntitiesFilters,
 		}
@@ -45,8 +50,8 @@ const useFilterEffects = ({
 		afterDateFilter,
 		artistFilters,
 		artists,
-		soundFilters,
-		sounds,
+		attributeFilters,
+		attributes,
 		songFilter,
 		buildTitle,
 		setTitle,

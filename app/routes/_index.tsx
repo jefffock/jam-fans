@@ -11,12 +11,12 @@ import Hero from '../components/Hero'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import VirtualJamList from '../components/VirtualJamList'
 import { addArtist, getArtists, getArtistsCount } from '../modules/artist/index.server'
+import { getAttributes, getSoundsCount } from '../modules/attribute/index.server'
 import { getJams, getJamsCount } from '../modules/jam/index.server'
 import { getProfileFromRequest } from '../modules/profile/index.server'
 import { addSet, getSets, getSetsCount } from '../modules/set/index.server'
 import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
 import { getSongs, getSongsCount } from '../modules/song/index.server'
-import { getSounds, getSoundsCount } from '../modules/sound/index.server'
 import { createFilterURL, scrollToTopOfRef, useWindowHeight, useWindowWidth } from '../utils'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -34,7 +34,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	const shows = await getShows(profile?.id)
 	const artists = await getArtists()
 	const songs = await getSongs()
-	const sounds = await getSounds()
+	const attributes = await getAttributes()
 	const jamsCount = await getJamsCount()
 	const setsCount = await getSetsCount()
 	const showsCount = await getShowsCount()
@@ -52,7 +52,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// 	shows,
 	// 	artists,
 	// 	songs,
-	// 	sounds,
+	// 	attributes,
 	// 	// profile,
 	// 	jamsCount,
 	// 	setsCount,
@@ -66,7 +66,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// 	getShows({ db }),
 	// 	getArtists({ db }),
 	// 	getSongs({ db }),
-	// 	getSounds({ db }),
+	// 	getAttributes({ db }),
 	// 	// getProfile(),
 	// 	getJamsCount({ db }),
 	// 	getSetsCount({ db }),
@@ -85,7 +85,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 			allJams: jams,
 			allShows: shows,
 			allSets: sets,
-			sounds,
+			attributes,
 			count: jams.length,
 			profile,
 			search: url.search,
@@ -130,7 +130,7 @@ export default function Index() {
 	const {
 		artists,
 		songs,
-		sounds,
+		attributes,
 		count,
 		search,
 		song,
@@ -154,7 +154,7 @@ export default function Index() {
 	const [headerHeight, setHeaderHeight] = useState(0)
 	const [artistFilters, setArtistFilters] = useState([])
 	const [songFilter, setSongFilter] = useState(song)
-	const [soundFilters, setSoundFilters] = useState([])
+	const [attributeFilters, setAttributeFilters] = useState([])
 	const [orderBy, setOrderBy] = useState('avg_rating')
 	const [showComments, setShowComments] = useState(false)
 	const [beforeDateFilter, setBeforeDateFilter] = useState(null)
@@ -177,6 +177,11 @@ export default function Index() {
 	const windowHeight = useWindowHeight()
 	const windowWidth = useWindowWidth()
 	const [showsOnDate, setShowsOnDate] = useState([])
+	const [activeTab, setActiveTab] = useState('explore')
+	const [activeAddTab, setActiveAddTab] = useState('jamSetShow')
+	const [filteredEntitiesLengthUntrimmed, setFilteredEntitiesLengthUntrimmed] = useState(
+		jamsCount + setsCount + showsCount
+	)
 
 	useEffect(() => {
 		setQuery('')
@@ -191,9 +196,10 @@ export default function Index() {
 		songFilter,
 		artistFilters,
 		linkFilter,
-		soundFilters,
+		attributeFilters,
 		beforeDateFilter,
 		afterDateFilter,
+		setFilteredEntitiesLengthUntrimmed,
 	})
 
 	useFilterEffects({
@@ -202,8 +208,8 @@ export default function Index() {
 		afterDateFilter,
 		artistFilters,
 		artists,
-		soundFilters,
-		sounds,
+		attributeFilters,
+		attributes,
 		songFilter,
 		setTitle,
 		scrollToTopOfRef,
@@ -228,7 +234,7 @@ export default function Index() {
 			<EntityListContainer>
 				<EntityListHeader title={title} open={open} setOpen={setOpen} headerRef={headerRef} />
 				<JamFiltersClientside
-					sounds={sounds}
+					attributes={attributes}
 					artists={artists}
 					songs={songs}
 					open={open}
@@ -238,7 +244,7 @@ export default function Index() {
 					showIframe={showIframe}
 					setArtistFilters={setArtistFilters}
 					setSongFilter={setSongFilter}
-					setSoundFilters={setSoundFilters}
+					setAttributeFilters={setAttributeFilters}
 					setBeforeDateFilter={setBeforeDateFilter}
 					setAfterDateFilter={setAfterDateFilter}
 					setDateFilter={setDateFilter}
@@ -247,7 +253,7 @@ export default function Index() {
 					setOrderBy={setOrderBy}
 					songFilter={songFilter}
 					artistFilters={artistFilters}
-					soundFilters={soundFilters}
+					attributeFilters={attributeFilters}
 					beforeDateFilter={beforeDateFilter}
 					afterDateFilter={afterDateFilter}
 					dateFilter={dateFilter}
@@ -267,6 +273,11 @@ export default function Index() {
 					showsOnDate={showsOnDate}
 					filteredMusicalEntities={filteredMusicalEntities}
 					profile={profile}
+					setActiveAddTab={setActiveAddTab}
+					setActiveTab={setActiveTab}
+					activeTab={activeTab}
+					activeAddTab={activeAddTab}
+					filteredEntitiesLengthUntrimmed={filteredEntitiesLengthUntrimmed}
 				/>
 				<VirtualJamList
 					items={filteredMusicalEntities}
@@ -274,12 +285,11 @@ export default function Index() {
 					showIframe={showIframe}
 					setShowIframe={setShowIframe}
 					showRatings={showRatings}
-					headerHeight={headerHeight}
-					windowHeight={windowHeight}
-					windowWidth={windowWidth}
-					scrollTop={scrollTop}
-					setScrollTop={setScrollTop}
-					jamCardHeight={jamCardHeight}
+					setArtistFilters={setArtistFilters}
+					setDateFilter={setDateFilter}
+					setOpen={setOpen}
+					setActiveAddTab={setActiveAddTab}
+					setActiveTab={setActiveTab}
 				/>
 			</EntityListContainer>
 			{/* <BottomNav /> */}

@@ -61,3 +61,7 @@
 .grid-max-content {
 	grid-template-columns: max-content auto;
 }
+
+text-med {
+	font-size: 0.9rem;
+}

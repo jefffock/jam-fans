@@ -8,23 +8,25 @@ export default function VirtualEntityList({
 	items,
 	profile,
 	setShowIframe,
-	headerHeight,
-	windowHeight,
-	scrollTop,
 	showIframe,
 	showRatings,
+	setArtistFilters,
+	setDateFilter,
+	setOpen,
+	setActiveAddTab,
+	setActiveTab,
 }) {
 	// let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
-	let cardHeight = 322
-	const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
-	const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items?.length)
-	const visibleItems = items?.slice(startIndex, endIndex)
-	const placeholdersBefore = startIndex > 0 ? [...Array(startIndex + 1)] : []
-	const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items?.length - endIndex)] : []
+	// let cardHeight = 322
+	// const startIndex = Math.floor(scrollTop / cardHeight) > 5 ? Math.floor(scrollTop / cardHeight) - 5 : 0
+	// const endIndex = Math.min(startIndex + Math.ceil((windowHeight - headerHeight) / cardHeight) + 7, items?.length)
+	// const visibleItems = items?.slice(startIndex, endIndex)
+	// const placeholdersBefore = startIndex > 0 ? [...Array(startIndex + 1)] : []
+	// const placeholdersAfter = endIndex < items.length - 1 ? [...Array(items?.length - endIndex)] : []
 	// combine placeholders and visible items into one array
 	// const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
 	// TODO: re-implement virtual list
-	const itemsToRender = items
+	// const itemsToRender = items
 	const ratingsVisible = getRatingsVisible()
 	const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
 	const [iframeUrl, setIframeUrl] = useState('')
@@ -49,8 +51,6 @@ export default function VirtualEntityList({
 				1
 			}
 		}
-		console.log('reformattedLink', reformattedLink)
-		console.log('iframeUrl', iframeUrl)
 		setFormattedIframeUrl(reformattedLink ?? iframeUrl)
 	}, [iframeUrl])
 
@@ -58,7 +58,7 @@ export default function VirtualEntityList({
 		setShowIframe(false)
 	}
 
-	const cards = itemsToRender?.map((item) => {
+	const cards = items?.map((item) => {
 		return (
 			<EntityCard
 				key={item.key}
@@ -68,6 +68,11 @@ export default function VirtualEntityList({
 				setIframeUrl={setIframeUrl}
 				showRatings={ratingsVisible}
 				onlyShowVerifiedRatings={onlyShowVerifiedRatings}
+				setDateFilter={setDateFilter}
+				setArtistFilters={setArtistFilters}
+				setOpen={setOpen}
+				setActiveAddTab={setActiveAddTab}
+				setActiveTab={setActiveTab}
 			/>
 		)
 	})

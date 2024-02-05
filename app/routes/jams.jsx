@@ -69,7 +69,7 @@
 // 	const [headerHeight, setHeaderHeight] = useState(0)
 // 	const [artistFilters, setArtistFilters] = useState([])
 // 	const [songFilter, setSongFilter] = useState(song)
-// 	const [soundFilters, setSoundFilters] = useState([])
+// 	const [attributeFilters, setAttributeFilters] = useState([])
 // 	const [orderBy, setOrderBy] = useState('avg_rating')
 // 	const [showComments, setShowComments] = useState(false)
 // 	const [beforeDateFilter, setBeforeDateFilter] = useState(null)
@@ -129,13 +129,13 @@
 // 				(!songFilter || jam.song_name === songFilter) &&
 // 				(artistFilters.length === 0 || artistFilters.includes(jam.artist_id.toString())) &&
 // 				(!linkFilter || jam.listen_link) &&
-// 				(soundFilters.length === 0 ||
-// 					soundFilters.every((filter) => jam.sound_ids.includes(filter.toString()))) &&
+// 				(attributeFilters.length === 0 ||
+// 					attributeFilters.every((filter) => jam.sound_ids.includes(filter.toString()))) &&
 // 				(!beforeDateFilter || jam.year <= beforeDateFilter) &&
 // 				(!afterDateFilter || jam.year >= Number(afterDateFilter))
 // 			)
 // 		})
-// 	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, soundFilters, beforeDateFilter, afterDateFilter])
+// 	}, [allJams, dateFilter, songFilter, artistFilters, linkFilter, attributeFilters, beforeDateFilter, afterDateFilter])
 
 // 	useEffect(() => {
 // 		const filters = {
@@ -143,7 +143,7 @@
 // 			beforeDateFilter,
 // 			afterDateFilter,
 // 			artistNames: artistFilters.map((id) => artists.find((artist) => artist.id === parseInt(id))?.artist),
-// 			soundNames: soundFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
+// 			soundNames: attributeFilters.map((id) => sounds.find((sound) => sound.id === parseInt(id))?.label),
 // 			songName: songFilter,
 // 		}
 
@@ -184,7 +184,7 @@
 // 					showIframe={showIframe}
 // 					setArtistFilters={setArtistFilters}
 // 					setSongFilter={setSongFilter}
-// 					setSoundFilters={setSoundFilters}
+// 					setAttributeFilters={setAttributeFilters}
 // 					setBeforeDateFilter={setBeforeDateFilter}
 // 					setAfterDateFilter={setAfterDateFilter}
 // 					setDateFilter={setDateFilter}
@@ -193,7 +193,7 @@
 // 					setOrderBy={setOrderBy}
 // 					songFilter={songFilter}
 // 					artistFilters={artistFilters}
-// 					soundFilters={soundFilters}
+// 					attributeFilters={attributeFilters}
 // 					beforeDateFilter={beforeDateFilter}
 // 					afterDateFilter={afterDateFilter}
 // 					dateFilter={dateFilter}

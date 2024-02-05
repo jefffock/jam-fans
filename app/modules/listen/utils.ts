@@ -1,6 +1,5 @@
 export const formatIframeUrl = (iframeUrl) => {
 	let reformattedLink
-	console.log('iframeUrl', iframeUrl)
 	if (iframeUrl.includes('youtu')) {
 		if (iframeUrl.includes('watch?v=')) {
 			reformattedLink = iframeUrl.replace('watch?v=', 'embed/')

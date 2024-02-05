@@ -9,9 +9,11 @@ const useFilteredMusicalEntities = ({
 	songFilter,
 	artistFilters,
 	linkFilter,
-	soundFilters,
+	attributeFilters,
 	beforeDateFilter,
 	afterDateFilter,
+	attributes,
+	setFilteredEntitiesLengthUntrimmed,
 }) => {
 	return useMemo(() => {
 		let combinedArray = []
@@ -25,7 +27,10 @@ const useFilteredMusicalEntities = ({
 			combinedArray = [...combinedArray, ...allShows]
 		}
 
-		return combinedArray
+		const soundFilters = attributeFilters.filter((filter) => JSON.parse(filter).is_sound)
+		const platformAttributes = attributeFilters.filter((filter) => !JSON.parse(filter).is_sound)
+
+		combinedArray = combinedArray
 			.filter((item) => {
 				return (
 					(!dateFilter || item.date === dateFilter || item.date_text === dateFilter) &&
@@ -33,12 +38,18 @@ const useFilteredMusicalEntities = ({
 					(artistFilters.length === 0 || artistFilters.includes(item.artist_id.toString())) &&
 					(!linkFilter || item.listen_link) &&
 					(soundFilters.length === 0 ||
-						soundFilters.every((filter) => item.sound_ids.includes(filter.toString()))) &&
+						soundFilters.every((filter) => item.attribute_ids.includes(JSON.parse(filter).id))) &&
 					(!beforeDateFilter || item.year <= beforeDateFilter) &&
-					(!afterDateFilter || item.year >= Number(afterDateFilter))
+					(!afterDateFilter || item.year >= Number(afterDateFilter)) &&
+					(platformAttributes.length === 0 ||
+						platformAttributes.some((filter) => item.attribute_ids.includes(JSON.parse(filter).id)))
 				)
 			})
 			.sort((a, b) => b.likes - a.likes)
+
+		setFilteredEntitiesLengthUntrimmed(combinedArray.length)
+
+		return combinedArray?.slice(0, 100)
 	}, [
 		allJams,
 		allSets,
@@ -48,7 +59,7 @@ const useFilteredMusicalEntities = ({
 		songFilter,
 		artistFilters,
 		linkFilter,
-		soundFilters,
+		attributeFilters,
 		beforeDateFilter,
 		afterDateFilter,
 	])

@@ -1,25 +1,19 @@
-import { Fragment, useState, useEffect, useMemo } from 'react'
-import { Form, useSubmit, useFetcher, Link } from '@remix-run/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { set } from 'zod'
-import SoundPicker from './SoundPicker'
-import ArtistPicker from './ArtistPicker'
-import SongPicker from './SongPicker'
-import { useDebounce } from '~/hooks'
-import MusicalEntityPicker from './EntityPicker'
-import FiltersSlideout from './FiltersSlideout'
-import DatePicker from './DatePicker'
-import Accordion from './Accordion'
+import { useFetcher, useSubmit } from '@remix-run/react'
+import { useMemo, useState } from 'react'
 import { buildFiltersButtonText } from '~/utils'
-import YearFilter from './YearFilterNew'
-import FiltersForm from './FiltersForm'
-import Checkbox from './Checkbox'
-import EntityDisplayPreferences from './EntityDisplayPreferences'
-import { FilterButtonsContainer } from './FilterButtonsContainer'
+import Accordion from './Accordion'
 import AddEntity from './AddEntity'
+import ArtistPicker from './ArtistPicker'
+import AttributePicker from './AttributePicker'
+import DatePicker from './DatePicker'
+import EntityDisplayPreferences from './EntityDisplayPreferences'
+import MusicalEntityPicker from './EntityPicker'
+import { FilterButtonsContainer } from './FilterButtonsContainer'
+import FiltersForm from './FiltersForm'
 import FiltersFormBody from './FiltersFormBody'
+import FiltersSlideout from './FiltersSlideout'
+import SongPicker from './SongPicker'
+import YearFilter from './YearFilterNew'
 
 function classNames(...classes) {
 	return classes.filter(Boolean).join(' ')
@@ -28,14 +22,14 @@ function classNames(...classes) {
 export default function JamFiltersClientside({
 	songs,
 	artists,
-	sounds,
+	attributes,
 	open,
 	setOpen,
 	totalCount,
 	search,
 	showIframe,
 	setArtistFilters,
-	setSoundFilters,
+	setAttributeFilters,
 	setSongFilter,
 	setBeforeDateFilter,
 	setAfterDateFilter,
@@ -45,7 +39,7 @@ export default function JamFiltersClientside({
 	setShowRatings,
 	songFilter,
 	artistFilters,
-	soundFilters,
+	attributeFilters,
 	beforeDateFilter,
 	afterDateFilter,
 	dateFilter,
@@ -65,14 +59,17 @@ export default function JamFiltersClientside({
 	showsOnDate,
 	filteredMusicalEntities,
 	profile,
+	activeAddTab,
+	setActiveAddTab,
+	activeTab,
+	setActiveTab,
+	filteredEntitiesLengthUntrimmed,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
 	const [date, setDate] = useState('')
 	const [dateInput, setDateInput] = useState('')
 	const [songSelected, setSongSelected] = useState(null)
-	const [activeTab, setActiveTab] = useState('explore')
-	const [activeAddTab, setActiveAddTab] = useState('jamSetShow')
 	const noFiltersSelected = musicalEntitiesLength === jamsCount + setsCount + showsCount
 
 	const dates = []
@@ -85,10 +82,11 @@ export default function JamFiltersClientside({
 
 	const afterYearDisplayValue = afterDateFilter ? `${afterDateFilter} or later` : '1960 or later'
 
-	function clearFilters() {
+	function clearFilters(e) {
+		e.preventDefault()
 		setQuery('')
 		setArtistFilters([])
-		setSoundFilters([])
+		setAttributeFilters([])
 		setSongFilter('')
 		setDateFilter('')
 		setBeforeDateFilter('')
@@ -113,12 +111,13 @@ export default function JamFiltersClientside({
 		}
 	}
 
-	function handleSoundsChange(e) {
-		let soundId = e.target.value
+	function handleAttributesChange(e) {
+		let attribute = e.target.value
+		console.log('attribute', attribute)
 		if (e.target.checked) {
-			setSoundFilters((prev) => [...prev, soundId])
+			setAttributeFilters((prev) => [...prev, attribute])
 		} else {
-			setSoundFilters((prev) => prev.filter((sound) => sound !== soundId))
+			setAttributeFilters((prev) => prev.filter((prevAttribute) => prevAttribute !== attribute))
 		}
 	}
 
@@ -178,6 +177,11 @@ export default function JamFiltersClientside({
 		return filteredMusicalEntities?.filter((entity) => entity.type === 'jam').length
 	}, [filteredMusicalEntities])
 
+	const sounds = attributes?.filter((attr) => attr?.is_sound)
+	const attributesNotSounds = attributes?.filter((attr) => !attr?.is_sound)
+
+	const parsedSelectedSounds = attributeFilters?.map((sound) => JSON.parse(sound)).filter((sound) => sound?.is_sound)
+
 	return (
 		<FiltersSlideout
 			open={open}
@@ -198,6 +202,9 @@ export default function JamFiltersClientside({
 							handleArtistsChange={handleArtistsChange}
 							artistFilters={artistFilters}
 							onClick={handleAddArtistClick}
+							setActiveAddTab={setActiveAddTab}
+							setActiveTab={setActiveTab}
+							setArtistFilters={setArtistFilters}
 						/>
 						<DatePicker
 							dateInput={dateInput}
@@ -206,16 +213,21 @@ export default function JamFiltersClientside({
 							dateFilter={dateFilter}
 							showsOnDate={showsOnDate}
 							setActiveTab={setActiveTab}
-							showLabel={false}
 							setActiveAddTab={setActiveAddTab}
 							jamsCount={filteredJamsCount}
 							setsCount={filteredSetsCount}
 						/>
-						<Accordion title="sounds">
-							<SoundPicker
-								sounds={sounds}
-								handleSoundsChange={handleSoundsChange}
-								soundFilters={soundFilters}
+						<Accordion
+							title="sounds"
+							isPreviewEnabled={true}
+							previewItems={parsedSelectedSounds}
+							previewItemLabelKey="label"
+						>
+							<AttributePicker
+								attributes={sounds}
+								handleAttributesChange={handleAttributesChange}
+								attributeFilters={attributeFilters}
+								open={attributeFilters.length > 0}
 							/>
 						</Accordion>
 						<SongPicker
@@ -245,11 +257,16 @@ export default function JamFiltersClientside({
 								displayValue={afterYearDisplayValue}
 							/>
 						</div>
-						<EntityDisplayPreferences handleLinkChange={handleLinkChange} linkFilter={linkFilter} />
+						<EntityDisplayPreferences
+							handleLinkChange={handleLinkChange}
+							linkFilter={linkFilter}
+							attributesNotSounds={attributesNotSounds}
+							handleAttributesChange={handleAttributesChange}
+						/>
 					</FiltersFormBody>
 					<FilterButtonsContainer
 						musicalEntitiesFilters={musicalEntitiesFilters}
-						musicalEntitiesLength={musicalEntitiesLength}
+						musicalEntitiesLength={filteredEntitiesLengthUntrimmed}
 						noFiltersSelected={noFiltersSelected}
 						handleCloseFilters={handleCloseFilters}
 						buildFiltersButtonText={buildFiltersButtonText}
