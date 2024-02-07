@@ -86,7 +86,7 @@ export default function VirtualEntityList({
 					<IFrame formattedIframeUrl={formattedIframeUrl} closeIframe={closeIframe} />
 				</>
 			)}
-			<div className="max-w-100vw flex flex-col items-center justify-center">{cards}</div>
+			<div className="max-w-100vw flex flex-col items-center justify-center p-4">{cards}</div>
 		</div>
 	)
 }

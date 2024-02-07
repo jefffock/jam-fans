@@ -4,14 +4,6 @@ import DatePicker from './DatePicker'
 import InfoAlert from './alerts/InfoAlert'
 import EntityCard from './cards/EntityCard'
 
-const setNumberMap = {
-	set_1: 'set 1',
-	set_2: 'set 2',
-	set_3: 'set 3',
-	encore: 'encore',
-	late_set: 'late set',
-}
-
 export default function AddJamSetShow({
 	artists,
 	date,
@@ -25,20 +17,20 @@ export default function AddJamSetShow({
 	showOnJF,
 	availableSets,
 	profile,
-	jamsOnJF,
+	attributes,
 }) {
 	const fetcher = useFetcher()
 
 	return (
-		<div className="flex-col flex items-center">
+		<div className="flex-col flex items-center max-w-screen">
 			<select
 				className="border-2 rounded-md p-2 m-2"
 				value={selectedArtist}
 				onChange={(e) => setSelectedArtist(e.target.value)}
 			>
 				<option value="">Select an artist</option>
-				{artists.map((art, index) => (
-					<option key={index} value={JSON.stringify(art)}>
+				{artists.map((art) => (
+					<option key={art.id} value={JSON.stringify(art)}>
 						{art.artist}
 					</option>
 				))}
@@ -58,17 +50,25 @@ export default function AddJamSetShow({
 			{!profile && selectedArtist && dateFilter && (
 				<InfoAlert
 					title="you aren't logged in"
-					description="you can still add, like, and rate jams, sets, and shows, but you can't comment or favorite and your "
+					description="you can still add jams, sets, and shows, but they won't be associated with your account. if you want to keep track of your contributions, please log in"
+					linkTo="/ssrlogin"
+					linkText="log in"
 				/>
 			)}
-			<div className="flex justify-center w-screen text-2xl m-2 space-x-5 p-2">
+			<div className="flex flex-col justify-center items-center text-center w-screen text-3xl m-2 space-5 p-2">
 				{selectedArtist && <p>{JSON.parse(selectedArtist).artist}</p>}
-				<p>{location}</p>
-				<p>{dateFilter}</p>
+				<p className="text-2xl">{dateFilter}</p>
+				<p className="text-xl">{location}</p>
 			</div>
-
 			{showOnJF && (
-				<EntityCard item={showOnJF} profile={profile} showRatings={false} showDateArtistLocation={false} />
+				<EntityCard
+					item={showOnJF}
+					profile={profile}
+					showRatings={false}
+					// showDateArtistLocation={false}
+					attributes={attributes}
+					inAdd={true}
+				/>
 			)}
 			{!showOnJF && dateFilter && selectedArtist && (
 				<fetcher.Form method="post" preventScrollReset={true} action="resources/shows">
@@ -87,25 +87,70 @@ export default function AddJamSetShow({
 					/>
 				</fetcher.Form>
 			)}
-			{selectedArtist && dateFilter && setsOnJF && <p>sets on jam fans</p>}
+			{setlist && setlist.length > 0 && selectedArtist && dateFilter && (
+				<>
+					<p className="text-2xl mt-8">setlist</p>
+					<div className="flex flex-col items-center max-w-98p">
+						{setlist.map((song) =>
+							song.label.indexOf('Added') === -1 ? (
+								<div key={song.id} className="p-2">
+									<fetcher.Form
+										method="post"
+										preventScrollReset={true}
+										key={song.label}
+										action="resources/jams"
+									>
+										<input type="hidden" name="entity" value="Jam" />
+										<input type="hidden" name="date" value={dateFilter} />
+										<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
+										<input type="hidden" name="song" value={song.label} />
+										<input type="hidden" name="artist" value={selectedArtist} />
+										<Button size="small" type="submit" text={`add ${song.label}`} value="add-jam" />
+									</fetcher.Form>
+								</div>
+							) : (
+								<EntityCard
+									key={song.jam.id}
+									item={song.jam}
+									profile={profile}
+									showRatings={false}
+									// showDateArtistLocation={false}
+									attributes={attributes}
+									inAdd={true}
+								/>
+							)
+						)}
+					</div>
+				</>
+			)}
+			{selectedArtist && dateFilter && setsOnJF && setsOnJF.length > 0 && (
+				<p className="text-2xl mt-8">sets on jam fans</p>
+			)}
 			{selectedArtist &&
 				dateFilter &&
 				setsOnJF &&
 				setsOnJF.map((set) => (
 					<EntityCard
-						key={set.key}
+						key={set.id}
 						item={set}
 						profile={profile}
 						showRatings={false}
-						showDateArtistLocation={false}
+						// showDateArtistLocation={false}
+						attributes={attributes}
 					/>
 				))}
-			{selectedArtist && dateFilter && availableSets && <p>add a set:</p>}
-			<div className="flex gap-2">
+			{selectedArtist && dateFilter && availableSets && <p className="text-2xl mt-8">add a set</p>}
+			<div className="flex flex-col items-center">
 				{selectedArtist &&
 					dateFilter &&
 					availableSets.map((set) => (
-						<fetcher.Form method="post" preventScrollReset={true} key={set.key} action="resources/sets">
+						<fetcher.Form
+							method="post"
+							preventScrollReset={true}
+							key={set.id}
+							action="resources/sets"
+							className="p-2"
+						>
 							<input type="hidden" name="entity" value="Set" />
 							<input type="hidden" name="set_number" value={set.value} />
 							<input type="hidden" name="date" value={dateFilter} />
@@ -119,38 +164,6 @@ export default function AddJamSetShow({
 						</fetcher.Form>
 					))}
 			</div>
-
-			{setlist && setlist.length > 0 && selectedArtist && dateFilter && (
-				<>
-					<p>setlist</p>
-					<div className="flex flex-col space-y-4">
-						{setlist.map((song) =>
-							song.label.indexOf('Added') === -1 ? (
-								<fetcher.Form
-									method="post"
-									preventScrollReset={true}
-									key={song.label}
-									action="resources/jams"
-								>
-									<input type="hidden" name="entity" value="Jam" />
-									<input type="hidden" name="date" value={dateFilter} />
-									<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
-									<input type="hidden" name="song" value={song.label} />
-									<Button size="small" type="submit" text={`add ${song.label}`} value="add-jam" />
-								</fetcher.Form>
-							) : (
-								<EntityCard
-									key={song.jam.key}
-									item={song.jam}
-									profile={profile}
-									showRatings={false}
-									showDateArtistLocation={false}
-								/>
-							)
-						)}
-					</div>
-				</>
-			)}
 		</div>
 	)
 }

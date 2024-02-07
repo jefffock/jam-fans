@@ -47,9 +47,11 @@ const useFilteredMusicalEntities = ({
 			})
 			.sort((a, b) => b.likes - a.likes)
 
+		console.log('combinedArray filtered length', combinedArray.length)
+
 		setFilteredEntitiesLengthUntrimmed(combinedArray.length)
 
-		return combinedArray?.slice(0, 1)
+		return combinedArray?.slice(0, 100)
 	}, [
 		allJams,
 		allSets,

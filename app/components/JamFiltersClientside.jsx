@@ -112,7 +112,6 @@ export default function JamFiltersClientside({
 
 	function handleAttributesChange(e) {
 		let attribute = e.target.value
-		console.log('attribute in handleAttributesChanges', attribute)
 		if (e.target.checked) {
 			setAttributeFilters((prev) => [...prev, attribute])
 		} else {
@@ -121,9 +120,7 @@ export default function JamFiltersClientside({
 	}
 
 	function handleDateInputChange(e) {
-		console.log('dateInputString', e.target.value)
 		const year = Number(e.target.value.slice(0, 4))
-		console.log('year', year)
 		// check if year is between 1900 and present year
 		if (year >= 1900 && year <= new Date().getFullYear()) {
 			setDateFilter(e.target.value)
@@ -282,6 +279,7 @@ export default function JamFiltersClientside({
 					activeAddTab={activeAddTab}
 					setActiveAddTab={setActiveAddTab}
 					profile={profile}
+					attributes={attributes}
 				/>
 			)}
 		</FiltersSlideout>

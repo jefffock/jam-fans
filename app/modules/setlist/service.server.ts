@@ -6,22 +6,19 @@ export async function getSetlist({ artist, date }) {
 			artist: artist.artist,
 			date: date,
 		},
+		include: {
+			artists: true,
+		},
 	})
 
 	if (artist.data_source === 'Phishnet') {
-		console.log('getting phishnet setlist')
 		const enrichedSetlist = await getPhishnetSetlist({ artist, date, jfVersions })
-		console.log('enrichedSetlist', enrichedSetlist)
 		return enrichedSetlist
 	} else if (artist.data_source === 'Songfish') {
-		console.log('getting songfish setlist')
 		const enrichedSetlist = await getSongfishSetlist({ artist, date, jfVersions })
-		console.log('enrichedSetlist', enrichedSetlist)
 		return enrichedSetlist
 	} else if (artist.data_source === 'SetlistFM') {
-		console.log('getting setlistfm setlist')
 		const enrichedSetlist = await getSetlistFMSetlist({ artist, date, jfVersions })
-		console.log('enrichedSetlist', enrichedSetlist)
 		return enrichedSetlist
 	}
 }
@@ -46,7 +43,7 @@ async function getPhishnetSetlist({ artist, date, jfVersions }) {
 		const location = `${song.venue}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
 		const titles = setlist.data
 			.filter((song) => song.artistid === artistId)
-			.map((song) => {
+			.map((song, index) => {
 				let title = song.song
 				if (song.song === 'Also Sprach Zarathustra') title = 'Also Sprach Zarathustra (2001)'
 				const alreadyAdded = jfVersions.find(({ song_name }) => song_name === song.song)
@@ -54,11 +51,10 @@ async function getPhishnetSetlist({ artist, date, jfVersions }) {
 					label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 					value: title,
 					jam: alreadyAdded,
+					id: index,
 				}
 			})
 		setlist = titles
-		console.log('setlist', setlist)
-		console.log('titles', titles)
 		return { setlist, location }
 	}
 }
@@ -73,7 +69,7 @@ async function getSongfishSetlist({ artist, date, jfVersions }) {
 		const location = `${song.venuename}, ${song.city}, ${song?.country === 'USA' ? song.state : song.country}`
 		const titles = setlist.data
 			.filter((song) => song.artist_id === 1)
-			.map((song) => {
+			.map((song, index) => {
 				let title = song.songname
 				if (song.songname === 'Echo Of A Rose') title = 'Echo of a Rose'
 				const alreadyAdded = jfVersions.find(({ song_name }) => song_name === song.songname)
@@ -81,6 +77,7 @@ async function getSongfishSetlist({ artist, date, jfVersions }) {
 					label: `${song.isjamchart === '1' ? '☆ ' : ''}${alreadyAdded ? '(Added) ' + title : title}`,
 					value: title,
 					jam: alreadyAdded,
+					id: index,
 				}
 			})
 
@@ -107,7 +104,7 @@ async function getSetlistFMSetlist({ artist, date, jfVersions }) {
 		const location = `${song.venue.name}, ${song.venue.city.name}, ${song.venue.city.country.code === 'US' ? song.venue.city.stateCode : song.venue.city.country.name}`
 		const titles = setlist.setlist[0].sets.set
 			.map(({ song }) =>
-				song.map(({ name }) => {
+				song.map(({ name }, index) => {
 					const alreadyAdded = jfVersions.find(({ song_name }) => song_name === name)
 					if (name === '2 x 2') {
 						name = '2x2'
@@ -116,6 +113,7 @@ async function getSetlistFMSetlist({ artist, date, jfVersions }) {
 						label: alreadyAdded ? '(Added) ' + name : name,
 						value: name,
 						jam: alreadyAdded,
+						id: index,
 					}
 				})
 			)

@@ -330,6 +330,7 @@ model artists {
   jams_duplicate jams_duplicate[]
   sets           sets[]
   shows          shows[]
+  songs          songs[]
   tours          tours[]
 
   @@schema("public")
@@ -794,8 +795,10 @@ model songs {
   artist             String?
   submitter_id       String?              @db.Uuid
   emoji_code         String?
+  artist_id          Int?
   jams               jams[]
   jams_duplicate     jams_duplicate[]
+  artists            artists?             @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profiles           profiles?            @relation(fields: [submitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   versions           versions[]
   versions_duplicate versions_duplicate[]

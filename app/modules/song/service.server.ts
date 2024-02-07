@@ -14,30 +14,42 @@ export async function getSongs() {
 	return songs
 }
 
-export function getSongById({ songs, id }) {
-	//filter songs by id
-	const filteredSongs = songs.filter((song) => song.id === id)
-
-	// const song = await db.songs.findUnique({
-	// 	where: {
-	// 		id: 24,
-	// 	},
-	// })
-	return filteredSongs[0]
-}
-
 export async function getSongsCount(): Promise<number> {
 	const count = await db.songs.count()
 	return count
 }
 
-export async function addSong({ song, artist, submitter_id }) {
+export async function addSong({ song, artist, submitter }) {
+	console.log('in addSong', song, artist, submitter)
 	const songAdded = await db.songs.create({
 		data: {
 			song: song,
-			artist: artist,
+			artist: artist.artist,
+			artist_id: artist.id,
+			submitter_name: submitter.submitter,
 			submitter_id: submitter_id,
 		},
 	})
+	console.log('songAdded', songAdded)
 	return songAdded
+}
+
+export async function getSongIdFromName({ song, artist, submitter }) {
+	console.log('in getSongIdFromName', song, artist, submitter)
+	const songId = await db.songs.findFirst({
+		where: {
+			song: song,
+		},
+		select: {
+			id: true,
+		},
+	})
+	console.log('songId', songId)
+	if (!songId) {
+		//add song
+		const addedSong = await addSong({ song, artist, submitter })
+		console.log('addedSong', addedSong)
+		return addedSong.id
+	}
+	return songId
 }

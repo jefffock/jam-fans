@@ -26,28 +26,33 @@ export default function EntityCard({
 	setActiveAddTab,
 	setActiveTab,
 	attributes,
+	inAdd,
 }) {
-	const verifiedRating = (item?.avg_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
-	const unverifiedRating = (item?.avg_unverified_rating / 2).toFixed(3)?.replace(/\.?0+$/, '')
+	const verifiedRating = (item?.avg_rating / 2).toFixed(1)?.replace(/\.?0+$/, '')
+	// const unverifiedRating = (item?.avg_unverified_rating / 2).toFixed(1)?.replace(/\.?0+$/, '')
 	const [showComments, setShowComments] = useState(false)
 	const [showCurateOptions, setShowCurateOptions] = useState(false)
 	const fetcher = useFetcher()
+	const addShowFetcher = useFetcher()
+
 	const previousAttributes =
-		item?.attribute_ids?.map((attributeId) =>
-			JSON.stringify(attributes.find((attribute) => attribute.id === attributeId))
-		) || []
-	const [stringifiedSelectedAttributes, setStringifiedSelectedAttributes] = useState([
-		...previousAttributes.map((item) => item),
-	])
+		(attributes &&
+			item?.attribute_ids?.map((attributeId) =>
+				JSON.stringify(attributes?.find((attribute) => attribute.id === attributeId))
+			)) ||
+		[]
+	const [stringifiedSelectedAttributes, setStringifiedSelectedAttributes] = useState(
+		[...previousAttributes.map((item) => item)] ?? []
+	)
 
-	console.log('previousAttributes in card', previousAttributes)
+	let parsedSelectedAttributes
+	if (stringifiedSelectedAttributes) {
+		parsedSelectedAttributes = stringifiedSelectedAttributes?.map((item) => JSON.parse(item)).filter(Boolean)
+	}
 
-	const parsedSelectedAttributes = stringifiedSelectedAttributes.map((item) => JSON.parse(item)).filter(Boolean)
-
-	console.log('parsedSelectedAttributes in card', parsedSelectedAttributes)
+	const newParsedSelectedAttributes = parsedSelectedAttributes.filter((attr) => !item.attribute_ids.includes(attr.id))
 
 	function handleListenClick() {
-		console.log('listen clicked', item?.listen_link)
 		setIframeUrl(item?.listen_link)
 		setShowIframe(true)
 	}
@@ -69,33 +74,29 @@ export default function EntityCard({
 	}
 
 	function handlePlusClick() {
-		console.log('plus clicked', item)
 		setShowCurateOptions(!showCurateOptions)
 	}
 
 	let songEmojis = item.song_emoji?.split(',')
 	let artistEmojis = item.artist_emoji?.split(',')
 
-	const ratingToShow = onlyShowVerifiedRatings ? verifiedRating : unverifiedRating
+	const ratingToShow = verifiedRating
 
 	function handleDateClick() {
-		console.log('date clicked', item)
 		setDateFilter(item.date)
-		setArtistFilters([item?.artist_id])
+		setArtistFilters([JSON.stringify(item?.artist_id)])
+		setOpen(true)
 		setActiveTab('add')
 		setActiveAddTab('jamSetShow')
-		setOpen(true)
 	}
 
 	function handleAttributesChange(e) {
 		const newAttribute = e.target.value
-		console.log('newAttribute', newAttribute)
-		console.log('stringifiedSelectedAttributes', stringifiedSelectedAttributes)
 		let updatedAttributes = []
 		if (e.target.checked) {
 			updatedAttributes = [...stringifiedSelectedAttributes, newAttribute]
 		} else {
-			updatedAttributes = stringifiedSelectedAttributes.filter(
+			updatedAttributes = stringifiedSelectedAttributes?.filter(
 				(attribute) => JSON.parse(attribute).id !== JSON.parse(newAttribute).id
 			)
 		}
@@ -104,9 +105,23 @@ export default function EntityCard({
 
 	const likesToShow = fetcher?.state === 'idle' ? item?.likes || '' : Number(item?.likes) + 1
 
+	const sortedSounds = item?.attributes
+		?.filter((soundItem) => {
+			const foundAttribute = attributes?.find((attribute) => attribute.label === soundItem)
+			return foundAttribute?.is_sound
+		})
+		.sort((a, b) => a.localeCompare(b))
+
+	const sortedPlatforms = item?.attributes
+		?.filter((platformItem) => {
+			const foundAttribute = attributes?.find((attribute) => attribute.label === platformItem)
+			return foundAttribute && !foundAttribute.is_sound
+		})
+		.sort((a, b) => a.localeCompare(b))
+
 	return (
 		<div
-			className={`p-6 bg-gray-50 border border-gray-200 rounded-lg shadow w-112 max-w-95p my-6 mx-auto flex flex-col justify-between h-90`}
+			className={`p-4 bg-gray-50 border border-gray-200 rounded-lg shadow my-4 flex flex-col justify-between h-90 max-w-95p w-112`}
 		>
 			<div className="overflow-y-auto">
 				<div className="flex justify-between">
@@ -130,13 +145,13 @@ export default function EntityCard({
 						<p className="mb-2 text-xl tracking-tight text-gray-900">{`updating...`}</p>
 					)}
 					{/* first row */}
-					{item.entity === 'Show' && <h5 className="mb-2 text-xl tracking-tight text-gray-900 ">show</h5>}
+					{item.entity === 'Show' && <h5 className="mb-2 text-xl tracking-tight text-gray-500 ">show</h5>}
 					{item.entity === 'Set' && (
-						<h5 className="mb-2 text-xl tracking-tight text-gray-900 ">
+						<h5 className="mb-2 text-xl tracking-tight text-gray-500 ">
 							{item.set_number.replace('_', ' ')}
 						</h5>
 					)}
-					{item.entity === 'Jam' && <h5 className="mb-2 text-xl tracking-tight text-gray-900 ">jam</h5>}
+					{item.entity === 'Jam' && <h5 className="mb-2 text-xl tracking-tight text-gray-500 ">jam</h5>}
 				</div>
 				{showDateArtistLocation && (
 					<div className="flex justify-between">
@@ -150,8 +165,8 @@ export default function EntityCard({
 									{item.date}
 								</h5>
 							)}
-							{item.entity === 'Jam' && !item.show_id && (
-								<fetcher.Form method="post" action="?index" preventScrollReset={true}>
+							{item.entity === 'Jam' && !item.show_id && !inAdd && (
+								<addShowFetcher.Form method="post" action="?index" preventScrollReset={true}>
 									<input type="hidden" name="artist_id" value={item.artist_id} />
 									<input type="hidden" name="date_text" value={item.date} />
 									<input type="hidden" name="day" value={item?.date?.slice(8, 10)} />
@@ -160,9 +175,15 @@ export default function EntityCard({
 									<input type="hidden" name="location" value={item.location} />
 									<div className="flex justify-items-start gap-8 align-middle">
 										<p className="mb-2 text-xl tracking-tight text-gray-900">{item.date}</p>
-										<Button text={'add show'} type={'submit'} name={'_action'} value={'add-show'} />
+										<Button
+											text={addShowFetcher?.state === 'idle' ? 'add show' : 'adding show...'}
+											type={'submit'}
+											name={'_action'}
+											value={'add-show'}
+											disabled={addShowFetcher?.state !== 'idle'}
+										/>
 									</div>
-								</fetcher.Form>
+								</addShowFetcher.Form>
 							)}
 						</div>
 						{/* right */}
@@ -197,9 +218,9 @@ export default function EntityCard({
 				)}
 				{/* third row */}
 				{showDateArtistLocation && <p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>}
-				{!showCurateOptions && item?.attributes && (
-					<p className="mb-2 font-normal text-gray-700">{item?.attributes.join(', ')}</p>
-				)}
+				{sortedSounds && <p className="font-normal text-gray-700 max-w-80">{sortedSounds.join(', ')}</p>}
+				{sortedPlatforms && <p className="font-normal text-gray-700">{sortedPlatforms.join(', ')}</p>}
+				{showCurateOptions && !newParsedSelectedAttributes.length > 0 && <br />}
 				{showCurateOptions && (
 					<AttributePicker
 						attributes={attributes}
@@ -209,6 +230,11 @@ export default function EntityCard({
 						title="add sounds, where to listen"
 						parsedSelectedAttributes={parsedSelectedAttributes}
 						previousAttributes={previousAttributes}
+						previewAboveLabel={true}
+						newAttributes={newParsedSelectedAttributes}
+						disableButton={!newParsedSelectedAttributes?.length > 0}
+						entityType={item.entity}
+						entityId={item.id}
 					/>
 				)}
 				{item?.name && <p className="font-normal text-gray-700">{`added by ${item.name} (${item?.points})`}</p>}
@@ -241,7 +267,7 @@ export default function EntityCard({
 					</button>
 				)}
 			</div>
-			<div className="flex justify-between">
+			<div className="flex justify-between mt-2">
 				{item?.listen_link ? (
 					<SoundIcon height="h-10" width="w-10" strokeWidth="2" onClick={handleListenClick} />
 				) : (

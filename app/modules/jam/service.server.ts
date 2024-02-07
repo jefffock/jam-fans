@@ -1,21 +1,16 @@
 import type { Prisma } from '../../database'
 import { db } from '../../database'
-export async function addJam(data: {
-	date: string
-	artist: string
-	song_id: number
-	avg_rating?: number
-	location?: string
-	submitter_name?: string
-	user_id?: string
-	listen_link?: string
-	song_name?: string
-	num_ratings?: number
-	song_submitter_name?: string
-	sounds?: string[]
-}) {
+
+export async function addJam({ date, artist, song_id, submitter, song_name }) {
+	console.log('in addJam', date, artist, song_id, submitter, song_name)
 	const newVersion = await db.versions.create({
-		data,
+		data: {
+			date,
+			artist,
+			song_id,
+			submitter,
+			song_name,
+		},
 	})
 	return newVersion
 }

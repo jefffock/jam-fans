@@ -7,7 +7,6 @@ export const loader = async ({ request, params }) => {
 	const queryParams = Object.fromEntries(url.searchParams.entries())
 	const artist = JSON.parse(queryParams?.artist)
 	const date = queryParams?.date
-	console.log('artist, date', artist, date)
 	try {
 		const enrichedSetlist = await getSetlist({ artist, date })
 		return json({ enrichedSetlist })

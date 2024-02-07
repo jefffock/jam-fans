@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react'
 import AddJamSetShow from './AddJamSetShow'
 
 const SETS = [
-	{ label: 'set 1', value: 'set_1' },
-	{ label: 'set 2', value: 'set_2' },
-	{ label: 'set 3', value: 'set_3' },
-	{ label: 'encore', value: 'encore' },
-	{ label: 'late set', value: 'late_set' },
+	{ label: 'set 1', value: 'set_1', id: 1 },
+	{ label: 'set 2', value: 'set_2', id: 2 },
+	{ label: 'set 3', value: 'set_3', id: 3 },
+	{ label: 'encore', value: 'encore', id: 4 },
+	{ label: 'late set', value: 'late_set', id: 5 },
 ]
 
 export default function AddEntity({
@@ -20,6 +20,7 @@ export default function AddEntity({
 	activeAddTab,
 	setActiveAddTab,
 	profile,
+	attributes,
 }) {
 	const [selectedArtist, setSelectedArtist] = useState(
 		JSON.stringify(artists.find((art) => art.id === Number(artist))) || ''
@@ -46,7 +47,6 @@ export default function AddEntity({
 	}, [jamsOnJF, showOnJF])
 
 	useEffect(() => {
-		console.log('selectedArtist or dateFilter changed')
 		setSetlist([])
 		if (selectedArtist && dateFilter && setlist.length === 0) {
 			//make sure each song is on jam fans
@@ -116,6 +116,7 @@ export default function AddEntity({
 					location={fetcher?.data?.enrichedSetlist?.location || location}
 					setSelectedArtist={setSelectedArtist}
 					profile={profile}
+					attributes={attributes}
 				/>
 			)}
 		</div>

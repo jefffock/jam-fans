@@ -721,7 +721,6 @@ export default function AddJam() {
 	}
 
 	function handleRatingChange(rating: string) {
-		console.log('typeof rating', typeof rating)
 		if (rating === 'No rating') {
 			setRating('')
 		} else {
