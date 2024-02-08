@@ -18,7 +18,6 @@ export default function EntityCard({
 	setIframeOpen,
 	setIframeUrl,
 	showDateArtistLocation = true,
-	onlyShowVerifiedRatings,
 	ref,
 	setDateFilter,
 	setArtistFilters,

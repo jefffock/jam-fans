@@ -42,7 +42,6 @@ export default function VirtualEntityList({
 				setIframeOpen={setIframeOpen}
 				setIframeUrl={setIframeUrl}
 				displayRatings={displayRatings}
-				onlyShowVerifiedRatings={onlyShowVerifiedRatings}
 				setDateFilter={setDateFilter}
 				setArtistFilters={setArtistFilters}
 				setOpen={setOpen}
