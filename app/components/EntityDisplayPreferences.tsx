@@ -1,4 +1,3 @@
-import { getRatingsVisible, handleRatingsVisibleChange } from '~/utils'
 import Checkbox from './Checkbox'
 
 export default function EntityDisplayPreferences({
@@ -6,8 +5,13 @@ export default function EntityDisplayPreferences({
 	linkFilter,
 	attributesNotSounds,
 	handleAttributesChange,
+	displayRatings,
+	setDisplayRatings,
 }) {
-	const ratingsVisible = getRatingsVisible()
+	function handleDisplayRatingsChange(e) {
+		setDisplayRatings(e.target.checked)
+	}
+	// const ratingsVisible = getRatingsVisible()
 	// const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
 	return (
 		<div className="px-4 py-2 pb-36">
@@ -24,8 +28,8 @@ export default function EntityDisplayPreferences({
 					id="show-ratings"
 					label="show ratings"
 					// description="show average rating on the card"
-					onChange={handleRatingsVisibleChange}
-					defaultChecked={ratingsVisible}
+					onChange={handleDisplayRatingsChange}
+					defaultChecked={displayRatings}
 				/>
 				{attributesNotSounds &&
 					attributesNotSounds?.map((attribute) => (

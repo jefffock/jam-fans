@@ -225,8 +225,8 @@ export default function EntityCard({
 						{item.entity !== 'Jam' && (
 							<p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>
 						)}
-						<p className={`${!displayRatings || item.num_ratings === 0 ? 'hidden' : 'flex float-right'}`}>
-							{item.num_ratings} rating{item.num_ratings != 1 ? 's' : ''}
+						<p className={`${!displayRatings || item?.num_ratings === 0 ? 'hidden' : 'flex float-right'}`}>
+							{item?.num_ratings} rating{item?.num_ratings != 1 ? 's' : ''}
 						</p>
 					</div>
 				)}

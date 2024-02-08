@@ -1,5 +1,4 @@
 import { useFetcher } from '@remix-run/react'
-import { getRatingsVisible } from '~/utils'
 import Button from './Button'
 import DatePicker from './DatePicker'
 import InfoAlert from './alerts/InfoAlert'
@@ -24,7 +23,7 @@ export default function AddJamSetShow({
 	setIframeUrl,
 }) {
 	const fetcher = useFetcher()
-	const displayRatings = getRatingsVisible()
+	// const displayRatings = getRatingsVisible()
 
 	return (
 		<div className={`flex-col flex items-center max-w-screen `}>

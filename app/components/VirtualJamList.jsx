@@ -1,6 +1,6 @@
 import EntityCard from './cards/EntityCard'
 // import SetCard from './cards/SetCard'
-import { getOnlyShowVerifiedRatings, getRatingsVisible } from '~/utils'
+import { getOnlyShowVerifiedRatings } from '~/utils'
 
 export default function VirtualEntityList({
 	items,
@@ -30,18 +30,18 @@ export default function VirtualEntityList({
 	// const itemsToRender = [...placeholdersBefore, ...visibleItems, ...placeholdersAfter]
 	// TODO: re-implement virtual list
 	// const itemsToRender = items
-	const ratingsVisible = getRatingsVisible()
+	// const ratingsVisible = getRatingsVisible()
 	const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
 
 	const cards = items?.map((item) => {
 		return (
 			<EntityCard
-				key={item.key}
+				key={`${item.entity}-${item.id}`}
 				item={item}
 				profile={profile}
 				setIframeOpen={setIframeOpen}
 				setIframeUrl={setIframeUrl}
-				displayRatings={ratingsVisible}
+				displayRatings={displayRatings}
 				onlyShowVerifiedRatings={onlyShowVerifiedRatings}
 				setDateFilter={setDateFilter}
 				setArtistFilters={setArtistFilters}

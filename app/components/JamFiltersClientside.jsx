@@ -257,6 +257,8 @@ export default function JamFiltersClientside({
 							linkFilter={linkFilter}
 							attributesNotSounds={attributesNotSounds}
 							handleAttributesChange={handleAttributesChange}
+							displayRatings={displayRatings}
+							setDisplayRatings={setDisplayRatings}
 						/>
 					</FiltersFormBody>
 					<FilterButtonsContainer

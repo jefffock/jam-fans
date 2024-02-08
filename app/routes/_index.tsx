@@ -147,7 +147,6 @@ export default function Index() {
 	} = useLoaderData()
 	const [open, setOpen] = useState(false)
 	const [iframeOpen, setIframeOpen] = useState(false)
-	const [displayRatings, setDisplayRatings] = useState(false)
 	const headerRef = useRef(null)
 	const pageRef = useRef(null)
 	// const [headerHeight, setHeaderHeight] = useState(0)
@@ -182,6 +181,7 @@ export default function Index() {
 	const [iframeUrl, setIframeUrl] = useState('')
 	const [formattedIframeUrl, setFormattedIframeUrl] = useState('')
 	const isRelisten = formattedIframeUrl?.includes('relist')
+	const [displayRatings, setDisplayRatings] = useState(false)
 
 	useEffect(() => {
 		let reformattedLink
