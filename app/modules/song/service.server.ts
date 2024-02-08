@@ -27,8 +27,8 @@ export async function addSong({ song, artist, profile }) {
 			song: song,
 			artist: parsedArtist.artist,
 			artist_id: parsedArtist.id,
-			submitter_name: profile.name,
-			submitter_id: profile.id,
+			submitter_name: profile?.name,
+			submitter_id: profile?.id,
 		},
 	})
 	console.log('songAdded', songAdded)
