@@ -58,14 +58,19 @@ export default function AddEntity({
 			//put each entity in an accordion, especially the setlist
 			//add sounds, link, location in dropdown
 			//create sounds checkbox for each entity that is on jam fans
-			const selectedArtistFields = {
-				artist: JSON.parse(selectedArtist).artist,
-				mbid: JSON.parse(selectedArtist).mbid,
-				baseUrl: JSON.parse(selectedArtist).api_base_url,
-				data_source: JSON.parse(selectedArtist).data_source,
-			}
-			let urlToFetch = '/resources/setlist?artist=' + JSON.stringify(selectedArtistFields) + '&date=' + dateFilter
+
+			const params = new URLSearchParams()
+			params.append('artist', JSON.parse(selectedArtist).artist)
+			params.append('mbid', JSON.parse(selectedArtist).mbid)
+			params.append('baseUrl', JSON.parse(selectedArtist).api_base_url || '') // Assuming baseUrl can be null, use an empty string as fallback
+			params.append('data_source', JSON.parse(selectedArtist).data_source)
+			params.append('date', dateFilter) // Assuming dateFilter is a variable holding the date value
+
+			// Now use the serialized params in the URL
+			let urlToFetch = `/resources/setlist?${params.toString()}`
 			fetcher.load(urlToFetch)
+			// let urlToFetch = '/resources/setlist?artist=' + JSON.stringify(selectedArtistFields) + '&date=' + dateFilter
+			// fetcher.load(urlToFetch)
 		}
 	}, [selectedArtist, dateFilter])
 
