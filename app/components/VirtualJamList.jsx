@@ -31,7 +31,7 @@ export default function VirtualEntityList({
 	// TODO: re-implement virtual list
 	// const itemsToRender = items
 	// const ratingsVisible = getRatingsVisible()
-	const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
+	// const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
 
 	const cards = items?.map((item) => {
 		return (
