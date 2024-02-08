@@ -21,6 +21,7 @@ export default function AddJamSetShow({
 	iframeOpen,
 	setIframeOpen,
 	setIframeUrl,
+	displayRatings,
 }) {
 	const fetcher = useFetcher()
 	// const displayRatings = getRatingsVisible()
@@ -86,10 +87,11 @@ export default function AddJamSetShow({
 					<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
 					<input type="hidden" name="location" value={location} />
 					<Button
-						text={`add ${JSON.parse(selectedArtist).artist}'s ${dateFilter} show`}
+						text={`${fetcher?.state === 'idle' ? `add ${JSON.parse(selectedArtist).artist}'s ${dateFilter} show` : 'updating...'}`}
 						type="submit"
 						name="_action"
 						value="add-show"
+						disabled={fetcher?.state !== 'idle'}
 					/>
 				</fetcher.Form>
 			)}
@@ -100,12 +102,7 @@ export default function AddJamSetShow({
 						{setlist.map((song) =>
 							song.label.indexOf('Added') === -1 ? (
 								<div key={song.id} className="p-2">
-									<fetcher.Form
-										method="post"
-										preventScrollReset={true}
-										key={song.label}
-										action="resources/jams"
-									>
+									<fetcher.Form method="post" preventScrollReset={true} action="resources/jams">
 										<input type="hidden" name="entity" value="Jam" />
 										<input type="hidden" name="date" value={dateFilter} />
 										<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
@@ -167,7 +164,7 @@ export default function AddJamSetShow({
 						<fetcher.Form
 							method="post"
 							preventScrollReset={true}
-							key={set.id}
+							key={`${set.id}-${set.label}`}
 							action="resources/sets"
 							className="p-2"
 						>

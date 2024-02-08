@@ -24,6 +24,7 @@ export default function AddEntity({
 	iframeOpen,
 	setIframeOpen,
 	setIframeUrl,
+	displayRatings,
 }) {
 	const [selectedArtist, setSelectedArtist] = useState(
 		JSON.stringify(artists.find((art) => art.id === Number(artist))) || ''
@@ -122,6 +123,7 @@ export default function AddEntity({
 					iframeOpen={iframeOpen}
 					setIframeOpen={setIframeOpen}
 					setIframeUrl={setIframeUrl}
+					displayRatings={displayRatings}
 				/>
 			)}
 		</div>
