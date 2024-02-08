@@ -56,8 +56,8 @@ export default function Login() {
 	const actionData = useActionData()
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-100 100vh">
-			<Form method="post" className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow 100vh">
+		<div className="min-h-screen flex items-center bg-gray-100 100vh">
+			<Form method="post" className="max-w-md w-full space-y-8 bg-white p-10 m-4 rounded-lg shadow ">
 				<div>
 					<label htmlFor="email" className="block text-sm font-medium text-gray-700">
 						email:
