@@ -1,7 +1,6 @@
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useOutletContext, Link, NavLink, Form, useFormAction } from '@remix-run/react'
+import { Disclosure } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Link, NavLink, useFormAction } from '@remix-run/react'
 
 const navigation = [
 	// { name: 'jams', href: '/jams', current: false },
@@ -10,7 +9,7 @@ const navigation = [
 ]
 
 const userNavigationLoggedOut = [
-	{ name: 'login', href: '/ssrlogin' },
+	{ name: 'login', href: '/login' },
 	{ name: 'create an account', href: '/join' },
 	{ name: 'credits', href: '/credits' },
 	{ name: 'contact', href: '/contact' },

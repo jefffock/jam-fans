@@ -9,7 +9,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	const cookies = parse(request.headers.get('Cookie') ?? '')
 	const headers = new Headers()
 
-	console.log('authSession in ssrlogin', authSession)
+	console.log('authSession in login', authSession)
 
 	// const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
 	// 	cookies: {

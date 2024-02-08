@@ -56,7 +56,7 @@ export default function AddJamSetShow({
 				<InfoAlert
 					title="you aren't logged in"
 					description="you can still add jams, sets, and shows, but they won't be associated with your account. if you want to keep track of your contributions, please log in"
-					linkTo="/ssrlogin"
+					linkTo="/login"
 					linkText="log in"
 				/>
 			)}
