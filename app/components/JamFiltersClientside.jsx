@@ -26,7 +26,7 @@ export default function JamFiltersClientside({
 	setOpen,
 	totalCount,
 	search,
-	showIframe,
+	iframeOpen,
 	setArtistFilters,
 	setAttributeFilters,
 	setSongFilter,
@@ -35,7 +35,7 @@ export default function JamFiltersClientside({
 	setDateFilter,
 	setOrderBy,
 	setShowComments,
-	setShowRatings,
+	setDisplayRatings,
 	songFilter,
 	artistFilters,
 	attributeFilters,
@@ -43,7 +43,7 @@ export default function JamFiltersClientside({
 	afterDateFilter,
 	dateFilter,
 	showComments,
-	showRatings,
+	displayRatings,
 	orderBy,
 	musicalEntitiesLength,
 	linkFilter,
@@ -63,6 +63,8 @@ export default function JamFiltersClientside({
 	activeTab,
 	setActiveTab,
 	filteredEntitiesLengthUntrimmed,
+	setIframeOpen,
+	setIframeUrl,
 }) {
 	const submit = useSubmit()
 	const fetcher = useFetcher()
@@ -182,7 +184,7 @@ export default function JamFiltersClientside({
 		<FiltersSlideout
 			open={open}
 			setOpen={setOpen}
-			showIframe={showIframe}
+			iframeOpen={iframeOpen}
 			activeTab={activeTab}
 			setActiveTab={setActiveTab}
 		>
@@ -265,6 +267,7 @@ export default function JamFiltersClientside({
 						buildFiltersButtonText={buildFiltersButtonText}
 						clearFilters={clearFilters}
 						setOpen={setOpen}
+						iframeOpen={iframeOpen}
 					/>
 				</FiltersForm>
 			)}
@@ -280,6 +283,10 @@ export default function JamFiltersClientside({
 					setActiveAddTab={setActiveAddTab}
 					profile={profile}
 					attributes={attributes}
+					iframeOpen={iframeOpen}
+					setIframeOpen={setIframeOpen}
+					setIframeUrl={setIframeUrl}
+					displayRatings={displayRatings}
 				/>
 			)}
 		</FiltersSlideout>

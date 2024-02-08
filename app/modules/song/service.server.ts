@@ -19,37 +19,35 @@ export async function getSongsCount(): Promise<number> {
 	return count
 }
 
-export async function addSong({ song, artist, submitter }) {
-	console.log('in addSong', song, artist, submitter)
+export async function addSong({ song, artist, profile }) {
+	console.log('in addSong', song, artist, profile)
+	const parsedArtist = JSON.parse(artist)
 	const songAdded = await db.songs.create({
 		data: {
 			song: song,
-			artist: artist.artist,
-			artist_id: artist.id,
-			submitter_name: submitter.submitter,
-			submitter_id: submitter_id,
+			artist: parsedArtist.artist,
+			artist_id: parsedArtist.id,
+			submitter_name: profile.name,
+			submitter_id: profile.id,
 		},
 	})
 	console.log('songAdded', songAdded)
 	return songAdded
 }
 
-export async function getSongIdFromName({ song, artist, submitter }) {
-	console.log('in getSongIdFromName', song, artist, submitter)
-	const songId = await db.songs.findFirst({
+export async function getSongFromName({ song, artist, profile }) {
+	console.log('in getSongIdFromName', song, artist, profile)
+	const songJF = await db.songs.findFirst({
 		where: {
 			song: song,
 		},
-		select: {
-			id: true,
-		},
 	})
-	console.log('songId', songId)
-	if (!songId) {
+	console.log('songJF', songJF)
+	if (!songJF) {
 		//add song
-		const addedSong = await addSong({ song, artist, submitter })
+		const addedSong = await addSong({ song, artist, profile })
 		console.log('addedSong', addedSong)
-		return addedSong.id
+		return addedSong
 	}
-	return songId
+	return songJF
 }

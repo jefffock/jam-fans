@@ -1,8 +1,8 @@
-import { Combobox, Listbox, Transition, Dialog } from '@headlessui/react'
-import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment } from 'react'
 
-export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, setActiveTab, children }) {
+export default function FiltersSlideout({ open, setOpen, iframeOpen, activeTab, setActiveTab, children }) {
 	return (
 		<Transition.Root show={open} as={Fragment}>
 			<Dialog as="div" className="relative z-10 text-lg" onClose={setOpen}>
@@ -22,7 +22,7 @@ export default function FiltersSlideout({ open, setOpen, showIframe, activeTab, 
 								<Dialog.Panel className="pointer-events-auto w-screen">
 									<div
 										className={`flex h-full mx-auto flex-col divide-y divide-gray-200 bg-white pt-4 shadow-xl rounded-t-xl ${
-											showIframe ? 'pb-40' : 'pb-0'
+											iframeOpen ? 'pb-40' : 'pb-0'
 										} sm:pb-0`}
 									>
 										<div className="flex min-h-0 flex-1 flex-col overflow-y-scroll py-6">

@@ -1,5 +1,4 @@
-export default function IFrame({ formattedIframeUrl, closeIframe }: { src: string }) {
-	console.log('formattedIframeUrl in IFrame', formattedIframeUrl)
+export default function Iframe({ formattedIframeUrl, closeIframe }: { src: string }) {
 	const isRelisten = formattedIframeUrl?.includes('relist')
 	return (
 		<div
@@ -10,12 +9,7 @@ export default function IFrame({ formattedIframeUrl, closeIframe }: { src: strin
 			<button onClick={closeIframe} className="text-left text-white ml-2">
 				Close &#215;
 			</button>
-			<iframe
-				src={formattedIframeUrl}
-				// title={`Listen to ${jam.song_name} from ${jam.date}`}
-				height={'100%'}
-				width={'100%'}
-			></iframe>
+			<iframe src={formattedIframeUrl} title={'listen'} height={'100%'} width={'100%'}></iframe>
 		</div>
 	)
 }

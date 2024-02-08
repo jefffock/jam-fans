@@ -8,5 +8,5 @@ export async function action({ request }: ActionFunctionArgs) {
 	let { _action, ...values } = Object.fromEntries(formData)
 	console.log('in add attributes', values)
 	const addedAttributes = await addAttributesToEntity(values)
-	return json({ ok: true })
+	return json({ addedAttributes })
 }

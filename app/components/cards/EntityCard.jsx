@@ -14,8 +14,8 @@ import ThumbUpOutline from '../icons/thumb-up-outline'
 export default function EntityCard({
 	item,
 	profile,
-	showRatings,
-	setShowIframe,
+	displayRatings,
+	setIframeOpen,
 	setIframeUrl,
 	showDateArtistLocation = true,
 	onlyShowVerifiedRatings,
@@ -54,7 +54,7 @@ export default function EntityCard({
 
 	function handleListenClick() {
 		setIframeUrl(item?.listen_link)
-		setShowIframe(true)
+		setIframeOpen(true)
 	}
 
 	const comments = item?.ratings
@@ -122,6 +122,7 @@ export default function EntityCard({
 	return (
 		<div
 			className={`p-4 bg-gray-50 border border-gray-200 rounded-lg shadow my-4 flex flex-col justify-between h-90 max-w-95p w-112`}
+			onClick={() => console.log('item', item)}
 		>
 			<div className="overflow-y-auto">
 				<div className="flex justify-between">
@@ -159,13 +160,13 @@ export default function EntityCard({
 						<div className="flex items-center space-x-4">
 							{item.entity === 'Jam' && item.show_id && (
 								<h5
-									className="mb-2 text-xl tracking-tight text-gray-900 underline cursor-pointer"
+									className={`mb-2 text-xl tracking-tight text-gray-900 ${inAdd ? '' : 'underline cursor-pointer'}`}
 									onClick={handleDateClick}
 								>
 									{item.date}
 								</h5>
 							)}
-							{item.entity === 'Jam' && !item.show_id && !inAdd && (
+							{item.entity === 'Jam' && !item.show_id && (
 								<addShowFetcher.Form method="post" action="?index" preventScrollReset={true}>
 									<input type="hidden" name="artist_id" value={item.artist_id} />
 									<input type="hidden" name="date_text" value={item.date} />
@@ -185,9 +186,15 @@ export default function EntityCard({
 									</div>
 								</addShowFetcher.Form>
 							)}
+							{item.entity !== 'Jam' && (
+								<h6 className="mb-2 text-xl tracking-tight text-gray-900">
+									{item.artists.artist}{' '}
+									{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
+								</h6>
+							)}
 						</div>
 						{/* right */}
-						<div className={`${showRatings ? 'flex float-right' : 'hidden'}`}>
+						<div className={`${displayRatings ? 'flex float-right' : 'hidden'}`}>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 20 20"
@@ -200,24 +207,33 @@ export default function EntityCard({
 									clipRule="evenodd"
 								/>
 							</svg>
-							<p className="mb-2 font-normal text-gray-700 ml-auto">{showRatings ? ratingToShow : ''}</p>
+							<p className="mb-2 font-normal text-gray-700 ml-auto">
+								{displayRatings ? ratingToShow : ''}
+							</p>
 						</div>
 					</div>
 				)}
 				{/* second row */}
 				{showDateArtistLocation && (
 					<div className="flex justify-between">
-						<h6 className="mb-2 text-xl tracking-tight text-gray-900">
-							{item.artists.artist}{' '}
-							{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
-						</h6>
-						<p className={`${!showRatings || item.num_ratings === 0 ? 'hidden' : 'flex float-right'}`}>
+						{item.entity === 'Jam' && (
+							<h6 className="mb-2 text-xl tracking-tight text-gray-900">
+								{item.artists.artist}{' '}
+								{artistEmojis && artistEmojis.map((emoji) => String.fromCodePoint(emoji)).join('')}
+							</h6>
+						)}
+						{item.entity !== 'Jam' && (
+							<p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>
+						)}
+						<p className={`${!displayRatings || item.num_ratings === 0 ? 'hidden' : 'flex float-right'}`}>
 							{item.num_ratings} rating{item.num_ratings != 1 ? 's' : ''}
 						</p>
 					</div>
 				)}
 				{/* third row */}
-				{showDateArtistLocation && <p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>}
+				{showDateArtistLocation && item.entity === 'Jam' && (
+					<p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>
+				)}
 				{sortedSounds && <p className="font-normal text-gray-700 max-w-80">{sortedSounds.join(', ')}</p>}
 				{sortedPlatforms && <p className="font-normal text-gray-700">{sortedPlatforms.join(', ')}</p>}
 				{showCurateOptions && !newParsedSelectedAttributes.length > 0 && <br />}

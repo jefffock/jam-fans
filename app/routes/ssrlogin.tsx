@@ -1,9 +1,8 @@
-import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, parse, serialize } from '@supabase/ssr'
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
 import { Form, useActionData } from '@remix-run/react'
-import { json } from '@remix-run/node'
+import { parse } from '@supabase/ssr'
 import type { AuthSession } from '~/modules/auth'
-import { signInWithEmail, createAuthSession, getAuthSession } from '~/modules/auth'
+import { createAuthSession, getAuthSession, signInWithEmail } from '~/modules/auth'
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const authSession = await getAuthSession(request)
@@ -34,19 +33,6 @@ export async function action({ request }: ActionFunctionArgs) {
 	const cookies = parse(request.headers.get('Cookie') ?? '')
 	const headers = new Headers()
 
-	const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-		cookies: {
-			get(key) {
-				return cookies[key]
-			},
-			set(key, value, options) {
-				headers.append('Set-Cookie', serialize(key, value, options))
-			},
-			remove(key, options) {
-				headers.append('Set-Cookie', serialize(key, '', options))
-			},
-		},
-	})
 	const formData = await request.formData()
 	const email = formData.get('email')
 	const password = formData.get('password')
@@ -56,20 +42,8 @@ export async function action({ request }: ActionFunctionArgs) {
 	const session: AuthSession | null = await signInWithEmail(email.toString(), password.toString())
 	console.log('session', session)
 	if (!session) return json({ error: 'Invalid email or password' }, { status: 400 })
-	// return new Response(session, {
-	// 	headers,
-	// })
-	//if session redirect to home
 	if (session) {
 		return await createAuthSession({ request, authSession: session, redirectTo: '/login-success' })
-		// return redirect('/', {
-		// 	headers: {
-		// 		'Set-Cookie': serialize('supabaseSession', session.accessToken, {
-		// 			path: '/',
-		// 			maxAge: 60 * 60 * 24 * 30, // 30 days
-		// 		}),
-		// 	},
-		// })
 	}
 	//if no session redirect to login
 	//if session and no cookie, set cookie
@@ -82,17 +56,40 @@ export default function Login() {
 	const actionData = useActionData()
 
 	return (
-		<Form method="post">
-			<div>
-				<label htmlFor="email">Email:</label>
-				<input type="email" id="email" name="email" required />
-			</div>
-			<div>
-				<label htmlFor="password">Password:</label>
-				<input type="password" id="password" name="password" required />
-			</div>
-			{actionData?.error && <p style={{ color: 'red' }}>{actionData.error}</p>}
-			<button type="submit">Login</button>
-		</Form>
+		<div className="min-h-screen flex items-center justify-center bg-gray-100 100vh">
+			<Form method="post" className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow 100vh">
+				<div>
+					<label htmlFor="email" className="block text-sm font-medium text-gray-700">
+						email:
+					</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						required
+						className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					/>
+				</div>
+				<div>
+					<label htmlFor="password" className="block text-sm font-medium text-gray-700">
+						password:
+					</label>
+					<input
+						type="password"
+						id="password"
+						name="password"
+						required
+						className="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+					/>
+				</div>
+				{actionData?.error && <p className="text-red-500 text-xs italic">{actionData.error}</p>}
+				<button
+					type="submit"
+					className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+				>
+					login
+				</button>
+			</Form>
+		</div>
 	)
 }

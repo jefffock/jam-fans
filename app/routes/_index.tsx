@@ -8,6 +8,7 @@ import SiteStats from '~/components/SiteStats'
 import useFilterEffects from '~/hooks/use-filter-effects'
 import useFilteredMusicalEntities from '~/hooks/use-filtered-musical-entities'
 import Hero from '../components/Hero'
+import Iframe from '../components/Iframe'
 import JamFiltersClientside from '../components/JamFiltersClientside'
 import VirtualJamList from '../components/VirtualJamList'
 import { addArtist, getArtists, getArtistsCount } from '../modules/artist/index.server'
@@ -17,7 +18,7 @@ import { getProfileFromRequest } from '../modules/profile/index.server'
 import { addSet, getSets, getSetsCount } from '../modules/set/index.server'
 import { addShow, getShows, getShowsCount } from '../modules/show/index.server'
 import { getSongs, getSongsCount } from '../modules/song/index.server'
-import { createFilterURL, scrollToTopOfRef, useWindowHeight, useWindowWidth } from '../utils'
+import { createFilterURL, scrollToTopOfRef } from '../utils'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
 	// console.log('request', request)
@@ -146,12 +147,11 @@ export default function Index() {
 		profile,
 	} = useLoaderData()
 	const [open, setOpen] = useState(false)
-	const [showIframe, setShowIframe] = useState(false)
-	const [iframeUrl, setIframeUrl] = useState('')
-	const [showRatings, setShowRatings] = useState(false)
+	const [iframeOpen, setIframeOpen] = useState(false)
+	const [displayRatings, setDisplayRatings] = useState(false)
 	const headerRef = useRef(null)
 	const pageRef = useRef(null)
-	const [headerHeight, setHeaderHeight] = useState(0)
+	// const [headerHeight, setHeaderHeight] = useState(0)
 	const [artistFilters, setArtistFilters] = useState([])
 	const [songFilter, setSongFilter] = useState(song)
 	const [attributeFilters, setAttributeFilters] = useState([])
@@ -166,22 +166,48 @@ export default function Index() {
 		sets: true,
 		shows: true,
 	})
-	const [spotifyFilter, setSpotifyFilter] = useState(false)
-	const [youtubeFilter, setYoutubeFilter] = useState(false)
-	const [appleFilter, setAppleFilter] = useState(false)
-	const [scrollTop, setScrollTop] = useState(0)
-	const [jamCardHeight, setJamCardHeight] = useState(0)
+	// const [scrollTop, setScrollTop] = useState(0)
+	// const [jamCardHeight, setJamCardHeight] = useState(0)
 	const [title, setTitle] = useState('🔥 jams, sets, and shows')
 	const [query, setQuery] = useState('')
 	// const debouncedQuery = useDebounce(query, 300)
-	const windowHeight = useWindowHeight()
-	const windowWidth = useWindowWidth()
+	// const windowHeight = useWindowHeight()
+	// const windowWidth = useWindowWidth()
 	const [showsOnDate, setShowsOnDate] = useState([])
 	const [activeTab, setActiveTab] = useState('explore')
 	const [activeAddTab, setActiveAddTab] = useState('jamSetShow')
 	const [filteredEntitiesLengthUntrimmed, setFilteredEntitiesLengthUntrimmed] = useState(
 		jamsCount + setsCount + showsCount
 	)
+
+	const [iframeUrl, setIframeUrl] = useState('')
+	const [formattedIframeUrl, setFormattedIframeUrl] = useState('')
+
+	useEffect(() => {
+		let reformattedLink
+		if (!reformattedLink && iframeUrl) {
+			if (iframeUrl.includes('youtu')) {
+				if (iframeUrl.includes('watch?v=')) {
+					reformattedLink = iframeUrl.replace('watch?v=', 'embed/')
+				}
+				if (iframeUrl.includes('youtu.be')) {
+					let youTubeId
+					let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+					let match = iframeUrl.match(regExp)
+					if (match && match[2].length == 11) {
+						youTubeId = match[2]
+						reformattedLink = `https://www.youtube.com/embed/${youTubeId}?autoplay=1`
+					}
+				}
+				1
+			}
+		}
+		setFormattedIframeUrl(reformattedLink ?? iframeUrl)
+	}, [iframeUrl])
+
+	function closeIframe() {
+		setIframeOpen(false)
+	}
 
 	useEffect(() => {
 		setQuery('')
@@ -241,7 +267,7 @@ export default function Index() {
 					setOpen={setOpen}
 					totalCount={count}
 					search={search}
-					showIframe={showIframe}
+					iframeOpen={iframeOpen}
 					setArtistFilters={setArtistFilters}
 					setSongFilter={setSongFilter}
 					setAttributeFilters={setAttributeFilters}
@@ -249,7 +275,7 @@ export default function Index() {
 					setAfterDateFilter={setAfterDateFilter}
 					setDateFilter={setDateFilter}
 					setShowComments={setShowComments}
-					setShowRatings={setShowRatings}
+					setDisplayRatings={setDisplayRatings}
 					setOrderBy={setOrderBy}
 					songFilter={songFilter}
 					artistFilters={artistFilters}
@@ -258,7 +284,7 @@ export default function Index() {
 					afterDateFilter={afterDateFilter}
 					dateFilter={dateFilter}
 					showComments={showComments}
-					showRatings={showRatings}
+					displayRatings={displayRatings}
 					orderBy={orderBy}
 					musicalEntitiesLength={filteredMusicalEntities.length}
 					linkFilter={linkFilter}
@@ -278,13 +304,16 @@ export default function Index() {
 					activeTab={activeTab}
 					activeAddTab={activeAddTab}
 					filteredEntitiesLengthUntrimmed={filteredEntitiesLengthUntrimmed}
+					setIframeUrl={setIframeUrl}
+					setIframeOpen={setIframeOpen}
 				/>
 				<VirtualJamList
 					items={filteredMusicalEntities}
 					profile={profile}
-					showIframe={showIframe}
-					setShowIframe={setShowIframe}
-					showRatings={showRatings}
+					iframeOpen={iframeOpen}
+					setIframeOpen={setIframeOpen}
+					setIframeUrl={setIframeUrl}
+					displayRatings={displayRatings}
 					setArtistFilters={setArtistFilters}
 					setDateFilter={setDateFilter}
 					setOpen={setOpen}
@@ -293,7 +322,11 @@ export default function Index() {
 					attributes={attributes}
 				/>
 			</EntityListContainer>
-			{/* <BottomNav /> */}
+			{iframeOpen && formattedIframeUrl && (
+				<>
+					<Iframe formattedIframeUrl={formattedIframeUrl} closeIframe={closeIframe} />
+				</>
+			)}{' '}
 		</div>
 	)
 }

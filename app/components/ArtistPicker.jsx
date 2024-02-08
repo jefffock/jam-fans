@@ -13,6 +13,7 @@ export default function ArtistPicker({
 	function handleAddEntityClick(e) {
 		setActiveTab('add')
 		setActiveAddTab('jamSetShow')
+		console.log('add entity click', e.target.value)
 		setArtistFilters([`${e.target.value}`])
 	}
 

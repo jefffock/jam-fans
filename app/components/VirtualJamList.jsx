@@ -1,21 +1,23 @@
-import IFrame from './IFrame'
 import EntityCard from './cards/EntityCard'
 // import SetCard from './cards/SetCard'
-import { useEffect, useState } from 'react'
 import { getOnlyShowVerifiedRatings, getRatingsVisible } from '~/utils'
 
 export default function VirtualEntityList({
 	items,
 	profile,
-	setShowIframe,
-	showIframe,
-	showRatings,
+	setIframeOpen,
+	iframeOpen,
+	displayRatings,
 	setArtistFilters,
 	setDateFilter,
 	setOpen,
 	setActiveAddTab,
 	setActiveTab,
 	attributes,
+	iframeUrl,
+	setIframeUrl,
+	formattedIframeUrl,
+	setFormattedIframeUrl,
 }) {
 	// let cardHeight = jamCardHeight ? jamCardHeight + 50 : 320
 	// let cardHeight = 322
@@ -30,34 +32,6 @@ export default function VirtualEntityList({
 	// const itemsToRender = items
 	const ratingsVisible = getRatingsVisible()
 	const onlyShowVerifiedRatings = getOnlyShowVerifiedRatings()
-	const [iframeUrl, setIframeUrl] = useState('')
-	const [formattedIframeUrl, setFormattedIframeUrl] = useState('')
-
-	useEffect(() => {
-		let reformattedLink
-		if (!reformattedLink && iframeUrl) {
-			if (iframeUrl.includes('youtu')) {
-				if (iframeUrl.includes('watch?v=')) {
-					reformattedLink = iframeUrl.replace('watch?v=', 'embed/')
-				}
-				if (iframeUrl.includes('youtu.be')) {
-					let youTubeId
-					let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
-					let match = iframeUrl.match(regExp)
-					if (match && match[2].length == 11) {
-						youTubeId = match[2]
-						reformattedLink = `https://www.youtube.com/embed/${youTubeId}?autoplay=1`
-					}
-				}
-				1
-			}
-		}
-		setFormattedIframeUrl(reformattedLink ?? iframeUrl)
-	}, [iframeUrl])
-
-	function closeIframe() {
-		setShowIframe(false)
-	}
 
 	const cards = items?.map((item) => {
 		return (
@@ -65,9 +39,9 @@ export default function VirtualEntityList({
 				key={item.key}
 				item={item}
 				profile={profile}
-				setShowIframe={setShowIframe}
+				setIframeOpen={setIframeOpen}
 				setIframeUrl={setIframeUrl}
-				showRatings={ratingsVisible}
+				displayRatings={ratingsVisible}
 				onlyShowVerifiedRatings={onlyShowVerifiedRatings}
 				setDateFilter={setDateFilter}
 				setArtistFilters={setArtistFilters}
@@ -80,13 +54,10 @@ export default function VirtualEntityList({
 	})
 
 	return (
-		<div>
-			{showIframe && formattedIframeUrl && (
-				<>
-					<IFrame formattedIframeUrl={formattedIframeUrl} closeIframe={closeIframe} />
-				</>
-			)}
-			<div className="max-w-100vw flex flex-col items-center justify-center p-4">{cards}</div>
+		<div
+			className={`max-w-100vw flex flex-col items-center justify-center p-4 pb-48 ${iframeOpen ? 'lg:pb-0' : 'pb-0'}`}
+		>
+			{cards}
 		</div>
 	)
 }

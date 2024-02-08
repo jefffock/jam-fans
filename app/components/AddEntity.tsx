@@ -21,6 +21,9 @@ export default function AddEntity({
 	setActiveAddTab,
 	profile,
 	attributes,
+	iframeOpen,
+	setIframeOpen,
+	setIframeUrl,
 }) {
 	const [selectedArtist, setSelectedArtist] = useState(
 		JSON.stringify(artists.find((art) => art.id === Number(artist))) || ''
@@ -110,13 +113,15 @@ export default function AddEntity({
 					handleDateInputChange={handleDateInputChange}
 					showOnJF={showOnJF}
 					setsOnJF={setsOnJF}
-					jamsOnJF={jamsOnJF}
 					availableSets={availableSets}
 					setlist={fetcher?.data?.enrichedSetlist?.setlist || setlist}
 					location={fetcher?.data?.enrichedSetlist?.location || location}
 					setSelectedArtist={setSelectedArtist}
 					profile={profile}
 					attributes={attributes}
+					iframeOpen={iframeOpen}
+					setIframeOpen={setIframeOpen}
+					setIframeUrl={setIframeUrl}
 				/>
 			)}
 		</div>

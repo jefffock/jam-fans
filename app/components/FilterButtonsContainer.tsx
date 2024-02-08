@@ -7,9 +7,12 @@ export const FilterButtonsContainer = ({
 	buildFiltersButtonText,
 	clearFilters,
 	musicalEntitiesFilters,
+	iframeOpen = false,
 }) => {
 	return (
-		<div className="absolute flex justify-center items-center flex-col bottom-0 py-2 bg-white w-96 px-2 mx-auto">
+		<div
+			className={`absolute flex justify-center items-center flex-col bottom-0 py-2 bg-white w-96 px-2 mx-auto ${iframeOpen ? ' pb-48 lg:pb-2' : 'pb-2'}`}
+		>
 			<button
 				className={
 					`m-2 w-fit transition duration-300 ease-in-out text-xl motion-reduce:transition-none hover:transition-all inline-flex justify-center rounded-md py-2 px-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ` +

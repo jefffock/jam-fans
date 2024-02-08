@@ -68,7 +68,30 @@ export async function addShow(values) {
 		},
 	})
 	console.log('newShow', newShow)
-	return newShow
+	const updatedJams = await updateShowIdForJams(Number(values.artist_id), values.date_text, newShow.id)
+
+	return { newShow, updatedJams }
+}
+
+export async function updateShowIdForJams(artistId: number, date: string, showId: number) {
+	try {
+		const updatedJams = await db.jams.updateMany({
+			where: {
+				artist_id: artistId,
+				date: date, // Assuming 'date' is stored in a format that matches the input format
+			},
+			data: {
+				show_id: showId,
+			},
+		})
+
+		console.log('Update successful')
+		return updatedJams
+	} catch (error) {
+		console.error('Error updating jams:', error)
+	}
+
+	console.error('Error updating jams:', error)
 }
 
 export async function addShowByJamId(jamId: number | string) {

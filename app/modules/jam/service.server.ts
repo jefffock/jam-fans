@@ -1,15 +1,38 @@
 import type { Prisma } from '../../database'
 import { db } from '../../database'
 
-export async function addJam({ date, artist, song_id, submitter, song_name }) {
-	console.log('in addJam', date, artist, song_id, submitter, song_name)
-	const newVersion = await db.versions.create({
+export async function addJam({ date, artist, song, profile, location, show_id }) {
+	const parsedArtist = JSON.parse(artist)
+	console.log('in addJam', date, artist, song, profile)
+	const dateArray = date.split('-')
+	const day = Number(dateArray[2])
+	const month = Number(dateArray[1])
+	const year = Number(dateArray[0])
+	let showId = show_id
+	if (!showId) {
+		const show = await db.shows.findFirst({
+			where: {
+				artist_id: parsedArtist.id,
+				date_text: date,
+			},
+		})
+		showId = show?.id
+	}
+	const newVersion = await db.jams.create({
 		data: {
 			date,
-			artist,
-			song_id,
-			submitter,
-			song_name,
+			artist: parsedArtist.artist,
+			artist_id: parsedArtist.id,
+			song_id: song.id,
+			song_name: song.song,
+			song_submitter_name: song.submitter_name,
+			submitter_name: profile?.name,
+			user_id: profile?.id,
+			location,
+			show_id: Number(showId),
+			day,
+			month,
+			year,
 		},
 	})
 	return newVersion
@@ -18,7 +41,7 @@ export async function addJam({ date, artist, song_id, submitter, song_name }) {
 export async function getJam(data: { version_id: number }) {
 	const { version_id } = data
 
-	const version = await db.versions.findUnique({
+	const version = await db.jams.findUnique({
 		where: {
 			id: version_id,
 		},
@@ -39,7 +62,7 @@ export async function rateJam(data: { profile_id: string; version_id: number; ra
 		},
 	})
 
-	const updatedVersion = await db.versions.update({
+	const updatedVersion = await db.jams.update({
 		where: {
 			id: version_id,
 		},
@@ -68,7 +91,7 @@ export async function addLinkToJam(data: { username: string; link: string; versi
 		},
 	})
 
-	const updatedVersion = await db.versions.update({
+	const updatedVersion = await db.jams.update({
 		where: {
 			id: version_id,
 		},
@@ -91,7 +114,7 @@ export const addSoundsToJam = async (data: { username: string; sounds: string[];
 		},
 	})
 
-	const updatedVersion = await db.versions.update({
+	const updatedVersion = await db.jams.update({
 		where: {
 			id: version_id,
 		},
@@ -106,13 +129,13 @@ export const addSoundsToJam = async (data: { username: string; sounds: string[];
 export async function getJamsByShow(data: { show_id: number }) {
 	const { show_id } = data
 
-	const versions = await db.versions.findMany({
+	const jams = await db.jams.findMany({
 		where: {
 			show_id,
 		},
 	})
 
-	return versions
+	return jams
 }
 
 export async function getJams(userId) {
@@ -152,27 +175,27 @@ export async function getJams(userId) {
 
 	// TODO: REMOVE. implement add show_id to jam or set on creation
 	// Fetch all shows
-	const allShows = await db.shows.findMany()
+	// const allShows = await db.shows.findMany()
 
 	// Create a map of jams with show_id added
-	const jamMap = new Map(allJams.map((jam) => [jam.id, { ...jam, show_id: null, key: `jam-${jam.id}` }]))
+	// const jamMap = new Map(allJams.map((jam) => [jam.id, { ...jam, show_id: null, key: `jam-${jam.id}` }]))
 
 	// Iterate over each show and update corresponding jams
-	allShows.forEach((show) => {
-		allJams.forEach((jam) => {
-			if (jam.artist_id === show.artist_id && jam.date === show.date_text && jam.show_id === null) {
-				const updatedJam = jamMap.get(jam.id)
-				if (updatedJam) {
-					updatedJam.show_id = show.id
-					jamMap.set(jam.id, updatedJam)
-				}
-			}
-		})
-	})
+	// allShows.forEach((show) => {
+	// 	allJams.forEach((jam) => {
+	// 		if (jam.artist_id === show.artist_id && jam.date === show.date_text && jam.show_id === null) {
+	// 			const updatedJam = jamMap.get(jam.id)
+	// 			if (updatedJam) {
+	// 				updatedJam.show_id = show.id
+	// 				jamMap.set(jam.id, updatedJam)
+	// 			}
+	// 		}
+	// 	})
+	// })
 
 	// Convert the map back to an array
-	const modifiedJams = Array.from(jamMap.values())
-	return modifiedJams
+	// const modifiedJams = Array.from(jamMap.values())
+	return allJams
 }
 
 interface QueryParams {

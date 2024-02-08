@@ -1,4 +1,5 @@
 import { useFetcher } from '@remix-run/react'
+import { getRatingsVisible } from '~/utils'
 import Button from './Button'
 import DatePicker from './DatePicker'
 import InfoAlert from './alerts/InfoAlert'
@@ -18,11 +19,15 @@ export default function AddJamSetShow({
 	availableSets,
 	profile,
 	attributes,
+	iframeOpen,
+	setIframeOpen,
+	setIframeUrl,
 }) {
 	const fetcher = useFetcher()
+	const displayRatings = getRatingsVisible()
 
 	return (
-		<div className="flex-col flex items-center max-w-screen">
+		<div className={`flex-col flex items-center max-w-screen `}>
 			<select
 				className="border-2 rounded-md p-2 m-2"
 				value={selectedArtist}
@@ -64,10 +69,12 @@ export default function AddJamSetShow({
 				<EntityCard
 					item={showOnJF}
 					profile={profile}
-					showRatings={false}
+					displayRatings={displayRatings}
 					// showDateArtistLocation={false}
 					attributes={attributes}
 					inAdd={true}
+					setIframeOpen={setIframeOpen}
+					setIframeUrl={setIframeUrl}
 				/>
 			)}
 			{!showOnJF && dateFilter && selectedArtist && (
@@ -103,9 +110,18 @@ export default function AddJamSetShow({
 										<input type="hidden" name="entity" value="Jam" />
 										<input type="hidden" name="date" value={dateFilter} />
 										<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
+										<input type="hidden" name="location" value={location} />
 										<input type="hidden" name="song" value={song.label} />
 										<input type="hidden" name="artist" value={selectedArtist} />
-										<Button size="small" type="submit" text={`add ${song.label}`} value="add-jam" />
+										<input type="hidden" name="show_id" value={showOnJF ? showOnJF.id : null} />
+
+										<Button
+											size="small"
+											type="submit"
+											text={`${fetcher?.state === 'idle' ? `add ${song.label}` : 'updating...'}`}
+											value="add-jam"
+											disabled={fetcher?.state !== 'idle'}
+										/>
 									</fetcher.Form>
 								</div>
 							) : (
@@ -113,10 +129,12 @@ export default function AddJamSetShow({
 									key={song.jam.id}
 									item={song.jam}
 									profile={profile}
-									showRatings={false}
+									displayRatings={displayRatings}
 									// showDateArtistLocation={false}
 									attributes={attributes}
 									inAdd={true}
+									setIframeOpen={setIframeOpen}
+									setIframeUrl={setIframeUrl}
 								/>
 							)
 						)}
@@ -134,9 +152,12 @@ export default function AddJamSetShow({
 						key={set.id}
 						item={set}
 						profile={profile}
-						showRatings={false}
+						displayRatings={displayRatings}
 						// showDateArtistLocation={false}
 						attributes={attributes}
+						inAdd={true}
+						setIframeOpen={setIframeOpen}
+						setIframeUrl={setIframeUrl}
 					/>
 				))}
 			{selectedArtist && dateFilter && availableSets && <p className="text-2xl mt-8">add a set</p>}
@@ -155,12 +176,9 @@ export default function AddJamSetShow({
 							<input type="hidden" name="set_number" value={set.value} />
 							<input type="hidden" name="date" value={dateFilter} />
 							<input type="hidden" name="artist_id" value={JSON.parse(selectedArtist).id} />
-							<Button
-								type="submit"
-								name="_action"
-								value="add-set"
-								text={`add ${set.label} ${set.label === 'set 3' || set.label === 'late set' ? '(if there was one)' : ''}`}
-							/>
+							<input type="hidden" name="location" value={location} />
+							<input type="hidden" name="show_id" value={showOnJF ? showOnJF.id : null} />
+							<Button type="submit" name="_action" value="add-set" text={`add ${set.label}`} />
 						</fetcher.Form>
 					))}
 			</div>
