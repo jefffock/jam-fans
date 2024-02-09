@@ -51,13 +51,13 @@ export default function ArtistPicker({
 												className="select-none text-gray-700 whitespace-normal"
 											>
 												<p className="font-normal text-xl min-h-8">{artist.artist}</p>
-												<p className="text-sm font-light">{entityCountLabel}</p>
+												<p className="text-sm font-normal">{entityCountLabel}</p>
 												<Button
 													value={artist.id}
 													size="small"
 													text={`add ${artist.artist} jams, shows`}
 													onClick={(e) => handleAddEntityClick(e)}
-													className="mt-2 font-light"
+													className="mt-2 font-normal"
 												/>
 											</label>
 										</div>
