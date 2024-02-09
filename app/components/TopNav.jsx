@@ -51,19 +51,19 @@ export default function TopNav({ profile }) {
 					{({ open }) => (
 						<>
 							<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-								<div className="flex h-16 justify-between">
+								<div className="flex h-16 justify-between relative">
 									<div className="flex">
-										<div className="flex flex-shrink-0 items-center">
+										<div className="flex flex-shrink-0 items-center cursor-pointer">
 											<Link to="/">
 												<img
 													href="/"
-													className="block h-8 w-auto lg:hidden"
+													className="block h-8 w-auto lg:hidden cursor-pointer"
 													src="/icon-circle.webp"
 													alt="Jam Fans"
 												/>
 												<img
 													href="/"
-													className="hidden h-8 w-auto lg:block"
+													className="hidden h-8 w-auto lg:block cursor-pointer"
 													src="/icon-circle.webp"
 													alt="Jam Fans"
 												/>
@@ -77,51 +77,21 @@ export default function TopNav({ profile }) {
 													className={({ isActive }) =>
 														isActive ? activeClassName : inactiveClassName
 													}
-													//  className={classNames(
-													//   isActive
-													//     ? 'border-cyan-500 text-gray-900'
-													//     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-													//   'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
-													// )}
 												>
 													{item.name}
 												</NavLink>
-												// <a
-												// 	key={item.name}
-												// 	href={item.href}
-												// 	className={classNames(
-												// 		item.current
-												// 			? 'border-cyan-500 text-gray-900'
-												// 			: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-												// 		'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium'
-												// 	)}
-												// 	aria-current={item.current ? 'page' : undefined}
-												// >
-												// 	{item.name}
-												// </a>
 											))}
 										</div>
 									</div>
-									<div className="fixed top-4 left-0 right-0 flex justify-center items-center">
-										<p className="text-center text-xl mondegreen">
-											jam.fans{' '}
-											<span className="align-baseline text-xs text-custom-pink">beta</span>
-										</p>
+									<div className="absolute left-1/2 transform -translate-x-1/2 mt-4 ">
+										<Link to="/" className="flex justify-center items-center">
+											<p className="text-center text-xl mondegreen cursor-pointer">
+												jam.fans{' '}
+												<span className="align-baseline text-xs text-custom-pink">beta</span>
+											</p>
+										</Link>
 									</div>
 									<div className="flex sm:flex-row self-center items-end">
-										{/* {user && (
-											<div className=''>
-												{userNavigation.map((item, itemIndex) => (
-													<Disclosure.Button
-														key={item.Index}
-														className='border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex px-1 pt-1 border-b-2 text-sm font-medium'
-														onClick={item.name === 'Sign out' ? () => handleSignOut() : null}
-													>
-														{item.name}
-													</Disclosure.Button>
-												))}
-											</div>
-										)} */}
 										{!profile && (
 											<div className="hidden lg:-my-px lg:mx-4 lg:flex lg:space-x-8">
 												<a

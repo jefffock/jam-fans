@@ -1,17 +1,22 @@
-import { Links, LiveReload, Outlet, Scripts, ScrollRestoration, useRouteError, useLoaderData } from '@remix-run/react'
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
-import { createBrowserClient, createServerClient } from '@supabase/ssr'
-import TopNav from './components/TopNav'
-import BottomNav from './components/BottomNav'
-import { AuthSession } from '@supabase/supabase-js'
-import { getAuthSession } from './modules/auth'
 import { json } from '@remix-run/node'
-import { getProfile, getProfileFromRequest } from './modules/profile/index.server'
+import {
+	Link,
+	Links,
+	LiveReload,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
+	useLoaderData,
+	useRouteError,
+} from '@remix-run/react'
+import TopNav from './components/TopNav'
+import { getProfileFromRequest } from './modules/profile/index.server'
 
 // import type { LinksFunction } from "@remix-run/node";
 
-import styles from './tailwind.css'
 import otherStyles from './customStyles.css'
+import styles from './tailwind.css'
 
 export const links = () => [
 	{ rel: 'stylesheet', href: styles },
@@ -22,9 +27,12 @@ export const links = () => [
 export const meta: MetaFunction = () => {
 	return [
 		{
-			title: 'Jam Fans | Find and add great jams by Grateful Dead, Phish, SCI, UM, moe. WSMFP, BMFS, Goose, and more',
+			title: 'sharing jams is caring',
 		},
-		{ description: 'Find and add great jams by Grateful Dead, Phish, SCI, UM, moe., WSMFP, BMFS, Goose, and more' },
+		{
+			description:
+				'explore and share jams and shows by the grateful dead, phish, sci, um, moe., tdb, wsmfp, bmfs, goose, eggy, spafford, and more',
+		},
 	]
 }
 
@@ -35,22 +43,24 @@ export function ErrorBoundary() {
 	return (
 		<html>
 			<head>
-				<title>My bad...</title>
+				<title>my bad...</title>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<Links />
 			</head>
 			<body>
-				<p className="mx-auto p-10">
-					Something went wrong :&#40; Please let me know on{' '}
-					<a className="color-blue underline" href="https://www.instagram.com/jefffocks/">
-						insta
-					</a>{' '}
-					or{' '}
-					<a className="color-blue underline" href="https://twitter.com/jeffphox">
-						bird app
-					</a>
-				</p>
+				<div className="flex flex-col">
+					<p className="text-center p-10 pt-20">something went wrong... sorry about that :/</p>
+					<p className="text-center mx-auto w-fit p-10">
+						let me know -{' '}
+						<a className=" underline" href="mailto:hi@jam.fans">
+							hi@jam.fans
+						</a>{' '}
+					</p>
+					<p className="text-center p-10">
+						<Link to="/">refreshing the page</Link> should get things going again
+					</p>
+				</div>
 				<Scripts />
 			</body>
 		</html>

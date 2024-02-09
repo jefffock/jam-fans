@@ -1,5 +1,3 @@
-import React, { useState } from 'react'
-
 export default function MusicalEntityPicker({ entitiesFilters, setEntitiesFilters }) {
 	const handleEntityChange = (event) => {
 		setEntitiesFilters({
@@ -17,7 +15,7 @@ export default function MusicalEntityPicker({ entitiesFilters, setEntitiesFilter
 						name={key}
 						checked={value}
 						onChange={handleEntityChange}
-						className="form-checkbox h-5 w-5 accent-cyan-600"
+						className="form-checkbox h-5 w-5 accent-mondegreen hover:accent-custom-pink"
 					/>
 					<span className="text-gray-700">{key}</span>
 				</label>

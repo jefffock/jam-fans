@@ -15,10 +15,10 @@ export const FilterButtonsContainer = ({
 		>
 			<button
 				className={
-					`m-2 w-fit transition duration-300 ease-in-out text-xl motion-reduce:transition-none hover:transition-all inline-flex justify-center rounded-md py-2 px-4 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ` +
+					`m-2 w-fit transition duration-300 ease-in-out text-xl motion-reduce:transition-none hover:transition-all inline-flex justify-center rounded-md py-2 px-4 font-medium` +
 					(musicalEntitiesLength !== 0
-						? ' bg-gradient-to-br from-cyan-500 to-cyan-700  text-white shadow-lg hover:bg-gradient-to-br hover:from-cyan-600 hover:to-cyan-800  focus:ring-cyan-500 active:scale-95 active:shadow-none'
-						: ' border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-cyan-400 cursor-not-allowed')
+						? ' transform hover:scale-105 transition duration-300 ease-in-out bg-gradient-to-br from-custom-pink to-mondegreen text-white shadow-lg hover:bg-gradient-to-br hover:from-pink-darker hover:to-mondegreen-darker active:scale-95 active:shadow-none'
+						: ' border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-50 cursor-not-allowed')
 				}
 				onClick={handleCloseFilters}
 				disabled={musicalEntitiesLength === 0}

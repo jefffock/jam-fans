@@ -1,5 +1,5 @@
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
-import { useActionData } from '@remix-run/react'
+import { Form, useActionData } from '@remix-run/react'
 import { parse } from '@supabase/ssr'
 import type { AuthSession } from '~/modules/auth'
 import { createAuthSession, getAuthSession, signInWithEmail } from '~/modules/auth'
@@ -57,14 +57,14 @@ export default function Login() {
 
 	return (
 		<div className="min-h-screen flex flex-col items-center justify-start bg-gray-100">
-			<div className="text-center my-8 mx-4">
-				<h2 className="text-2xl font-semibold text-gray-800 mb-4">login to:</h2>
+			<div className="text-center my-6 mx-4">
+				<h2 className="text-2xl font-semibold text-gray-700 mb-4">login to:</h2>
 				<p className="text-lg text-gray-700">keep track of your favorites</p>
-				<p className="text-lg text-gray-700">rate stuff</p>
-				<p className="text-lg text-gray-700">comment on stuff</p>
+				<p className="text-lg text-gray-700">rate</p>
+				<p className="text-lg text-gray-700">comment</p>
 			</div>
 			<div className="m-2">
-				<form method="post" className="max-w-md w-full space-y-8 bg-white p-10 rounded-lg shadow">
+				<Form method="post" className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow">
 					<div>
 						<label htmlFor="email" className="block text-sm font-medium text-gray-700">
 							email
@@ -90,13 +90,15 @@ export default function Login() {
 						/>
 					</div>
 					{actionData?.error && <p className="text-red-500 text-xs italic">{actionData.error}</p>}
-					<button
-						type="submit"
-						className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-mondegreen hover:bg-custom-pink"
-					>
-						login
-					</button>
-				</form>
+					<div className="flex justify-center">
+						<button
+							type="submit"
+							className="flex align-center justify-center items-center rounded-md px-4 py-2 text-sm font-medium transform hover:scale-105 transition duration-300 ease-in-out bg-gradient-to-br from-mondegreen to-custom-pink text-white shadow-lg hover:bg-gradient-to-br hover:from-mondgreen-darker hover:to-pink-darker active:scale-95 active:shadow-none min-w-32"
+						>
+							login
+						</button>
+					</div>
+				</Form>
 			</div>
 			<p className="text-sm text-gray-500">be kind</p>
 			<p className="text-sm text-gray-500">have fun</p>

@@ -233,7 +233,7 @@ export default function EntityCard({
 				{showDateArtistLocation && item.entity === 'Jam' && (
 					<p className="mb-2 font-normal text-gray-700 mr-auto">{item.location}</p>
 				)}
-				{sortedSounds && <p className="font-normal text-gray-700 max-w-80">{sortedSounds.join(', ')}</p>}
+				{sortedSounds && <p className="font-normal text-gray-700">{sortedSounds.join(', ')}</p>}
 				{sortedPlatforms && <p className="font-normal text-gray-700">{sortedPlatforms.join(', ')}</p>}
 				{showCurateOptions && !newParsedSelectedAttributes.length > 0 && <br />}
 				{showCurateOptions && (

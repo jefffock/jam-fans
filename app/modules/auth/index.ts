@@ -6,6 +6,7 @@ export {
 	refreshAccessToken,
 	updateAccountPassword,
 	sendResetPasswordLink,
+	signInWithGoogle,
 } from './service.server'
 export {
 	commitAuthSession,
