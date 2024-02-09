@@ -315,7 +315,7 @@ export default function EntityCard({
 						<input type="hidden" name="entity_id" value={item?.id} />
 						<input type="hidden" name="entity_type" value={item.entity} />
 						<button type="submit" name="_action" value="like">
-							<div className="flex text-right items-center align-middle mondegreen text-sm font-medium">
+							<div className="flex text-right items-center align-middle mondegreen text-sm font-semibold">
 								{item?.userRating?.likes > 0 ? (
 									<ThumbSolidIcon height="h-7" width="w-10" strokeWidth="2" />
 								) : (
