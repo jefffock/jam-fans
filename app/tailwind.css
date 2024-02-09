@@ -884,6 +884,11 @@ video {
   height: 100vh;
 }
 
+.h-fit {
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
 .max-h-40 {
   max-height: 10rem;
 }
@@ -976,6 +981,10 @@ video {
 
 .w-screen {
   width: 100vw;
+}
+
+.w-7 {
+  width: 1.75rem;
 }
 
 .min-w-0 {
@@ -1753,6 +1762,10 @@ video {
   vertical-align: bottom;
 }
 
+.align-text-bottom {
+  vertical-align: text-bottom;
+}
+
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -1836,11 +1849,6 @@ video {
 .text-blue-500 {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity));
-}
-
-.text-blue-600 {
-  --tw-text-opacity: 1;
-  color: rgb(37 99 235 / var(--tw-text-opacity));
 }
 
 .text-blue-700 {

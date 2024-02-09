@@ -282,19 +282,19 @@ export default function EntityCard({
 					</button>
 				)}
 			</div>
-			<div className="flex justify-between mt-2">
+			<div className="flex justify-between mt-2 align-text-bottom">
 				{item?.listen_link ? (
-					<SoundIcon height="h-10" width="w-10" strokeWidth="2" onClick={handleListenClick} />
+					<SoundIcon height="h-7" width="w-7" strokeWidth="2" onClick={handleListenClick} />
 				) : (
-					<SoundIcon height="h-10" width="w-10" strokeWidth="2" color="#CCC6C6" />
+					<SoundIcon height="h-7" width="w-7" strokeWidth="2" color="#CCC6C6" />
 				)}
 				{showCurateOptions ? (
-					<PlusCircleSolid height="h-10" width="w-10" onClick={handlePlusClick} />
+					<PlusCircleSolid height="h-7" width="w-7" onClick={handlePlusClick} />
 				) : (
-					<PlusCircleIcon height="h-10" width="w-10" strokeWidth="2" onClick={handlePlusClick} />
+					<PlusCircleIcon height="h-7" width="w-7" strokeWidth="2" onClick={handlePlusClick} />
 				)}
 				{profile && (
-					<fetcher.Form method="post" action="/resources/ratings">
+					<fetcher.Form method="post" action="/resources/ratings" className="h-7">
 						<input type="hidden" name="entity_id" value={item?.id} />
 						<input type="hidden" name="entity_type" value={item.entity} />
 						<input type="hidden" name="is_favorite" value={item?.userRating?.favorite} />
@@ -302,28 +302,30 @@ export default function EntityCard({
 						<button type="submit" name="_action" value="favorite" className="mondegreen my-auto">
 							<div className="flex items-center align-middle">
 								{item?.userRating?.favorite ? (
-									<HeartSolid height="h-10" width="w-10" strokeWidth="2" className="my-auto" />
+									<HeartSolid height="h-7" width="w-7" strokeWidth="2" className="my-auto" />
 								) : (
-									<HeartOutline height="h-10" width="w-10" strokeWidth="2" className="my-auto" />
+									<HeartOutline height="h-7" width="w-7" strokeWidth="2" className="my-auto" />
 								)}
 							</div>
 						</button>
 					</fetcher.Form>
 				)}
-				<fetcher.Form method="post" action="/resources/ratings">
-					<input type="hidden" name="entity_id" value={item?.id} />
-					<input type="hidden" name="entity_type" value={item.entity} />
-					<button type="submit" name="_action" value="like">
-						<div className="flex text-right items-center align-middle mondegreen">
-							{item?.userRating?.likes > 0 ? (
-								<ThumbSolidIcon height="h-10" width="w-10" strokeWidth="2" />
-							) : (
-								<ThumbUpOutline height="h-10" width="w-10" strokeWidth="2" />
-							)}
-							{likesToShow}
-						</div>
-					</button>
-				</fetcher.Form>
+				<div className="h-fit align-bottom">
+					<fetcher.Form method="post" action="/resources/ratings" className="h-7">
+						<input type="hidden" name="entity_id" value={item?.id} />
+						<input type="hidden" name="entity_type" value={item.entity} />
+						<button type="submit" name="_action" value="like">
+							<div className="flex text-right items-center align-middle mondegreen text-sm">
+								{item?.userRating?.likes > 0 ? (
+									<ThumbSolidIcon height="h-7" width="w-10" strokeWidth="2" />
+								) : (
+									<ThumbUpOutline height="h-7" width="w-10" strokeWidth="2" />
+								)}
+								{likesToShow}
+							</div>
+						</button>
+					</fetcher.Form>
+				</div>
 			</div>
 			{showCurateOptions && (
 				<div className="w-100">

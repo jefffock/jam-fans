@@ -6,7 +6,7 @@ export default function ThumbSolidIcon({
 	animationClass = '',
 }) {
 	return (
-		<div className="mondegreen">
+		<div className="mondegreen h-min w-min">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 24 24"

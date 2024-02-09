@@ -6,7 +6,7 @@ export default function PlusCircleSolid({
 	animationClass = '',
 }) {
 	return (
-		<div className="mondegreen" onClick={onClick}>
+		<div className="mondegreen h-min w-min" onClick={onClick}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 24 24"
