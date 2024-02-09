@@ -37,14 +37,14 @@ module.exports = {
 				'98p': '98%',
 			},
 			colors: {
-				mondegreen: 'var(#20665f)',
-				lime: 'var(7cf680)',
-				// 			--mondegreen: #20665f;
-				// --lime: #7cf680;
-				// --pink: #db8ef1;
-				// --cyan: #db8ef1;
-				// --font-size: 16px;
-				// --spacing-unit: 10px;
+				mondegreen: '#20665f',
+				'mondegreen-darker': '#1d5d57',
+				lime: '#7cf680',
+				'lime-darker': '#6fcf73',
+				'custom-pink': '#db8ef1',
+				'pink-darker': '#d37de8',
+				cyan: '#db8ef1',
+				'cyan-darker': '#d37de8',
 			},
 			fontSize: {
 				base: 'var(--font-base-size)',

@@ -102,6 +102,12 @@ export default function TopNav({ profile }) {
 											))}
 										</div>
 									</div>
+									<div className="fixed top-4 left-0 right-0 flex justify-center items-center">
+										<p className="text-center text-xl mondegreen">
+											jam.fans{' '}
+											<span className="align-baseline text-xs text-custom-pink">beta</span>
+										</p>
+									</div>
 									<div className="flex sm:flex-row self-center items-end">
 										{/* {user && (
 											<div className=''>
