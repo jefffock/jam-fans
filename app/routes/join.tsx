@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
 import { Form, Link } from '@remix-run/react'
 import type { AuthSession } from '@supabase/supabase-js'
 import { useState } from 'react'
@@ -11,6 +11,10 @@ import {
 	signInWithEmail,
 	signInWithGoogle,
 } from '~/modules/auth'
+
+export async function loader() {
+	return redirect('/')
+}
 
 export async function action({ request }) {
 	const formData = await request.formData()
@@ -116,7 +120,7 @@ export default function NewJoin() {
 								className="inline-flex items-center rounded-md px-4 py-2 m-2 text-sm font-medium leading-4 transform hover:scale-105 transition duration-300 ease-in-out bg-gradient-to-br from-mondegreen to-custom-pink text-white shadow-lg hover:bg-gradient-to-br hover:from-mondgreen-darker hover:to-pink-darker active:scale-95 active:shadow-none max-w-fit"
 								name="_action"
 								value="magic-link"
-								disabled={true}
+								disabled={false}
 							>
 								sign up with a magic link
 							</Button>
@@ -156,7 +160,7 @@ export default function NewJoin() {
 								className="w-full justify-center rounded-md border bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 hover:text-gray-900"
 								name="_action"
 								value="email-password"
-								disabled={true}
+								disabled={false}
 							>
 								sign up with email and password
 							</Button>

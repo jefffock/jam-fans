@@ -10,7 +10,7 @@ const navigation = [
 
 const userNavigationLoggedOut = [
 	{ name: 'login', href: '/login' },
-	{ name: 'create an account', href: '/join' },
+	// { name: 'create an account', href: '/join' },
 	{ name: 'credits', href: '/credits' },
 	{ name: 'contact', href: '/contact' },
 	// { name: 'terms of service', href: '/terms' },
