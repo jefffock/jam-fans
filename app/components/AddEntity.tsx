@@ -93,14 +93,14 @@ export default function AddEntity({
 				>
 					bands
 				</button> */}
-				<button
+				{/* <button
 					type="button"
 					className={`${activeAddTab === 'song' ? 'text-cyan-700 ' : 'text-neutral-500'}`}
 					disabled={activeAddTab === 'song'}
 					onClick={() => setActiveAddTab('song')}
 				>
 					songs
-				</button>
+				</button> */}
 				{/* <button
 					type="button"
 					className={`${activeAddTab === 'sound' ? 'text-cyan-700 ' : 'text-neutral-500'}`}

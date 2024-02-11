@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from '@remix-run/react'
 import { createBrowserClient, parse } from '@supabase/ssr'
 import { supabaseClient } from '~/integrations/supabase'
 import type { AuthSession } from '~/modules/auth'
-import { createAuthSession, getAuthSession, signInWithEmail } from '~/modules/auth'
+import { createAuthSession, getAuthSession, signInWithEmail, sendMagicLink } from '~/modules/auth'
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const authSession = await getAuthSession(request)

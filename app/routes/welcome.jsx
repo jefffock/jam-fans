@@ -1,6 +1,7 @@
 import { json, redirect } from '@remix-run/node'
-import { Form } from '@remix-run/react'
-import Button from '../components/Button'
+import { Form, useActionData } from '@remix-run/react'
+import { useState, useTransition } from 'react'
+import { getAuthSession } from '../modules/auth/session.server'
 import { createProfile, getProfileFromRequest } from '../modules/profile/index.server'
 
 export const loader = async ({ request, params }) => {
@@ -10,19 +11,38 @@ export const loader = async ({ request, params }) => {
 		console.log('redirecting to /', profile)
 		return redirect('/')
 	}
-	return json({ profile })
+	return null
 }
 
 export const action = async ({ request }) => {
 	const formData = await request.formData()
 	const username = formData.get('username')
-
-	const profile = await createProfile({ request, username })
+	const authSession = await getAuthSession(request)
+	console.log('authSession in /welcome action', authSession)
+	if (!authSession) {
+		console.log('welcome:no auth session - redirecting to /join')
+		return redirect('/join')
+	}
+	const profile = await createProfile({ request, username, id: authSession.userId })
+	if (profile.error) {
+		console.log('error creating profile', profile.error)
+		return json({ error: profile.error }, 500)
+	}
 	console.log('profile in /welcome action', profile)
 	return redirect('/')
 }
 
 export default function Welcome() {
+	const actionData = useActionData()
+
+	const transition = useTransition()
+	const [errorMessage, setErrorMessage] = useState(actionData?.error || '')
+
+	const handleNameChange = () => {
+		// Clear the error message when the user modifies the input
+		if (errorMessage) setErrorMessage('')
+	}
+
 	return (
 		<div className="flex flex-col max-w-xs justify-center mx-auto text-center my-20">
 			<img src="/icon-circle.png" className="mx-auto h-12 my-4 w-auto" alt="Jam Fans" />
@@ -42,26 +62,18 @@ export default function Welcome() {
 							id="username"
 							className="block w-full rounded-md border-gray-300 border-2 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm h-10 px-2"
 							placeholder=""
+							onChange={handleNameChange}
 						/>
-						<Button
+						{/* Display the error message if it exists */}
+						{errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
+						<button
 							type="submit"
 							className="inline-flex items-center rounded-md px-4 py-2 m-2 text-sm font-medium leading-4 transform hover:scale-105 transition duration-300 ease-in-out bg-gradient-to-br from-mondegreen to-custom-pink text-white shadow-lg hover:bg-gradient-to-br hover:from-mondgreen-darker hover:to-pink-darker active:scale-95 active:shadow-none"
 						>
 							choose this name
-						</Button>
+						</button>
 					</div>
 				</Form>
-				{/* {success && (
-					<>
-						<SuccessAlert
-							title={'success!'}
-							description={'your profile has been created. thank you for sharing the music you love!'}
-						/>
-						<Link className="underline" to="/">
-							start jamming
-						</Link>
-					</>
-				)} */}
 			</div>
 		</div>
 	)

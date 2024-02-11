@@ -18,10 +18,24 @@ export async function addPoints(data: { user_id: string; points: number }) {
 	return { updatedUser }
 }
 
-export async function createProfile({ request, username }) {
+export async function createProfile({ request, username, id }) {
 	console.log('in createProfile', username)
 	console.log('request', request)
-	return { message: true }
+	const existingProfile = await db.profiles.findUnique({
+		where: {
+			name: username,
+		},
+	})
+	if (existingProfile) {
+		return { error: 'Profile already exists' }
+	}
+	const newProfile = await db.profiles.create({
+		data: {
+			name: username,
+			id,
+		},
+	})
+	return { newProfile }
 	// const newProfile = await db.profiles.create({
 	// 	data: {
 	// 		id: user_id,
