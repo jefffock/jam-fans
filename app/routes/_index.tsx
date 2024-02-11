@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
-import { json } from '@remix-run/node'
+import { json, redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
 import { useEffect, useRef, useState } from 'react'
 import EntityListContainer from '~/components/EntityListContainer'
 import EntityListHeader from '~/components/EntityListHeader'
@@ -20,14 +21,40 @@ import { getSongs, getSongsCount } from '../modules/song/index.server'
 import { createFilterURL, scrollToTopOfRef } from '../utils'
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-	// console.log('request', request)
+	const requestUrl = new URL(request.url)
+	const code = requestUrl.searchParams.get('code')
+	const next = requestUrl.searchParams.get('next') || '/welcome'
+	const headers = new Headers()
+	console.log('headers', request.headers)
+	if (code) {
+		const cookies = parse(request.headers.get('Cookie') ?? '')
+		const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+			cookies: {
+				get(key) {
+					return cookies[key]
+				},
+				set(key, value, options) {
+					headers.append('Set-Cookie', serialize(key, value, options))
+				},
+				remove(key, options) {
+					headers.append('Set-Cookie', serialize(key, '', options))
+				},
+			},
+		})
+		const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+		console.log('error in auth.callback', error)
+		console.log('data in auth.callback', data)
+		if (!error && data) {
+			console.log('no error in auth.callback')
+			return redirect(next, { headers })
+		}
+	}
 
 	const response = new Response()
 
 	const url = new URL(request.url)
 	const searchParams = new URLSearchParams(url.search)
 	const queryParams = Object.fromEntries(searchParams)
-
 	const profile = await getProfileFromRequest(request)
 	const jams = await getJams(profile?.id)
 	const sets = await getSets(profile?.id)

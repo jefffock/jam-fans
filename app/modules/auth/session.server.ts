@@ -48,14 +48,18 @@ export async function createAuthSession({
 
 async function getSession(request: Request) {
 	const cookie = request.headers.get('Cookie')
+	console.log('cookie in getSession', cookie)
 	return sessionStorage.getSession(cookie)
 }
 
 export async function getAuthSession(request: Request): Promise<AuthSession | null> {
 	const session = await getSession(request)
+	console.log('session in getAuthSession', session)
 	if (!session) {
 		return null
 	}
+	const authSession = session.get(SESSION_KEY)
+	console.log('authSession in getAuthSession', authSession)
 	return session.get(SESSION_KEY)
 }
 
@@ -84,7 +88,7 @@ export async function commitAuthSession(
 
 export async function destroyAuthSession(request: Request) {
 	const session = await getSession(request)
-	console.log('going to destory session', session)
+	console.log('going to destroy session', session)
 
 	return redirect('/', {
 		headers: {

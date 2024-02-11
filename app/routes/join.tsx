@@ -1,4 +1,4 @@
-import { json, redirect } from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { Form, Link } from '@remix-run/react'
 import type { AuthSession } from '@supabase/supabase-js'
 import { useState } from 'react'
@@ -12,9 +12,9 @@ import {
 	signInWithGoogle,
 } from '~/modules/auth'
 
-export async function loader() {
-	return redirect('/')
-}
+// export async function loader() {
+// 	return redirect('/')
+// }
 
 export async function action({ request }) {
 	const formData = await request.formData()
@@ -95,9 +95,6 @@ export default function NewJoin() {
 			</div>
 
 			<div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-				<p className="font-semibold text-center">
-					i&apos;ll fix this tonight 2-9-24. sorry for the inconvenience
-				</p>
 				<div className="bg-white py-8 px-6 shadow sm:rounded-lg">
 					<Form method="post">
 						<div>

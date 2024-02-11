@@ -1,19 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 
-import { SUPABASE_SERVICE_ROLE, SUPABASE_URL, SUPABASE_ANON_PUBLIC } from '~/utils/env'
+import { SUPABASE_ANON_PUBLIC, SUPABASE_SERVICE_ROLE, SUPABASE_URL } from '~/utils/env'
 import { isBrowser } from '~/utils/is-browser'
 
 // ⚠️ cloudflare needs you define fetch option : https://github.com/supabase/supabase-js#custom-fetch-implementation
 // Use Remix fetch polyfill for node (See https://remix.run/docs/en/v1/other-api/node)
 function getSupabaseClient(supabaseKey: string, accessToken?: string) {
+	console.log('supabaseKey', supabaseKey)
+	console.log('accessToken', accessToken)
+	
 	const global = accessToken
 		? {
-				global: {
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
+			global: {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
 				},
-			}
+			},
+		}
 		: {}
 
 	return createClient(SUPABASE_URL, supabaseKey, {

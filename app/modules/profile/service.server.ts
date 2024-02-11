@@ -1,6 +1,5 @@
-import { db } from '../../database'
-import type { profiles } from '@prisma/client'
-import { getAuthSession } from '../auth'
+import { db } from '../../database';
+import { getAuthSession } from '../auth';
 
 export async function addPoints(data: { user_id: string; points: number }) {
 	const { user_id, points } = data
@@ -19,14 +18,17 @@ export async function addPoints(data: { user_id: string; points: number }) {
 	return { updatedUser }
 }
 
-export async function createProfile(user_id: string, name: string) {
-	const newProfile = await db.profiles.create({
-		data: {
-			id: user_id,
-			name,
-		},
-	})
-	return newProfile
+export async function createProfile({ request, username }) {
+	console.log('in createProfile', username)
+	console.log('request', request)
+	return { message: true }
+	// const newProfile = await db.profiles.create({
+	// 	data: {
+	// 		id: user_id,
+	// 		name,
+	// 	},
+	// })
+	// return newProfile
 }
 
 export async function getProfile(user_id: string) {
@@ -40,6 +42,7 @@ export async function getProfile(user_id: string) {
 
 export async function getProfileFromRequest(request) {
 	const authSession = await getAuthSession(request)
+	console.log('authSession in getprofile from request', authSession)
 
 	if (!authSession || !authSession.userId) {
 		return null

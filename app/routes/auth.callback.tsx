@@ -4,8 +4,11 @@ import { createServerClient, parse, serialize } from '@supabase/ssr'
 export async function loader({ request }: LoaderFunctionArgs) {
 	const requestUrl = new URL(request.url)
 	const code = requestUrl.searchParams.get('code')
-	const next = requestUrl.searchParams.get('next') || '/'
+	const next = requestUrl.searchParams.get('next') || '/welcome'
 	const headers = new Headers()
+	console.log('inauthcallback')
+	console.log('code', code)
+	console.log('next', next)
 
 	if (code) {
 		const cookies = parse(request.headers.get('Cookie') ?? '')
@@ -23,9 +26,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 			},
 		})
 
-		const { error } = await supabase.auth.exchangeCodeForSession(code)
-
-		if (!error) {
+		const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+		console.log('error in auth.callback', error)
+		console.log('data in auth.callback', data)
+		if (!error && data) {
 			console.log('no error in auth.callback')
 			return redirect(next, { headers })
 		}

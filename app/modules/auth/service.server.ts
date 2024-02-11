@@ -16,16 +16,18 @@ import type { AuthSession } from './types'
 // }
 
 export async function signInWithGoogle() {
+	console.log('in signInWithGoogle')
 	const { data, error } = await getSupabaseAdmin().auth.signInWithOAuth({
 		provider: 'google',
 		options: {
-			redirectTo: `https://jam.fans/auth/callback`,
+			redirectTo: `http://jam.fans/auth/callback`,
 		},
 	})
 	if (error) {
 		console.error('sign in with google error', error)
 	} else {
 		console.log('data google', data)
+		return data
 	}
 }
 
@@ -57,6 +59,8 @@ export async function signInWithEmail(email: string, password: string) {
 		email,
 		password,
 	})
+	console.log('data signInWithEmail', data)
+	console.log('error signInWithEmail', error)
 
 	if (!data.session || error) return null
 
